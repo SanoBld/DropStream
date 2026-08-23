@@ -93,18 +93,18 @@ jobs:
 
       - name: Create release folder
         run: |
-          $FolderName = 'Twitch Drops Miner'
+          $FolderName = 'DropStream'
           New-Item $FolderName -ItemType Directory
           Copy-Item dist\*.exe $FolderName
           Copy-Item manual.txt $FolderName
-          Compress-Archive -Path $FolderName -DestinationPath Twitch.Drops.Miner.Windows.zip
+          Compress-Archive -Path $FolderName -DestinationPath DropStream.Windows.zip
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: Twitch.Drops.Miner.Windows
-          path: Twitch.Drops.Miner.Windows.zip
+          name: DropStream.Windows
+          path: DropStream.Windows.zip
 
   macos:
     name: macOS
@@ -145,18 +145,18 @@ jobs:
 
       - name: Create release folder and Zip
         run: |
-          FOLDER="Twitch Drops Miner"
+          FOLDER="DropStream"
           mkdir -p "$FOLDER"
-          cp -r "dist/Twitch Drops Miner (by DevilXD).app" "$FOLDER/"
+          cp -r "dist/DropStream.app" "$FOLDER/"
           cp manual.txt "$FOLDER/"
-          zip -r Twitch.Drops.Miner.MacOS.zip "$FOLDER"
+          zip -r DropStream.MacOS.zip "$FOLDER"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: Twitch.Drops.Miner.MacOS
-          path: Twitch.Drops.Miner.MacOS.zip
+          name: DropStream.MacOS
+          path: DropStream.MacOS.zip
 
   linux-pyinstaller:
     name: Linux (PyInstaller) (${{matrix.arch}})
@@ -228,17 +228,17 @@ jobs:
 
       - name: Create release folder
         run: |
-          folder='Twitch Drops Miner'
+          folder='DropStream'
           mkdir "${folder}"
           cp manual.txt dist/* "${folder}"
-          7z a 'Twitch.Drops.Miner.Linux.PyInstaller-${{matrix.arch}}.zip' "${folder}"
+          7z a 'DropStream.Linux.PyInstaller-${{matrix.arch}}.zip' "${folder}"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: Twitch.Drops.Miner.Linux.PyInstaller-${{matrix.arch}}
-          path: Twitch.Drops.Miner.Linux.PyInstaller-${{matrix.arch}}.zip
+          name: DropStream.Linux.PyInstaller-${{matrix.arch}}
+          path: DropStream.Linux.PyInstaller-${{matrix.arch}}.zip
 
   linux-appimage:
     name: Linux (AppImage) (${{matrix.arch}})
@@ -292,17 +292,17 @@ jobs:
 
       - name: Create release folder
         run: |
-          folder='Twitch Drops Miner'
+          folder='DropStream'
           mkdir "${folder}"
           cp *.AppImage manual.txt "${folder}"
-          7z a 'Twitch.Drops.Miner.Linux.AppImage-${{matrix.arch}}.zip' "${folder}"
+          7z a 'DropStream.Linux.AppImage-${{matrix.arch}}.zip' "${folder}"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
-          name: Twitch.Drops.Miner.Linux.AppImage-${{matrix.arch}}
-          path: Twitch.Drops.Miner.Linux.AppImage-${{matrix.arch}}.zip
+          name: DropStream.Linux.AppImage-${{matrix.arch}}
+          path: DropStream.Linux.AppImage-${{matrix.arch}}.zip
 
   update_releases_page:
     name: Upload builds to Releases
@@ -345,7 +345,7 @@ jobs:
           artifactErrorsFailBuild: true
           artifacts: artifacts/*/*
           body: |
-            **This is an automatically generated in-development pre-release version of the application, that includes the latest master branch changes.**
+            **This is an automatically generated in-development pre-release build of DropStream (a fork of [Twitch Drops Miner by DevilXD](https://github.com/DevilXD/TwitchDropsMiner)), including the latest master branch changes.**
             **⚠️ This build is not stable and may end up terminating with a fatal error. ⚠️**
             **Use at your own risk.**
 

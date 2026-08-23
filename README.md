@@ -1,4 +1,9 @@
-# Twitch Drops Miner
+# DropStream
+
+> **DropStream** is a fork of [Twitch Drops Miner (TDM) by DevilXD](https://github.com/DevilXD/TwitchDropsMiner),
+> extended with a dashboard, multi-account profiles, a scheduler, a redesigned UI/theme system, and more.
+> All credit for the original design and core mining engine goes to DevilXD — if you find this fork useful,
+> please consider [supporting the original author](https://www.buymeacoffee.com/DevilXD).
 
 This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle.
 

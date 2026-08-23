@@ -175,9 +175,18 @@ class GUISettingsGeneral(TypedDict):
     autostart: str
     tray: str
     tray_notifications: str
-    dark_mode: str
+    theme: str
     priority_mode: str
     proxy: str
+
+
+class GUIThemes(TypedDict):
+    auto: str
+    light: str
+    dark: str
+    modern_auto: str
+    modern_light: str
+    modern_dark: str
 
 
 class GUISettingsAccounts(TypedDict):
@@ -218,6 +227,7 @@ class GUIPriorityModes(TypedDict):
 
 class GUISettings(TypedDict):
     general: GUISettingsGeneral
+    themes: GUIThemes
     accounts: GUISettingsAccounts
     scheduler: GUISettingsScheduler
     power_actions: GUIPowerActions
@@ -431,9 +441,17 @@ default_translation: Translation = {
                 "autostart": "Autostart: ",
                 "tray": "Autostart into tray: ",
                 "tray_notifications": "Tray notifications: ",
-                "dark_mode": "Dark mode: ",
+                "theme": "Theme: ",
                 "priority_mode": "Priority mode: ",
                 "proxy": "Proxy (requires restart):",
+            },
+            "themes": {
+                "auto": "Light/Dark (Auto)",
+                "light": "Light",
+                "dark": "Dark",
+                "modern_auto": "Modern (Auto)",
+                "modern_light": "Modern Light",
+                "modern_dark": "Modern Dark",
             },
             "accounts": {
                 "name": "Accounts",

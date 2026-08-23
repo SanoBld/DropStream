@@ -53,6 +53,7 @@ from constants import (
 )
 from scheduler import PowerAction
 import profiles as profiles_module
+from theme import PALETTES, resolve_theme
 if sys.platform == "win32":
     from registry import RegistryKey, ValueType, ValueNotFound
 
@@ -1082,7 +1083,7 @@ class ChannelList:
 
 
 class TrayIcon:
-    TITLE = "Twitch Drops Miner"
+    TITLE = "DropStream"
 
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
@@ -1659,7 +1660,7 @@ class _SettingsVars(TypedDict):
     tray: IntVar
     proxy: StringVar
     autostart: IntVar
-    dark_mode: IntVar
+    theme: StringVar
     language: StringVar
     priority_mode: StringVar
     tray_notifications: IntVar
@@ -1672,7 +1673,7 @@ class _SettingsVars(TypedDict):
 
 
 class SettingsPanel:
-    AUTOSTART_NAME: str = "TwitchDropsMiner"
+    AUTOSTART_NAME: str = "DropStream"
     AUTOSTART_KEY: str = "HKCU/Software/Microsoft/Windows/CurrentVersion/Run"
 
     @cached_property
@@ -1695,6 +1696,18 @@ class SettingsPanel:
             PowerAction.SHUTDOWN: _("gui", "settings", "power_actions", "shutdown"),
         }
 
+    @cached_property
+    def THEMES(self) -> dict[str, str]:
+        # NOTE: order matters, it's the order shown in the dropdown
+        return {
+            "auto": _("gui", "settings", "themes", "auto"),
+            "light": _("gui", "settings", "themes", "light"),
+            "dark": _("gui", "settings", "themes", "dark"),
+            "modern_auto": _("gui", "settings", "themes", "modern_auto"),
+            "modern_light": _("gui", "settings", "themes", "modern_light"),
+            "modern_dark": _("gui", "settings", "themes", "modern_dark"),
+        }
+
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
         self._settings: Settings = manager._twitch.settings
@@ -1702,12 +1715,16 @@ class SettingsPanel:
         if priority_mode not in self.PRIORITY_MODES:
             priority_mode = PriorityMode.PRIORITY_ONLY
             self._settings.priority_mode = priority_mode
+        current_theme = self._settings.theme
+        if current_theme not in self.THEMES:
+            current_theme = "auto"
+            self._settings.theme = current_theme
         self._vars: _SettingsVars = {
             "autostart": IntVar(master, 0),
             "language": StringVar(master, _.current),
             "proxy": StringVar(master, str(self._settings.proxy)),
             "tray": IntVar(master, self._settings.autostart_tray),
-            "dark_mode": IntVar(master, int(self._settings.dark_mode)),
+            "theme": StringVar(master, self.THEMES[current_theme]),
             "priority_mode": StringVar(master, self.PRIORITY_MODES[priority_mode]),
             "tray_notifications": IntVar(master, self._settings.tray_notifications),
             "enable_badges_emotes": IntVar(
@@ -1781,12 +1798,13 @@ class SettingsPanel:
                 ),
             ).grid(column=1, row=irow, sticky="w")
         ttk.Label(
-            checkboxes_frame, text=_("gui", "settings", "general", "dark_mode")
+            checkboxes_frame, text=_("gui", "settings", "general", "theme")
         ).grid(column=0, row=(irow := irow + 1), sticky="e")
-        ttk.Checkbutton(
+        SelectCombobox(
             checkboxes_frame,
-            variable=self._vars["dark_mode"],
-            command=self.update_dark_mode,
+            command=self.update_theme,
+            textvariable=self._vars["theme"],
+            values=list(self.THEMES.values()),
         ).grid(column=1, row=irow, sticky="w")
         ttk.Label(
             checkboxes_frame, text=_("gui", "settings", "general", "priority_mode")
@@ -1941,7 +1959,7 @@ class SettingsPanel:
         priority_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "priority")
         )
-        priority_frame.grid(column=1, row=0, rowspan=2, sticky="nsew")
+        priority_frame.grid(column=1, row=0, rowspan=4, sticky="nsew")
         self._priority_entry = PlaceholderCombobox(
             priority_frame, placeholder=_("gui", "settings", "game_name"), width=30
         )
@@ -2003,7 +2021,7 @@ class SettingsPanel:
         exclude_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
         )
-        exclude_frame.grid(column=2, row=0, rowspan=2, sticky="nsew")
+        exclude_frame.grid(column=2, row=0, rowspan=4, sticky="nsew")
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
@@ -2030,7 +2048,7 @@ class SettingsPanel:
 
         # Reload button
         reload_frame = ttk.Frame(center_frame)
-        reload_frame.grid(column=0, row=2, columnspan=3, pady=4)
+        reload_frame.grid(column=0, row=4, columnspan=3, pady=4)
         ttk.Label(reload_frame, text=_("gui", "settings", "reload_text")).grid(column=0, row=0)
         ttk.Button(
             reload_frame,
@@ -2042,9 +2060,13 @@ class SettingsPanel:
         self._priority_list.selection_clear(0, "end")
         self._exclude_list.selection_clear(0, "end")
 
-    def update_dark_mode(self) -> None:
-        self._settings.dark_mode = bool(self._vars["dark_mode"].get())
-        self._manager.apply_theme(self._settings.dark_mode)
+    def update_theme(self, event: tk.Event[ttk.Combobox] | None = None) -> None:
+        theme_label: str = self._vars["theme"].get()
+        for value, label in self.THEMES.items():
+            if theme_label == label:
+                self._settings.theme = value
+                self._manager.apply_theme_choice(value)
+                break
 
     def _get_self_path(self) -> str:
         # NOTE: we need double quotes in case the path contains spaces
@@ -2125,7 +2147,7 @@ class SettingsPanel:
                     f"""
                     [Desktop Entry]
                     Type=Application
-                    Name=Twitch Drops Miner
+                    Name=DropStream
                     Description=Mine timed drops on Twitch
                     Exec=sh -c '{self._get_autostart_path()}'
                     """
@@ -2340,15 +2362,17 @@ class HelpTab:
         about = ttk.LabelFrame(center_frame, padding=(4, 0, 4, 4), text="About")
         about.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
         about.columnconfigure(2, weight=1)
-        # About - created by
+        # About - based on
         ttk.Label(
-            about, text="Application created by: ", anchor="e"
+            about, text="DropStream is a fork of: ", anchor="e"
         ).grid(column=0, row=0, sticky="nsew")
         LinkLabel(
-            about, link="https://github.com/DevilXD", text="DevilXD"
+            about,
+            link="https://github.com/DevilXD/TwitchDropsMiner",
+            text="Twitch Drops Miner, by DevilXD",
         ).grid(column=1, row=0, sticky="nsew")
         # About - repo link
-        ttk.Label(about, text="Repository: ", anchor="e").grid(column=0, row=1, sticky="nsew")
+        ttk.Label(about, text="DropStream repository: ", anchor="e").grid(column=0, row=1, sticky="nsew")
         LinkLabel(
             about,
             link="https://github.com/DevilXD/TwitchDropsMiner",
@@ -2358,13 +2382,16 @@ class HelpTab:
         ttk.Separator(
             about, orient="horizontal"
         ).grid(column=0, row=2, columnspan=3, sticky="nsew")
-        ttk.Label(about, text="Donate: ", anchor="e").grid(column=0, row=3, sticky="nsew")
+        ttk.Label(about, text="Support the original project: ", anchor="e").grid(
+            column=0, row=3, sticky="nsew"
+        )
         LinkLabel(
             about,
             link="https://www.buymeacoffee.com/DevilXD",
             text=(
-                "If you like the application and found it useful, "
-                "please consider donating a small amount of money to support me. Thank you!"
+                "DropStream is built on top of DevilXD's Twitch Drops Miner. If you find this "
+                "fork useful, please consider donating to DevilXD, the author of the base "
+                "project, to support their work. Thank you!"
             ),
             wraplength=self.WIDTH,
         ).grid(column=1, row=3, sticky="nsew")
@@ -2565,7 +2592,9 @@ class GUIManager:
             self._orig_theme_name = self._style.theme_use()
         except Exception:
             self._orig_theme_name = ''
-        self.apply_theme(self._twitch.settings.dark_mode)
+        self.apply_theme_choice(self._twitch.settings.theme)
+        # if the theme tracks the OS setting, periodically re-check it (cheap, no-op if unchanged)
+        self._theme_auto_check()
         # stay hidden in tray if needed, otherwise show the window when everything's ready
         if self._twitch.settings.tray and sys.platform != "darwin":
             # NOTE: this starts the tray icon thread
@@ -2742,42 +2771,46 @@ class GUIManager:
             ctypes.sizeof(ctypes.c_int),
         )
 
-    def apply_theme(self, dark: bool) -> None:
+    def apply_theme_choice(self, theme: str) -> None:
+        # resolves a settings.theme value ("auto", "modern_dark", ...) and applies it
+        dark, style = resolve_theme(theme)
+        self._current_theme_dark = dark
+        self.apply_theme(dark, style)
+
+    def _theme_auto_check(self) -> None:
+        # every 30s, re-resolve the theme in case it's set to follow the OS and the OS changed
+        theme = self._twitch.settings.theme
+        if theme.endswith("auto"):
+            dark, _style = resolve_theme(theme)
+            if dark != getattr(self, "_current_theme_dark", None):
+                self.apply_theme_choice(theme)
+        self._root.after(30_000, self._theme_auto_check)
+
+    def apply_theme(self, dark: bool, style: str = "classic") -> None:
         """
-        Apply dark/light palette to ttk styles and Tk widgets in a minimal, non-invasive way.
+        Apply the selected palette (classic/modern, light/dark) to ttk styles
+        and Tk widgets in a minimal, non-invasive way.
         """
-        # Palette
+        palette = PALETTES[style]["dark" if dark else "light"]
+        bg = palette["bg"]
+        fg = palette["fg"]
+        sel_bg = palette["sel_bg"]
+        sel_fg = palette["sel_fg"]
+        link = palette["link"]
+        surface = palette["surface"]
+        header = palette["header"]
+        fieldbg = palette["fieldbg"]
+        border = palette["border"]
+        muted = palette["muted"]
+        accent = palette["accent"]
         if dark:
             # Switch to a configurable ttk theme for better color control
             if sys.platform != "darwin" and self._style.theme_use() != "clam":
                 self._style.theme_use("clam")
-            bg = "#1e1e1e"
-            fg = "#e6e6e6"
-            sel_bg = "#094771"
-            sel_fg = "#ffffff"
-            link = "#4ea3ff"
-            surface = "#252525"
-            header = "#2a2a2a"
-            fieldbg = "#2b2b2b"
-            border = "#3c3c3c"
-            muted = "#b3b3b3"
-            accent = "#0d99ff"
         else:
             # Restore original theme if we changed it
             if getattr(self, "_orig_theme_name", '') and self._style.theme_use() == "clam":
                 self._style.theme_use(self._orig_theme_name)
-            # Use platform defaults but ensure toggling back is readable
-            bg = "#f0f0f0"
-            fg = "#000000"
-            sel_bg = "#cce5ff"
-            sel_fg = "#000000"
-            link = "blue"
-            surface = "#ffffff"
-            header = "#eeeeee"
-            fieldbg = "#ffffff"
-            border = "#cccccc"
-            muted = "#404040"
-            accent = "#0a84ff"
 
         # Setting theme for macOS
         if sys.platform == "darwin":
