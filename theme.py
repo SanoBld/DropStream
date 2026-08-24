@@ -82,6 +82,56 @@ def system_prefers_dark() -> bool:
         return False
 
 
+def system_accent_color() -> str | None:
+    """
+    Best-effort read of the OS accent color as a "#rrggbb" hex string.
+    Returns None if unavailable (unsupported platform, or read failure).
+    """
+    try:
+        if sys.platform == "win32":
+            import winreg
+            key_path = r"Software\Microsoft\Windows\CurrentVersion\Explorer\Accent"
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
+                value, _type = winreg.QueryValueEx(key, "AccentColorMenu")
+                # value is a 32-bit ABGR DWORD
+                b = (value >> 8) & 0xFF
+                g = (value >> 16) & 0xFF
+                r = (value >> 24) & 0xFF
+                return f"#{r:02x}{g:02x}{b:02x}"
+        elif sys.platform == "darwin":
+            import subprocess
+            result = subprocess.run(
+                ["defaults", "read", "-g", "AppleAccentColor"],
+                capture_output=True, text=True,
+            )
+            if result.returncode != 0:
+                return None
+            # macOS accent color index -> approximate hex (no direct RGB exposed by defaults)
+            mac_accents = {
+                "-1": "#8e8e93", "0": "#e5484d", "1": "#ff8c00", "2": "#ffd60a",
+                "3": "#34c759", "4": "#0a84ff", "5": "#5e5ce6", "6": "#af52de",
+                "7": "#ff2d78",
+            }
+            return mac_accents.get(result.stdout.strip())
+        else:
+            import subprocess
+            result = subprocess.run(
+                ["gsettings", "get", "org.gnome.desktop.interface", "accent-color"],
+                capture_output=True, text=True,
+            )
+            if result.returncode != 0:
+                return None
+            gnome_accents = {
+                "blue": "#3584e4", "teal": "#2190a4", "green": "#3a944a",
+                "yellow": "#c88800", "orange": "#ed5b00", "red": "#e62d42",
+                "pink": "#d56199", "purple": "#9141ac", "slate": "#6f8396",
+            }
+            return gnome_accents.get(result.stdout.strip().strip("'"))
+    except Exception:
+        logger.debug("System accent color detection failed", exc_info=True)
+        return None
+
+
 def resolve_theme(theme: str) -> tuple[bool, str]:
     """
     Turns a settings.theme value ("light"/"dark"/"auto"/"modern_light"/"modern_dark"/"modern_auto")

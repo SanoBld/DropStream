@@ -17,6 +17,7 @@ class SettingsFile(TypedDict):
     language: str
     dark_mode: bool  # deprecated, kept for migrating pre-existing settings files
     theme: str  # "light" | "dark" | "auto" | "modern_light" | "modern_dark" | "modern_auto"
+    use_system_accent: bool
     exclude: set[str]
     priority: list[str]
     autostart_tray: bool
@@ -38,6 +39,7 @@ default_settings: SettingsFile = {
     "exclude": set(),
     "dark_mode": False,
     "theme": "auto",
+    "use_system_accent": False,
     "autostart_tray": False,
     "connection_quality": 1,
     "language": DEFAULT_LANG,
@@ -67,6 +69,7 @@ class Settings:
     dark_mode: bool
     theme: str
     exclude: set[str]
+    use_system_accent: bool
     priority: list[str]
     autostart_tray: bool
     connection_quality: int

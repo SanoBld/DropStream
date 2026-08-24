@@ -55,6 +55,7 @@ from constants import (
 from scheduler import PowerAction
 import profiles as profiles_module
 from theme import PALETTES, resolve_theme, build_tab_icons
+from version import __version__
 if sys.platform == "win32":
     from registry import RegistryKey, ValueType, ValueNotFound
 
@@ -766,6 +767,8 @@ class CampaignProgress:
 
     def display(self, drop: TimedDrop | None, *, countdown: bool = True, subone: bool = False):
         self._drop = drop
+        if hasattr(self._manager, "dashboard"):
+            self._manager.dashboard.refresh_campaign()
         vars_drop = self._vars["drop"]
         vars_campaign = self._vars["campaign"]
         self.stop_timer()
@@ -1303,9 +1306,24 @@ class DashboardTab:
             variable=progress_vars["drop"]["progress"],
         ).grid(column=0, row=3, columnspan=2, sticky="ew", pady=(2, 0))
 
+        # Drop campaign section: every item obtainable in the current campaign, with images,
+        # highlighting the drop currently being mined and marking already-claimed ones.
+        campaign_frame = ttk.LabelFrame(
+            master, text=_("gui", "dashboard", "campaign"), padding=(4, 4)
+        )
+        campaign_frame.grid(column=0, row=1, columnspan=2, sticky="nsew", pady=(0, 8))
+        self._campaign_frame = campaign_frame
+        self._campaign_items_frame: ttk.Frame | None = None
+        self._campaign_image_refs: list[PhotoImage] = []  # keep references alive
+        self._campaign_no_data_label = ttk.Label(
+            campaign_frame, text=_("gui", "dashboard", "no_data")
+        )
+        self._campaign_no_data_label.grid(column=0, row=0)
+        self._campaign_refresh_task: asyncio.Task[None] | None = None
+
         # summary counters
         summary = ttk.Frame(master)
-        summary.grid(column=0, row=1, columnspan=2, sticky="w", pady=(0, 8))
+        summary.grid(column=0, row=2, columnspan=2, sticky="w", pady=(0, 8))
         self._total_var = StringVar(master, "")
         self._hours_var = StringVar(master, "")
         ttk.Label(summary, textvariable=self._total_var).grid(column=0, row=0, padx=(0, 24))
@@ -1315,7 +1333,7 @@ class DashboardTab:
         week_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "weekly"), padding=(4, 4)
         )
-        week_frame.grid(column=0, row=2, sticky="nsew", padx=(0, 4))
+        week_frame.grid(column=0, row=3, sticky="nsew", padx=(0, 4))
         self._week_canvas = tk.Canvas(week_frame, width=280, height=160, highlightthickness=0)
         self._week_canvas.grid(column=0, row=0)
 
@@ -1323,7 +1341,7 @@ class DashboardTab:
         game_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "per_game"), padding=(4, 4)
         )
-        game_frame.grid(column=1, row=2, sticky="nsew", padx=(4, 0))
+        game_frame.grid(column=1, row=3, sticky="nsew", padx=(4, 0))
         self._game_canvas = tk.Canvas(game_frame, width=280, height=160, highlightthickness=0)
         self._game_canvas.grid(column=0, row=0)
 
@@ -1332,6 +1350,66 @@ class DashboardTab:
     def _on_tab_switched(self, event: tk.Event[ttk.Notebook]) -> None:
         if self._manager.tabs.current_tab() == 0:  # Dashboard is the 1st tab
             self.refresh()
+
+    def refresh_campaign(self) -> None:
+        # schedules the async campaign rebuild (fetches/caches drop images)
+        if self._campaign_refresh_task is not None and not self._campaign_refresh_task.done():
+            self._campaign_refresh_task.cancel()
+        self._campaign_refresh_task = asyncio.create_task(self._refresh_campaign_async())
+
+    async def _refresh_campaign_async(self) -> None:
+        drop = self._manager.progress._drop
+        # clear the previous content
+        if self._campaign_items_frame is not None:
+            self._campaign_items_frame.destroy()
+            self._campaign_items_frame = None
+        self._campaign_image_refs.clear()
+        if drop is None:
+            self._campaign_no_data_label.grid(column=0, row=0)
+            return
+        self._campaign_no_data_label.grid_remove()
+        campaign = drop.campaign
+        cache = self._manager._cache
+        items_frame = ttk.Frame(self._campaign_frame)
+        items_frame.grid(column=0, row=1, sticky="nsew")
+        self._campaign_items_frame = items_frame
+        # campaign box art on the left
+        campaign_image = await cache.get(campaign.image_url, size=(80, 106))
+        self._campaign_image_refs.append(campaign_image)
+        ttk.Label(
+            items_frame, image=campaign_image, text=campaign.name, compound="top",
+            justify="center", wraplength=90,
+        ).grid(column=0, row=0, rowspan=2, padx=(0, 10), sticky="n")
+        # every drop/item obtainable in this campaign
+        drops_row = ttk.Frame(items_frame)
+        drops_row.grid(column=1, row=0, sticky="nsew")
+        for i, campaign_drop in enumerate(campaign.drops):
+            is_current = campaign_drop.id == drop.id
+            card = ttk.Frame(
+                drops_row,
+                relief="solid" if is_current else "ridge",
+                borderwidth=2 if is_current else 1,
+                padding=4,
+            )
+            card.grid(column=i, row=0, padx=4, sticky="n")
+            benefit_images: list[PhotoImage] = await asyncio.gather(
+                *(cache.get(b.image_url, (56, 56)) for b in campaign_drop.benefits)
+            )
+            self._campaign_image_refs.extend(benefit_images)
+            imgs_row = ttk.Frame(card)
+            imgs_row.grid(column=0, row=0)
+            for j, image in enumerate(benefit_images):
+                ttk.Label(imgs_row, image=image).grid(column=j, row=0, padx=2)
+            status = (
+                "✓ " if campaign_drop.is_claimed
+                else "▶ " if is_current
+                else ""
+            )
+            ttk.Label(
+                card, text=f"{status}{campaign_drop.rewards_text()}",
+                justify="center", wraplength=140,
+                style="green.TLabel" if campaign_drop.is_claimed else "TLabel",
+            ).grid(column=0, row=1, pady=(4, 0))
 
     def _draw_bars(
         self, canvas: tk.Canvas, data: list[tuple[str, int]], *, w: int = 280, h: int = 160
@@ -1361,6 +1439,7 @@ class DashboardTab:
             canvas.create_text(x_center, h - pad_bottom + 10, text=short_label, font=("", 8))
 
     def refresh(self) -> None:
+        self.refresh_campaign()
         self._total_var.set(
             _("gui", "dashboard", "total_drops").format(count=self._stats.total_drops_claimed())
         )
@@ -1708,6 +1787,7 @@ class _SettingsVars(TypedDict):
     proxy: StringVar
     autostart: IntVar
     theme: StringVar
+    use_system_accent: IntVar
     language: StringVar
     priority_mode: StringVar
     tray_notifications: IntVar
@@ -1772,6 +1852,7 @@ class SettingsPanel:
             "proxy": StringVar(master, str(self._settings.proxy)),
             "tray": IntVar(master, self._settings.autostart_tray),
             "theme": StringVar(master, self.THEMES[current_theme]),
+            "use_system_accent": IntVar(master, int(self._settings.use_system_accent)),
             "priority_mode": StringVar(master, self.PRIORITY_MODES[priority_mode]),
             "tray_notifications": IntVar(master, self._settings.tray_notifications),
             "enable_badges_emotes": IntVar(
@@ -1852,6 +1933,14 @@ class SettingsPanel:
             command=self.update_theme,
             textvariable=self._vars["theme"],
             values=list(self.THEMES.values()),
+        ).grid(column=1, row=irow, sticky="w")
+        ttk.Label(
+            checkboxes_frame, text=_("gui", "settings", "general", "use_system_accent")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Checkbutton(
+            checkboxes_frame,
+            variable=self._vars["use_system_accent"],
+            command=self.update_use_system_accent,
         ).grid(column=1, row=irow, sticky="w")
         ttk.Label(
             checkboxes_frame, text=_("gui", "settings", "general", "priority_mode")
@@ -2335,6 +2424,10 @@ class SettingsPanel:
             profiles_module.launch_profile(name)
             self._manager.close()
 
+    def update_use_system_accent(self) -> None:
+        self._settings.use_system_accent = bool(self._vars["use_system_accent"].get())
+        self._manager.apply_theme_choice(self._settings.theme)
+
     def update_schedule(self) -> None:
         self._settings.schedule_enabled = bool(self._vars["schedule_enabled"].get())
         self._settings.schedule_start = self._vars["schedule_start"].get()
@@ -2409,28 +2502,46 @@ class HelpTab:
         about = ttk.LabelFrame(center_frame, padding=(4, 0, 4, 4), text="About")
         about.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
         about.columnconfigure(2, weight=1)
+        # About - version
+        ttk.Label(about, text="DropStream version: ", anchor="e").grid(
+            column=0, row=0, sticky="nsew"
+        )
+        ttk.Label(about, text=f"v{__version__}", anchor="w").grid(column=1, row=0, sticky="nsew")
         # About - based on
         ttk.Label(
-            about, text="DropStream is a fork of: ", anchor="e"
-        ).grid(column=0, row=0, sticky="nsew")
+            about, text="Based on: ", anchor="e"
+        ).grid(column=0, row=1, sticky="nsew")
         LinkLabel(
             about,
             link="https://github.com/DevilXD/TwitchDropsMiner",
-            text="Twitch Drops Miner, by DevilXD",
-        ).grid(column=1, row=0, sticky="nsew")
+            text="Twitch Drops Miner, originally created by DevilXD",
+        ).grid(column=1, row=1, sticky="nsew")
+        ttk.Label(
+            about,
+            text=(
+                "DropStream is an unofficial, community-made update/fork of DevilXD's "
+                "Twitch Drops Miner, adding a dashboard, multi-account profiles, a scheduler, "
+                "a redesigned theme system and more. All core mining functionality and the "
+                "original design come from DevilXD's project."
+            ),
+            wraplength=self.WIDTH,
+            justify="left",
+        ).grid(column=0, row=2, columnspan=2, sticky="nsew", pady=(2, 4))
         # About - repo link
-        ttk.Label(about, text="DropStream repository: ", anchor="e").grid(column=0, row=1, sticky="nsew")
+        ttk.Label(about, text="Original repository: ", anchor="e").grid(
+            column=0, row=3, sticky="nsew"
+        )
         LinkLabel(
             about,
             link="https://github.com/DevilXD/TwitchDropsMiner",
             text="https://github.com/DevilXD/TwitchDropsMiner",
-        ).grid(column=1, row=1, sticky="nsew")
+        ).grid(column=1, row=3, sticky="nsew")
         # About - donate
         ttk.Separator(
             about, orient="horizontal"
-        ).grid(column=0, row=2, columnspan=3, sticky="nsew")
+        ).grid(column=0, row=4, columnspan=3, sticky="nsew")
         ttk.Label(about, text="Support the original project: ", anchor="e").grid(
-            column=0, row=3, sticky="nsew"
+            column=0, row=5, sticky="nsew"
         )
         LinkLabel(
             about,
@@ -2858,6 +2969,11 @@ class GUIManager:
         border = palette["border"]
         muted = palette["muted"]
         accent = palette["accent"]
+        if self._twitch.settings.use_system_accent:
+            from theme import system_accent_color
+            detected = system_accent_color()
+            if detected is not None:
+                accent = detected
         if dark:
             # Switch to a configurable ttk theme for better color control
             if sys.platform != "darwin" and self._style.theme_use() != "clam":

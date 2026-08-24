@@ -143,7 +143,8 @@
                 "tray_notifications": "Notifications dans la barre des tâches :",
                 "priority_mode": "Mode de priorité :",
                 "proxy": "Proxy (nécessite un redémarrage) :",
-                "theme": "Thème : "
+                "theme": "Thème : ",
+                "use_system_accent": "Utiliser la couleur d'accentuation du système : "
             },
             "priority_modes": {
                 "priority_only": "Liste de priorité uniquement",
@@ -159,9 +160,9 @@
                 "auto": "Clair/Sombre (Auto)",
                 "light": "Clair",
                 "dark": "Sombre",
-                "modern_auto": "Moderne (Auto)",
-                "modern_light": "Moderne Clair",
-                "modern_dark": "Moderne Sombre"
+                "modern_auto": "Couleurs Twitch (Auto)",
+                "modern_light": "Couleurs Twitch Clair",
+                "modern_dark": "Couleurs Twitch Sombre"
             },
             "accounts": {
                 "name": "Comptes",
@@ -211,7 +212,8 @@
             "total_drops": "Total de drops récupérés : {count}",
             "hours_saved": "Heures de visionnage économisées : {hours}",
             "no_data": "Pas encore de données",
-            "now_mining": "En cours de minage"
+            "now_mining": "En cours de minage",
+            "campaign": "Campagne de drops"
         }
     }
 }

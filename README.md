@@ -1,9 +1,23 @@
 # DropStream
 
-> **DropStream** is a fork of [Twitch Drops Miner (TDM) by DevilXD](https://github.com/DevilXD/TwitchDropsMiner),
-> extended with a dashboard, multi-account profiles, a scheduler, a redesigned UI/theme system, and more.
-> All credit for the original design and core mining engine goes to DevilXD — if you find this fork useful,
-> please consider [supporting the original author](https://www.buymeacoffee.com/DevilXD).
+> **DropStream is an unofficial, community-made update of [Twitch Drops Miner (TDM), created by DevilXD](https://github.com/DevilXD/TwitchDropsMiner).**
+> All of the original design, the core drop-mining engine, and the vast majority of this codebase come directly
+> from DevilXD's project — full credit goes to them. This fork only adds a handful of extra features on top
+> (see below). If you find this fork useful, please consider
+> [supporting DevilXD, the original author](https://www.buymeacoffee.com/DevilXD), whose work this is built on.
+
+### What DropStream adds on top of the original TDM:
+
+- A **Dashboard** tab: weekly mining activity, drops per game, currently-mining summary, and the full drop
+  campaign progress (all items to collect, with images) for the game currently being mined.
+- **Multi-account profiles**: isolated settings/cookies/cache per account, with the ability to launch several
+  accounts in parallel or quickly switch between them, each with its own proxy.
+- A **scheduler**: restrict mining to specific hours, and optionally sleep/shut down the PC once all of today's
+  drops are claimed.
+- An enriched **system tray**: pause/resume, quick channel switching, and a live status line.
+- A **theme system**: Light/Dark/Auto, plus a "Twitch Colors" theme, with an option to follow your OS accent
+  color, and real vector tab icons.
+- Automatic OAuth token re-validation, to catch and recover from an expired session before it breaks mining.
 
 This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle.
 

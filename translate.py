@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import abc
+from pathlib import Path
 from typing import Any, TypedDict, TYPE_CHECKING
 
 from exceptions import MinerException
@@ -80,6 +81,7 @@ class GUITray(TypedDict):
 
 class GUIDashboard(TypedDict):
     now_mining: str
+    campaign: str
     weekly: str
     per_game: str
     total_drops: str
@@ -177,6 +179,7 @@ class GUISettingsGeneral(TypedDict):
     tray: str
     tray_notifications: str
     theme: str
+    use_system_accent: str
     priority_mode: str
     proxy: str
 
@@ -349,6 +352,7 @@ default_translation: Translation = {
         },
         "dashboard": {
             "now_mining": "Currently Mining",
+            "campaign": "Drop Campaign",
             "weekly": "Last 7 days",
             "per_game": "Drops per game",
             "total_drops": "Total drops claimed: {count}",
@@ -444,6 +448,7 @@ default_translation: Translation = {
                 "tray": "Autostart into tray: ",
                 "tray_notifications": "Tray notifications: ",
                 "theme": "Theme: ",
+                "use_system_accent": "Use system accent color: ",
                 "priority_mode": "Priority mode: ",
                 "proxy": "Proxy (requires restart):",
             },
@@ -451,9 +456,9 @@ default_translation: Translation = {
                 "auto": "Light/Dark (Auto)",
                 "light": "Light",
                 "dark": "Dark",
-                "modern_auto": "Modern (Auto)",
-                "modern_light": "Modern Light",
-                "modern_dark": "Modern Dark",
+                "modern_auto": "Twitch Colors (Auto)",
+                "modern_light": "Twitch Colors Light",
+                "modern_dark": "Twitch Colors Dark",
             },
             "accounts": {
                 "name": "Accounts",
@@ -552,13 +557,75 @@ class Translator:
             default_langpath = LANG_PATH.joinpath(f"{DEFAULT_LANG}.json")
             json_save(default_langpath, default_translation)
         self._translation["language_name"] = DEFAULT_LANG
+        self._cleanup_legacy_filenames()
         # load available translation names
-        for filepath in LANG_PATH.glob("*.json"):
+        seen_stems: set[str] = set()
+        for filepath in sorted(LANG_PATH.glob("*.json")):
+            if filepath.stem in seen_stems:
+                continue  # skip duplicate/leftover files pointing at the same language
+            seen_stems.add(filepath.stem)
             self._langs.append(filepath.stem)
         self._langs.sort()
         if DEFAULT_LANG in self._langs:
             self._langs.remove(DEFAULT_LANG)
         self._langs.insert(0, DEFAULT_LANG)
+
+    def _cleanup_legacy_filenames(self) -> None:
+        """
+        Older releases could end up with mis-decoded language filenames (accented
+        characters replaced by "#Uxxxx" escapes, or mangled into replacement/box glyphs,
+        due to a packaging bug). This removes duplicate/garbled leftovers so the language
+        list doesn't show multiple broken entries for the same language after an update.
+        """
+        import re
+        import json as _json
+        pattern = re.compile(r"#U([0-9a-fA-F]{4})")
+        try:
+            files = list(LANG_PATH.glob("*.json"))
+        except OSError:
+            return
+        # first pass: repair simple "#Uxxxx" escapes back into real characters
+        names = {f.name for f in files}
+        for f in list(files):
+            if not pattern.search(f.name):
+                continue
+            fixed_name = pattern.sub(lambda m: chr(int(m.group(1), 16)), f.name)
+            try:
+                if fixed_name in names:
+                    f.unlink()
+                    files.remove(f)
+                else:
+                    new_path = f.rename(f.with_name(fixed_name))
+                    files[files.index(f)] = new_path
+                    names.add(fixed_name)
+            except OSError:
+                pass
+
+        # second pass: for any remaining duplicates of the same language (by english_name),
+        # keep only the one whose filename looks clean, drop the mangled others
+        def is_clean(name: str) -> bool:
+            return "#" not in name and "\ufffd" not in name and "\u25a1" not in name
+
+        by_lang: dict[str, list[Path]] = {}
+        for f in files:
+            try:
+                with f.open(encoding="utf-8") as fh:
+                    english_name = _json.load(fh).get("english_name")
+            except (OSError, ValueError):
+                continue
+            if english_name:
+                by_lang.setdefault(english_name, []).append(f)
+        for group in by_lang.values():
+            if len(group) < 2:
+                continue
+            clean = [f for f in group if is_clean(f.stem)]
+            keep = clean[0] if clean else group[0]
+            for f in group:
+                if f != keep:
+                    try:
+                        f.unlink()
+                    except OSError:
+                        pass
 
     @property
     def languages(self) -> abc.Iterable[str]:

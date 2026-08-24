@@ -6,6 +6,11 @@ on:
       - "master"
   pull_request:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to embed in the build (e.g. 1.0.0). Leave empty to keep the current version.py value."
+        required: false
+        type: string
 
 env:
   PYTHON_VERSION: "3.10"
@@ -24,6 +29,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{env.PYTHON_VERSION}}
+
+      - name: Set version (if provided)
+        if: ${{ github.event.inputs.version != '' }}
+        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
 
       - name: Validate language files
         run: |
@@ -50,6 +59,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set version (if provided)
+        if: ${{ github.event.inputs.version != '' }}
+        shell: bash
+        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
 
       - name: Set up variables
         id: vars
@@ -115,6 +128,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set version (if provided)
+        if: ${{ github.event.inputs.version != '' }}
+        shell: bash
+        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
 
       - name: Set up variables
         id: vars
@@ -175,6 +192,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set version (if provided)
+        if: ${{ github.event.inputs.version != '' }}
+        shell: bash
+        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
 
       - name: Set up variables
         id: vars
@@ -257,6 +278,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set version (if provided)
+        if: ${{ github.event.inputs.version != '' }}
+        shell: bash
+        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
 
       - name: Set up variables
         id: vars
@@ -304,54 +329,3 @@ jobs:
           name: DropStream.Linux.AppImage-${{matrix.arch}}
           path: DropStream.Linux.AppImage-${{matrix.arch}}.zip
 
-  update_releases_page:
-    name: Upload builds to Releases
-    if: github.event_name != 'pull_request'
-    needs:
-      - windows
-      - linux-pyinstaller
-      - linux-appimage
-      - macos
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Set up variables
-        id: vars
-        run: |
-          echo "date_now=$(date --rfc-3339=seconds)" >> "${GITHUB_OUTPUT}"
-
-      - name: Download build artifacts from previous jobs
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Delete the existing pre-release (if present)
-        run: |
-          TAG=dev-build
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release delete "$TAG" --cleanup-tag --yes --repo "$GITHUB_REPOSITORY"
-          else
-            echo "No $TAG release; skipping delete"
-          fi
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
-      - name: Create a new dev build release
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          artifactErrorsFailBuild: true
-          artifacts: artifacts/*/*
-          body: |
-            **This is an automatically generated in-development pre-release build of DropStream (a fork of [Twitch Drops Miner by DevilXD](https://github.com/DevilXD/TwitchDropsMiner)), including the latest master branch changes.**
-            **⚠️ This build is not stable and may end up terminating with a fatal error. ⚠️**
-            **Use at your own risk.**
-
-            - Last build date: `${{steps.vars.outputs.date_now}}`
-            - Reference commit: ${{github.sha}}
-          name: Development build
-          prerelease: true
-          removeArtifacts: true
-          tag: dev-build
