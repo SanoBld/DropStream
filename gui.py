@@ -53,7 +53,7 @@ from constants import (
 )
 from scheduler import PowerAction
 import profiles as profiles_module
-from theme import PALETTES, resolve_theme
+from theme import PALETTES, resolve_theme, build_tab_icons
 if sys.platform == "win32":
     from registry import RegistryKey, ValueType, ValueNotFound
 
@@ -1229,12 +1229,25 @@ class Notebook:
         master.columnconfigure(0, weight=1)
         # prevent entries from being selected after switching tabs
         self._nb.bind("<<NotebookTabChanged>>", lambda event: manager._root.focus_set())
+        # tab widget -> icon key, so icons can be recolored/reapplied when the theme changes
+        self._icon_keys: dict[ttk.Widget, str] = {}
+        self._icons: dict[str, tk.PhotoImage] = {}
 
-    def add_tab(self, widget: ttk.Widget, *, name: str, **kwargs):
+    def add_tab(self, widget: ttk.Widget, *, name: str, icon_key: str | None = None, **kwargs):
         kwargs.pop("text", None)
         if "sticky" not in kwargs:
             kwargs["sticky"] = "nsew"
         self._nb.add(widget, text=name, **kwargs)
+        if icon_key is not None:
+            self._icon_keys[widget] = icon_key
+
+    def set_icons(self, icons: dict[str, tk.PhotoImage]) -> None:
+        # icons must be kept referenced (self._icons) or Tk will garbage-collect them
+        self._icons = icons
+        for widget, key in self._icon_keys.items():
+            icon = icons.get(key)
+            if icon is not None:
+                self._nb.tab(widget, image=icon, compound="left")
 
     def current_tab(self) -> int:
         return self._nb.index("current")
@@ -2530,7 +2543,7 @@ class GUIManager:
         self.tray = TrayIcon(self, root_frame)
         # Main tab
         main_frame = ttk.Frame(root_frame, padding=8)
-        self.tabs.add_tab(main_frame, name=_("gui", "tabs", "main"))
+        self.tabs.add_tab(main_frame, name=_("gui", "tabs", "main"), icon_key="main")
         self.status = StatusBar(self, main_frame)
         self.websockets = WebsocketStatus(self, main_frame)
         self.login = LoginForm(self, main_frame)
@@ -2540,19 +2553,19 @@ class GUIManager:
         # Dashboard tab
         dash_frame = ttk.Frame(root_frame, padding=8)
         self.dashboard = DashboardTab(self, dash_frame)
-        self.tabs.add_tab(dash_frame, name=_("gui", "tabs", "dashboard"))
+        self.tabs.add_tab(dash_frame, name=_("gui", "tabs", "dashboard"), icon_key="dashboard")
         # Inventory tab
         inv_frame = ttk.Frame(root_frame, padding=8)
         self.inv = InventoryOverview(self, inv_frame)
-        self.tabs.add_tab(inv_frame, name=_("gui", "tabs", "inventory"))
+        self.tabs.add_tab(inv_frame, name=_("gui", "tabs", "inventory"), icon_key="inventory")
         # Settings tab
         settings_frame = ttk.Frame(root_frame, padding=8)
         self.settings = SettingsPanel(self, settings_frame)
-        self.tabs.add_tab(settings_frame, name=_("gui", "tabs", "settings"))
+        self.tabs.add_tab(settings_frame, name=_("gui", "tabs", "settings"), icon_key="settings")
         # Help tab
         help_frame = ttk.Frame(root_frame, padding=8)
         self.help = HelpTab(self, help_frame)
-        self.tabs.add_tab(help_frame, name=_("gui", "tabs", "help"))
+        self.tabs.add_tab(help_frame, name=_("gui", "tabs", "help"), icon_key="help")
         # clamp minimum window size (update geometry first)
         root.update_idletasks()
         root.minsize(width=root.winfo_reqwidth(), height=root.winfo_reqheight())
@@ -2849,12 +2862,29 @@ class GUIManager:
         s.configure("TLabelframe", background=bg, foreground=fg)
         s.configure("TLabelframe.Label", background=bg, foreground=fg)
         # Buttons and checks
-        s.configure("TButton", background=surface, foreground=fg, bordercolor=border)
-        s.map(
-            "TButton",
-            background=[("active", header), ("pressed", border)],
-            foreground=[("disabled", muted)],
-        )
+        if style == "modern":
+            # flat, borderless buttons with an accent-tinted hover, closer to Windows 11 controls
+            s.configure(
+                "TButton",
+                background=surface,
+                foreground=fg,
+                bordercolor=surface,
+                relief="flat",
+                padding=(10, 6),
+            )
+            s.map(
+                "TButton",
+                background=[("active", header), ("pressed", header)],
+                bordercolor=[("focus", accent), ("!focus", surface)],
+                foreground=[("disabled", muted)],
+            )
+        else:
+            s.configure("TButton", background=surface, foreground=fg, bordercolor=border)
+            s.map(
+                "TButton",
+                background=[("active", header), ("pressed", border)],
+                foreground=[("disabled", muted)],
+            )
         s.configure(
             "TCheckbutton",
             background=bg,
@@ -2871,18 +2901,52 @@ class GUIManager:
             ],
             foreground=[("disabled", muted)],
             indicatorcolor=[
-                ("selected", accent if dark else fg),
+                ("selected", accent),
                 ("!selected", border),
             ],
         )
         # Notebook
         s.configure("TNotebook", background=bg, bordercolor=border)
-        s.configure("TNotebook.Tab", background=surface, foreground=fg, bordercolor=border)
-        s.map(
-            "TNotebook.Tab",
-            background=[("selected", header), ("active", header)],
-            foreground=[("disabled", muted)],
-        )
+        tab_font = self._fonts.get("tab")
+        if tab_font is None:
+            tab_font = default_font.copy()
+            self._fonts["tab"] = tab_font
+        if style == "modern":
+            # Windows 11-ish: no visible tab border, more breathing room, medium-weight label
+            tab_font.config(size=default_font.cget("size") + 1, weight="normal")
+            s.configure(
+                "TNotebook.Tab",
+                background=bg,
+                foreground=fg,
+                bordercolor=bg,
+                padding=(16, 8),
+                font=tab_font,
+            )
+            s.map(
+                "TNotebook.Tab",
+                background=[("selected", header), ("active", header)],
+                foreground=[("selected", accent), ("disabled", muted)],
+            )
+        else:
+            tab_font.config(size=default_font.cget("size"), weight="normal")
+            s.configure(
+                "TNotebook.Tab",
+                background=surface,
+                foreground=fg,
+                bordercolor=border,
+                padding=(8, 4),
+                font=tab_font,
+            )
+            s.map(
+                "TNotebook.Tab",
+                background=[("selected", header), ("active", header)],
+                foreground=[("disabled", muted)],
+            )
+        # Tab bar icons: small flat glyphs instead of plain text, recolored to match the theme
+        try:
+            self.tabs.set_icons(build_tab_icons(fg))
+        except Exception:
+            logger.debug("Failed to build tab icons", exc_info=True)
         # Entries/Combos
         s.configure(
             "TEntry", fieldbackground=fieldbg, background=fieldbg, foreground=fg, insertcolor=fg
@@ -2898,7 +2962,20 @@ class GUIManager:
             background=[("readonly", fieldbg)],
             arrowcolor=[("readonly", fg)],
         )
-        s.map("TEntry", foreground=[("disabled", muted)])
+        if style == "modern":
+            # accent-colored focus outline, Windows 11-style, instead of the plain system border
+            s.map(
+                "TEntry",
+                bordercolor=[("focus", accent), ("!focus", border)],
+                lightcolor=[("focus", accent)],
+                foreground=[("disabled", muted)],
+            )
+            s.map(
+                "TCombobox",
+                bordercolor=[("focus", accent), ("!focus", border)],
+            )
+        else:
+            s.map("TEntry", foreground=[("disabled", muted)])
         # Treeview
         s.configure(
             "Treeview",
@@ -2906,6 +2983,7 @@ class GUIManager:
             fieldbackground=surface,
             foreground=fg,
             bordercolor=border,
+            rowheight=26 if style == "modern" else 20,
         )
         s.map(
             "Treeview",
@@ -2914,7 +2992,12 @@ class GUIManager:
         )
         s.configure("Treeview.Heading", background=header, foreground=fg, bordercolor=border)
         # Progressbar
-        s.configure("TProgressbar", background=accent, troughcolor=surface)
+        s.configure(
+            "TProgressbar",
+            background=accent,
+            troughcolor=surface,
+            thickness=8 if style == "modern" else 12,
+        )
         # Scrollbars
         s.configure(
             "Vertical.TScrollbar",

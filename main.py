@@ -9,6 +9,17 @@ if __name__ == "__main__":
     import io
     import os
     import sys
+
+    # Force UTF-8 for stdio: on Windows the default console codepage (cp1252/cp437) mangles
+    # accented characters and special symbols in translated strings and logs.
+    for _stream_name in ("stdout", "stderr"):
+        _stream = getattr(sys, _stream_name)
+        if _stream is not None and hasattr(_stream, "reconfigure"):
+            try:
+                _stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
     import signal
     import asyncio
     import logging
@@ -162,7 +173,7 @@ if __name__ == "__main__":
         logger = logging.getLogger("TwitchDrops")
         logger.setLevel(settings.logging_level)
         if settings.log:
-            handler = logging.FileHandler(LOG_PATH)
+            handler = logging.FileHandler(LOG_PATH, encoding="utf8")
             handler.setFormatter(FILE_FORMATTER)
             logger.addHandler(handler)
         logging.getLogger("TwitchDrops.gql").setLevel(settings.debug_gql)
