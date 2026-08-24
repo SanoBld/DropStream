@@ -79,6 +79,7 @@ class GUITray(TypedDict):
 
 
 class GUIDashboard(TypedDict):
+    now_mining: str
     weekly: str
     per_game: str
     total_drops: str
@@ -340,13 +341,14 @@ default_translation: Translation = {
             "scheduled": "Outside scheduled hours",
         },
         "tabs": {
-            "main": "Main",
+            "main": "Details",
             "dashboard": "Dashboard",
             "inventory": "Inventory",
             "settings": "Settings",
             "help": "Help",
         },
         "dashboard": {
+            "now_mining": "Currently Mining",
             "weekly": "Last 7 days",
             "per_game": "Drops per game",
             "total_drops": "Total drops claimed: {count}",

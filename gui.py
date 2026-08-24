@@ -15,6 +15,7 @@ from textwrap import dedent
 from math import log10, ceil
 from dataclasses import dataclass
 from tkinter.font import Font, nametofont
+import tkinter.font as tkfont
 from functools import partial, cached_property
 from datetime import datetime, timedelta, timezone
 from tkinter import Tk, ttk, StringVar, DoubleVar, IntVar
@@ -1269,9 +1270,42 @@ class DashboardTab:
         master.columnconfigure(0, weight=1)
         master.columnconfigure(1, weight=1)
 
+        # "Currently mining" live card - reuses the same StringVars as the Details tab's
+        # progress widget, so it updates live without any extra polling.
+        progress_vars = manager.progress._vars
+        now_frame = ttk.LabelFrame(
+            master, text=_("gui", "dashboard", "now_mining"), padding=(4, 4)
+        )
+        now_frame.grid(column=0, row=0, columnspan=2, sticky="nsew", pady=(0, 8))
+        now_frame.columnconfigure(0, weight=1)
+        now_frame.columnconfigure(1, weight=1)
+        ttk.Label(now_frame, text=_("gui", "progress", "game")).grid(column=0, row=0, sticky="w")
+        ttk.Label(
+            now_frame, textvariable=progress_vars["campaign"]["game"]
+        ).grid(column=0, row=1, sticky="w")
+        ttk.Label(
+            now_frame, text=_("gui", "progress", "drop")
+        ).grid(column=1, row=0, sticky="w")
+        ttk.Label(
+            now_frame, textvariable=progress_vars["drop"]["rewards"]
+        ).grid(column=1, row=1, sticky="w")
+        ttk.Label(
+            now_frame, text=_("gui", "progress", "drop_progress")
+        ).grid(column=0, row=2, sticky="w", pady=(6, 0))
+        ttk.Label(
+            now_frame, textvariable=progress_vars["drop"]["percentage"]
+        ).grid(column=1, row=2, sticky="w", pady=(6, 0))
+        ttk.Progressbar(
+            now_frame,
+            mode="determinate",
+            length=300,
+            maximum=1,
+            variable=progress_vars["drop"]["progress"],
+        ).grid(column=0, row=3, columnspan=2, sticky="ew", pady=(2, 0))
+
         # summary counters
         summary = ttk.Frame(master)
-        summary.grid(column=0, row=0, columnspan=2, sticky="w", pady=(0, 8))
+        summary.grid(column=0, row=1, columnspan=2, sticky="w", pady=(0, 8))
         self._total_var = StringVar(master, "")
         self._hours_var = StringVar(master, "")
         ttk.Label(summary, textvariable=self._total_var).grid(column=0, row=0, padx=(0, 24))
@@ -1281,7 +1315,7 @@ class DashboardTab:
         week_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "weekly"), padding=(4, 4)
         )
-        week_frame.grid(column=0, row=1, sticky="nsew", padx=(0, 4))
+        week_frame.grid(column=0, row=2, sticky="nsew", padx=(0, 4))
         self._week_canvas = tk.Canvas(week_frame, width=280, height=160, highlightthickness=0)
         self._week_canvas.grid(column=0, row=0)
 
@@ -1289,14 +1323,14 @@ class DashboardTab:
         game_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "per_game"), padding=(4, 4)
         )
-        game_frame.grid(column=1, row=1, sticky="nsew", padx=(4, 0))
+        game_frame.grid(column=1, row=2, sticky="nsew", padx=(4, 0))
         self._game_canvas = tk.Canvas(game_frame, width=280, height=160, highlightthickness=0)
         self._game_canvas.grid(column=0, row=0)
 
         self.refresh()
 
     def _on_tab_switched(self, event: tk.Event[ttk.Notebook]) -> None:
-        if self._manager.tabs.current_tab() == 1:  # Dashboard is the 2nd tab
+        if self._manager.tabs.current_tab() == 0:  # Dashboard is the 1st tab
             self.refresh()
 
     def _draw_bars(
@@ -1462,7 +1496,7 @@ class InventoryOverview:
             frame.grid_remove()
 
     def _on_tab_switched(self, event: tk.Event[ttk.Notebook]) -> None:
-        if self._manager.tabs.current_tab() == 1:
+        if self._manager.tabs.current_tab() == 2:  # Inventory is the 3rd tab
             # refresh only if we're switching to the tab
             self.refresh()
 
@@ -1601,7 +1635,7 @@ class InventoryOverview:
             self._drops[drop.id] = label = ttk.Label(drop_frame, justify=tk.CENTER)
             self.update_progress(drop, label)
             label.grid(column=0, row=1)
-        if self._manager.tabs.current_tab() == 1:
+        if self._manager.tabs.current_tab() == 2:  # Inventory is the 3rd tab
             self._update_visibility(campaign)
             self._canvas_update()
 
@@ -2541,19 +2575,20 @@ class GUIManager:
         self.tabs = Notebook(self, root_frame)
         # Tray icon - place after notebook so it draws on top of the tabs space
         self.tray = TrayIcon(self, root_frame)
-        # Main tab
+        # Main ("Details") tab widgets are built first (Dashboard needs live progress vars),
+        # but the tab itself is added to the notebook after Dashboard so Dashboard shows first.
         main_frame = ttk.Frame(root_frame, padding=8)
-        self.tabs.add_tab(main_frame, name=_("gui", "tabs", "main"), icon_key="main")
         self.status = StatusBar(self, main_frame)
         self.websockets = WebsocketStatus(self, main_frame)
         self.login = LoginForm(self, main_frame)
         self.progress = CampaignProgress(self, main_frame)
         self.output = ConsoleOutput(self, main_frame)
         self.channels = ChannelList(self, main_frame)
-        # Dashboard tab
+        # Dashboard tab (now the first/landing tab): stats + a live "currently mining" summary
         dash_frame = ttk.Frame(root_frame, padding=8)
         self.dashboard = DashboardTab(self, dash_frame)
         self.tabs.add_tab(dash_frame, name=_("gui", "tabs", "dashboard"), icon_key="dashboard")
+        self.tabs.add_tab(main_frame, name=_("gui", "tabs", "main"), icon_key="details")
         # Inventory tab
         inv_frame = ttk.Frame(root_frame, padding=8)
         self.inv = InventoryOverview(self, inv_frame)
@@ -2768,7 +2803,7 @@ class GUIManager:
         Only works on Windows with DWM enabled.
 
         Args:
-            color: ARGB color value (e.g., 0x001E1E1E for dark gray).
+            color: COLORREF value (0x00BBGGRR format).
         """
         if sys.platform != "win32":
             return
@@ -2783,6 +2818,13 @@ class GUIManager:
             ctypes.byref(color_value),
             ctypes.sizeof(ctypes.c_int),
         )
+
+    @staticmethod
+    def _hex_to_colorref(hex_color: str) -> int:
+        # Windows COLORREF is 0x00BBGGRR, the reverse byte order of a "#RRGGBB" hex string
+        hex_color = hex_color.lstrip("#")
+        r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+        return (b << 16) | (g << 8) | r
 
     def apply_theme_choice(self, theme: str) -> None:
         # resolves a settings.theme value ("auto", "modern_dark", ...) and applies it
@@ -2820,10 +2862,17 @@ class GUIManager:
             # Switch to a configurable ttk theme for better color control
             if sys.platform != "darwin" and self._style.theme_use() != "clam":
                 self._style.theme_use("clam")
+        elif style == "modern" and sys.platform == "win32":
+            # "Modern Light" uses Windows' own native Fluent-rendered controls (buttons,
+            # checkboxes, comboboxes) via the "vista" ttk theme, instead of hand-drawn ones -
+            # this is the most authentic possible Windows 11 look.
+            if "vista" in self._style.theme_names() and self._style.theme_use() != "vista":
+                self._style.theme_use("vista")
         else:
             # Restore original theme if we changed it
-            if getattr(self, "_orig_theme_name", '') and self._style.theme_use() == "clam":
-                self._style.theme_use(self._orig_theme_name)
+            orig = getattr(self, "_orig_theme_name", '')
+            if orig and self._style.theme_use() != orig:
+                self._style.theme_use(orig)
 
         # Setting theme for macOS
         if sys.platform == "darwin":
@@ -2838,6 +2887,20 @@ class GUIManager:
         # Fonts
         default_font = nametofont("TkDefaultFont")
         self._fonts["default"] = default_font
+        if not hasattr(self, "_orig_font_family"):
+            self._orig_font_family = default_font.cget("family")
+            self._orig_font_size = default_font.cget("size")
+        if style == "modern" and sys.platform == "win32":
+            # Segoe UI Variable is Windows 11's system font; fall back to Segoe UI (Win10/11)
+            available = set(tkfont.families())
+            family = next(
+                (f for f in ("Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI")
+                 if f in available),
+                self._orig_font_family,
+            )
+            default_font.config(family=family, size=self._orig_font_size + 1)
+        else:
+            default_font.config(family=self._orig_font_family, size=self._orig_font_size)
         # Font - button style with a larger font
         self._fonts["large"] = default_font.copy()
         self._fonts["large"].config(size=10)
@@ -2861,6 +2924,16 @@ class GUIManager:
         s.configure("TLabel", background=bg, foreground=fg)
         s.configure("TLabelframe", background=bg, foreground=fg)
         s.configure("TLabelframe.Label", background=bg, foreground=fg)
+        if style == "modern":
+            # card-like grouping: a slightly raised surface tone + generous padding + accent border
+            s.configure(
+                "TLabelframe",
+                background=surface,
+                bordercolor=border,
+                relief="flat",
+                padding=(10, 8),
+            )
+            s.configure("TLabelframe.Label", background=surface, foreground=accent)
         # Buttons and checks
         if style == "modern":
             # flat, borderless buttons with an accent-tinted hover, closer to Windows 11 controls
@@ -3055,13 +3128,10 @@ class GUIManager:
         ):
             self._root.option_add(key, sel_fg)
 
-        # Set Windows title bar color to match dark theme
-        if dark:
-            # Use dark gray color 0x001E1E1E (ARGB format, matches bg color #1e1e1e)
-            self._set_title_bar_color(0x001E1E1E)
-        else:
-            # Reset to system default title bar color
-            self._set_title_bar_color(0xFFFFFFFF)
+        # Set the Windows title bar color to match the theme.
+        # "modern" gets an accent-tinted titlebar (Fluent-style); "classic" just follows bg.
+        titlebar_color = accent if style == "modern" else bg
+        self._set_title_bar_color(self._hex_to_colorref(titlebar_color))
 
 
 ###################

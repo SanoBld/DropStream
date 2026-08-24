@@ -38,15 +38,17 @@ PALETTES: dict[str, dict[str, Palette]] = {
         },
     },
     "modern": {
+        # Windows 11 Settings-app inspired: soft neutral window bg, brighter "card" surfaces
+        # with more contrast than classic, and a violet accent used consistently.
         "light": {
-            "bg": "#f3f3f3", "fg": "#1a1a1a", "sel_bg": "#e4d6ff", "sel_fg": "#1a1a1a",
-            "link": "#772ce8", "surface": "#ffffff", "header": "#ececec", "fieldbg": "#ffffff",
-            "border": "#d9d9d9", "muted": "#6e6e6e", "accent": "#9146ff",
+            "bg": "#f3f3f3", "fg": "#1a1a1a", "sel_bg": "#e9ddff", "sel_fg": "#3d0a91",
+            "link": "#772ce8", "surface": "#fbfbfb", "header": "#f3ecff", "fieldbg": "#ffffff",
+            "border": "#e2e2e2", "muted": "#6e6e6e", "accent": "#8338ec",
         },
         "dark": {
-            "bg": "#181818", "fg": "#f2f2f2", "sel_bg": "#3a1e70", "sel_fg": "#ffffff",
-            "link": "#bf94ff", "surface": "#202020", "header": "#262626", "fieldbg": "#242424",
-            "border": "#333333", "muted": "#9e9e9e", "accent": "#a970ff",
+            "bg": "#202020", "fg": "#f2f2f2", "sel_bg": "#3d2769", "sel_fg": "#e6d6ff",
+            "link": "#c69bff", "surface": "#2b2b2b", "header": "#33244a", "fieldbg": "#2d2d2d",
+            "border": "#3a3a3a", "muted": "#a3a3a3", "accent": "#b48cff",
         },
     },
 }
@@ -201,8 +203,20 @@ def build_tab_icons(color: str, size: int = 18):
             )
         return finish(img)
 
+    def draw_details(fg):
+        img, d = canvas()
+        m = S * 0.16
+        lw = max(2, int(S * 0.10))
+        d.rounded_rectangle([m, m * 0.7, S - m, S - m * 0.7], radius=S * 0.06, outline=fg, width=lw)
+        line_x0, line_x1 = m + S * 0.10, S - m - S * 0.10
+        for i, ly in enumerate((0.38, 0.55, 0.72)):
+            w = line_x1 - (S * 0.18 if i == 2 else 0)
+            d.line([(line_x0, S * ly), (w, S * ly)], fill=fg, width=max(2, int(S * 0.055)))
+        return finish(img)
+
     builders = {
         "main": draw_home,
+        "details": draw_details,
         "dashboard": draw_dashboard,
         "inventory": draw_inventory,
         "settings": draw_settings,
