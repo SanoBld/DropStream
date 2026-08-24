@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections import OrderedDict
 from datetime import datetime, timedelta, timezone
 
 import io
@@ -48,8 +49,13 @@ class ImageCache:
             # then reinitialize the image cache anew
             cleanup = True
             self._hashes = default_database.copy()
-        self._images: dict[ImageHash, Image] = {}
-        self._photos: dict[tuple[ImageHash, ImageSize], PhotoImage] = {}
+        self._images: OrderedDict[ImageHash, Image] = OrderedDict()
+        self._photos: OrderedDict[tuple[ImageHash, ImageSize], PhotoImage] = OrderedDict()
+        # RAM bound: the on-disk cache is fine to keep for days, but keeping every decoded
+        # image and every resized PhotoImage in memory for a whole 24h+ session adds up.
+        # Simple LRU-style cap: evict oldest entries once these grow past a small ceiling.
+        self._MAX_IMAGES = 150
+        self._MAX_PHOTOS = 150
         self._lock = asyncio.Lock()
         self._altered: bool = False
         # cleanup the URLs
@@ -100,11 +106,13 @@ class ImageCache:
                 self._hashes[url]["expires"] = self._new_expires()
                 if img_hash in self._images:
                     image = self._images[img_hash]
+                    self._images.move_to_end(img_hash)
                 else:
                     try:
                         loaded = Image_module.open(CACHE_PATH / img_hash)
                         loaded.load()  # force full decode so broken data is caught here
                         self._images[img_hash] = image = loaded
+                        self._evict_if_needed(self._images, self._MAX_IMAGES)
                     except (FileNotFoundError, Image_module.UnidentifiedImageError, OSError):
                         pass
             if image is None:
@@ -119,6 +127,7 @@ class ImageCache:
                     image = Image_module.new("RGB", (10, 10), (255, 255, 255))
                 img_hash = self._hash(image)
                 self._images[img_hash] = image
+                self._evict_if_needed(self._images, self._MAX_IMAGES)
                 image.save(CACHE_PATH / img_hash)
                 self._hashes[url] = {
                     "hash": img_hash,
@@ -131,6 +140,7 @@ class ImageCache:
             size = image.size
         photo_key = (img_hash, size)
         if photo_key in self._photos:
+            self._photos.move_to_end(photo_key)
             return self._photos[photo_key]
         if image.size != size:
             try:
@@ -139,4 +149,11 @@ class ImageCache:
                 # broken image data surfaced during resize; fall back to blank placeholder
                 image = Image_module.new("RGB", size, (255, 255, 255))
         self._photos[photo_key] = photo = PhotoImage(master=self._root, image=image)
+        self._evict_if_needed(self._photos, self._MAX_PHOTOS)
         return photo
+
+    @staticmethod
+    def _evict_if_needed(mapping: OrderedDict, max_size: int) -> None:
+        # drops the least-recently-used entries once the cache grows past its cap
+        while len(mapping) > max_size:
+            mapping.popitem(last=False)

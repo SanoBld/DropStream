@@ -18,7 +18,7 @@ from tkinter.font import Font, nametofont
 import tkinter.font as tkfont
 from functools import partial, cached_property
 from datetime import datetime, timedelta, timezone
-from tkinter import Tk, ttk, StringVar, DoubleVar, IntVar
+from tkinter import Tk, ttk, StringVar, DoubleVar, IntVar, messagebox
 from typing import Any, Union, Tuple, TypedDict, NoReturn, Generic, TYPE_CHECKING
 
 import pystray
@@ -52,7 +52,7 @@ from constants import (
     State,
     PriorityMode,
 )
-from scheduler import PowerAction
+from scheduler import PowerAction, parse_hhmm
 import profiles as profiles_module
 from theme import PALETTES, resolve_theme, build_tab_icons
 from version import __version__
@@ -444,14 +444,15 @@ class StatusBar:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         frame = ttk.LabelFrame(master, text=_("gui", "status", "name"), padding=(4, 0, 4, 4))
         frame.grid(column=0, row=0, columnspan=3, sticky="nsew", padx=2)
-        self._label = ttk.Label(frame)
+        self.text_var = StringVar(frame, '')
+        self._label = ttk.Label(frame, textvariable=self.text_var)
         self._label.grid(column=0, row=0, sticky="nsew")
 
     def update(self, text: str):
-        self._label.config(text=text)
+        self.text_var.set(text)
 
     def clear(self):
-        self._label.config(text='')
+        self.text_var.set('')
 
 
 class _WSEntry(TypedDict):
@@ -1268,10 +1269,40 @@ class DashboardTab:
 
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
+        self._twitch = manager._twitch
         self._stats = manager._twitch.stats
         manager.tabs.add_view_event(self._on_tab_switched)
         master.columnconfigure(0, weight=1)
         master.columnconfigure(1, weight=1)
+
+        # Status card: running/paused/idle, live-bound to the same status text as the
+        # status bar, plus pause/resume controls (including an optional "resume at" time).
+        status_frame = ttk.LabelFrame(
+            master, text=_("gui", "dashboard", "status"), padding=(4, 4)
+        )
+        status_frame.grid(column=0, row=0, columnspan=2, sticky="nsew", pady=(0, 8))
+        self._status_dot = tk.Canvas(status_frame, width=14, height=14, highlightthickness=0)
+        self._status_dot.grid(column=0, row=0, padx=(2, 6))
+        self._status_dot_id = self._status_dot.create_oval(2, 2, 12, 12, fill="#808080")
+        ttk.Label(
+            status_frame, textvariable=manager.status.text_var
+        ).grid(column=1, row=0, sticky="w")
+        self._pause_btn = ttk.Button(
+            status_frame, text=_("gui", "dashboard", "pause"), command=self._toggle_pause
+        )
+        self._pause_btn.grid(column=2, row=0, padx=(12, 4))
+        ttk.Label(
+            status_frame, text=_("gui", "dashboard", "resume_at")
+        ).grid(column=3, row=0, padx=(8, 2))
+        self._resume_at_var = StringVar(master, "")
+        ttk.Entry(
+            status_frame, width=6, textvariable=self._resume_at_var
+        ).grid(column=4, row=0)
+        ttk.Button(
+            status_frame, text=_("gui", "dashboard", "pause_until"), command=self._pause_until
+        ).grid(column=5, row=0, padx=(4, 0))
+        self._update_status_indicator()
+        self._manager._root.after(2000, self._poll_status)
 
         # "Currently mining" live card - reuses the same StringVars as the Details tab's
         # progress widget, so it updates live without any extra polling.
@@ -1279,7 +1310,7 @@ class DashboardTab:
         now_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "now_mining"), padding=(4, 4)
         )
-        now_frame.grid(column=0, row=0, columnspan=2, sticky="nsew", pady=(0, 8))
+        now_frame.grid(column=0, row=1, columnspan=2, sticky="nsew", pady=(0, 8))
         now_frame.columnconfigure(0, weight=1)
         now_frame.columnconfigure(1, weight=1)
         ttk.Label(now_frame, text=_("gui", "progress", "game")).grid(column=0, row=0, sticky="w")
@@ -1311,7 +1342,7 @@ class DashboardTab:
         campaign_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "campaign"), padding=(4, 4)
         )
-        campaign_frame.grid(column=0, row=1, columnspan=2, sticky="nsew", pady=(0, 8))
+        campaign_frame.grid(column=0, row=2, columnspan=2, sticky="nsew", pady=(0, 8))
         self._campaign_frame = campaign_frame
         self._campaign_items_frame: ttk.Frame | None = None
         self._campaign_image_refs: list[PhotoImage] = []  # keep references alive
@@ -1323,7 +1354,7 @@ class DashboardTab:
 
         # summary counters
         summary = ttk.Frame(master)
-        summary.grid(column=0, row=2, columnspan=2, sticky="w", pady=(0, 8))
+        summary.grid(column=0, row=3, columnspan=2, sticky="w", pady=(0, 8))
         self._total_var = StringVar(master, "")
         self._hours_var = StringVar(master, "")
         ttk.Label(summary, textvariable=self._total_var).grid(column=0, row=0, padx=(0, 24))
@@ -1333,7 +1364,7 @@ class DashboardTab:
         week_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "weekly"), padding=(4, 4)
         )
-        week_frame.grid(column=0, row=3, sticky="nsew", padx=(0, 4))
+        week_frame.grid(column=0, row=4, sticky="nsew", padx=(0, 4))
         self._week_canvas = tk.Canvas(week_frame, width=280, height=160, highlightthickness=0)
         self._week_canvas.grid(column=0, row=0)
 
@@ -1341,7 +1372,7 @@ class DashboardTab:
         game_frame = ttk.LabelFrame(
             master, text=_("gui", "dashboard", "per_game"), padding=(4, 4)
         )
-        game_frame.grid(column=1, row=3, sticky="nsew", padx=(4, 0))
+        game_frame.grid(column=1, row=4, sticky="nsew", padx=(4, 0))
         self._game_canvas = tk.Canvas(game_frame, width=280, height=160, highlightthickness=0)
         self._game_canvas.grid(column=0, row=0)
 
@@ -1350,6 +1381,33 @@ class DashboardTab:
     def _on_tab_switched(self, event: tk.Event[ttk.Notebook]) -> None:
         if self._manager.tabs.current_tab() == 0:  # Dashboard is the 1st tab
             self.refresh()
+
+    def _toggle_pause(self) -> None:
+        self._twitch.toggle_pause()
+        self._update_status_indicator()
+
+    def _pause_until(self) -> None:
+        raw = self._resume_at_var.get().strip()
+        parsed = parse_hhmm(raw)
+        if parsed is None:
+            return
+        now = datetime.now()
+        resume_at = now.replace(hour=parsed.hour, minute=parsed.minute, second=0, microsecond=0)
+        if resume_at <= now:
+            resume_at += timedelta(days=1)  # time already passed today: resume tomorrow
+        self._twitch.pause_until(resume_at)
+        self._update_status_indicator()
+
+    def _update_status_indicator(self) -> None:
+        color = "#e0a800" if self._twitch.paused else "#2ecc71"
+        self._status_dot.itemconfig(self._status_dot_id, fill=color)
+        self._pause_btn.config(
+            text=_("gui", "dashboard", "resume" if self._twitch.paused else "pause")
+        )
+
+    def _poll_status(self) -> None:
+        self._update_status_indicator()
+        self._manager._root.after(2000, self._poll_status)
 
     def refresh_campaign(self) -> None:
         # schedules the async campaign rebuild (fetches/caches drop images)
@@ -1526,13 +1584,16 @@ class InventoryOverview:
             filter_frame, text=_("gui", "inventory", "filter", "refresh"), command=self.refresh
         ).grid(column=(icolumn := icolumn + 1), row=0)
         # Inventory view
-        self._canvas = tk.Canvas(master, scrollregion=(0, 0, 0, 0))
+        self._canvas = tk.Canvas(master, scrollregion=(0, 0, 0, 0), highlightthickness=0)
         self._canvas.grid(column=0, row=1, sticky="nsew")
         master.rowconfigure(1, weight=1)
         master.columnconfigure(0, weight=1)
-        xscroll = ttk.Scrollbar(master, orient="horizontal", command=self._canvas.xview)
+        # NOTE: scrollbar/mousewheel commands are wrapped to force a full canvas redraw
+        # afterwards - on Windows, ttk widgets embedded in a Canvas can leave "ghost"
+        # duplicate copies of themselves behind when scrolled without this.
+        xscroll = ttk.Scrollbar(master, orient="horizontal", command=self._scroll_x)
         xscroll.grid(column=0, row=2, sticky="ew")
-        yscroll = ttk.Scrollbar(master, orient="vertical", command=self._canvas.yview)
+        yscroll = ttk.Scrollbar(master, orient="vertical", command=self._scroll_y)
         yscroll.grid(column=1, row=1, sticky="ns")
         self._canvas.configure(xscrollcommand=xscroll.set, yscrollcommand=yscroll.set)
         self._canvas.bind("<Configure>", self._canvas_update)
@@ -1609,10 +1670,23 @@ class InventoryOverview:
         delta = -1 if event.delta > 0 else 1
         state: int = event.state if isinstance(event.state, int) else 0
         if state & 1:
-            scroll = self._canvas.xview_scroll
+            self._canvas.xview_scroll(delta, "units")
         else:
-            scroll = self._canvas.yview_scroll
-        scroll(delta, "units")
+            self._canvas.yview_scroll(delta, "units")
+        self._force_redraw()
+
+    def _scroll_x(self, *args) -> None:
+        self._canvas.xview(*args)
+        self._force_redraw()
+
+    def _scroll_y(self, *args) -> None:
+        self._canvas.yview(*args)
+        self._force_redraw()
+
+    def _force_redraw(self) -> None:
+        # Windows-only ttk-in-Canvas ghosting workaround: force everything to repaint
+        # after a scroll, otherwise stale duplicate copies of the widgets can linger.
+        self._canvas.after_idle(self._canvas.update_idletasks)
 
     async def add_campaign(self, campaign: DropsCampaign) -> None:
         campaign_frame = ttk.Frame(self._main_frame, relief="ridge", borderwidth=1, padding=4)
@@ -2006,6 +2080,11 @@ class SettingsPanel:
             text=_("gui", "settings", "accounts", "switch"),
             command=self.switch_profile,
         ).grid(column=1, row=0, padx=(4, 0))
+        ttk.Button(
+            buttons_frame,
+            text=_("gui", "settings", "accounts", "delete"),
+            command=self.delete_profile,
+        ).grid(column=2, row=0, padx=(4, 0))
 
         # Scheduler section
         schedule_frame = ttk.LabelFrame(
@@ -2423,6 +2502,20 @@ class SettingsPanel:
         if name:
             profiles_module.launch_profile(name)
             self._manager.close()
+
+    def delete_profile(self) -> None:
+        # deletes the selected profile's folder (settings/cookies/cache/stats), after
+        # a confirmation dialog since this is destructive and can't be undone
+        name = self._selected_profile()
+        if not name:
+            return
+        if not messagebox.askyesno(
+            _("gui", "settings", "accounts", "delete"),
+            _("gui", "settings", "accounts", "delete_confirm").format(name=name),
+        ):
+            return
+        profiles_module.delete_profile(name)
+        self.refresh_profiles()
 
     def update_use_system_accent(self) -> None:
         self._settings.use_system_accent = bool(self._vars["use_system_accent"].get())
@@ -2978,17 +3071,23 @@ class GUIManager:
             # Switch to a configurable ttk theme for better color control
             if sys.platform != "darwin" and self._style.theme_use() != "clam":
                 self._style.theme_use("clam")
-        elif style == "modern" and sys.platform == "win32":
+        elif (
+            style == "modern"
+            and sys.platform == "win32"
+            and not self._twitch.settings.use_system_accent
+        ):
             # "Modern Light" uses Windows' own native Fluent-rendered controls (buttons,
             # checkboxes, comboboxes) via the "vista" ttk theme, instead of hand-drawn ones -
-            # this is the most authentic possible Windows 11 look.
+            # this is the most authentic possible Windows 11 look. Native rendering ignores
+            # our custom colors though, so skip it whenever the accent color needs to show
+            # through (progress bar, focus outlines, etc.) and use "clam" instead.
             if "vista" in self._style.theme_names() and self._style.theme_use() != "vista":
                 self._style.theme_use("vista")
         else:
-            # Restore original theme if we changed it
-            orig = getattr(self, "_orig_theme_name", '')
-            if orig and self._style.theme_use() != orig:
-                self._style.theme_use(orig)
+            # "clam" lets every widget (progress bar, focus outlines, tabs...) actually
+            # reflect the accent color - needed for classic light and for any accent-aware mode
+            if sys.platform != "darwin" and self._style.theme_use() != "clam":
+                self._style.theme_use("clam")
 
         # Setting theme for macOS
         if sys.platform == "darwin":
@@ -3072,6 +3171,7 @@ class GUIManager:
             s.map(
                 "TButton",
                 background=[("active", header), ("pressed", border)],
+                bordercolor=[("focus", accent), ("!focus", border)],
                 foreground=[("disabled", muted)],
             )
         s.configure(
@@ -3129,7 +3229,7 @@ class GUIManager:
             s.map(
                 "TNotebook.Tab",
                 background=[("selected", header), ("active", header)],
-                foreground=[("disabled", muted)],
+                foreground=[("selected", accent), ("disabled", muted)],
             )
         # Tab bar icons: small flat glyphs instead of plain text, recolored to match the theme
         try:
@@ -3164,7 +3264,12 @@ class GUIManager:
                 bordercolor=[("focus", accent), ("!focus", border)],
             )
         else:
-            s.map("TEntry", foreground=[("disabled", muted)])
+            s.map(
+                "TEntry",
+                bordercolor=[("focus", accent), ("!focus", border)],
+                foreground=[("disabled", muted)],
+            )
+            s.map("TCombobox", bordercolor=[("focus", accent), ("!focus", border)])
         # Treeview
         s.configure(
             "Treeview",

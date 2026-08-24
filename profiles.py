@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -18,6 +19,17 @@ def create_profile(name: str) -> bool:
     if not name or any(c in name for c in '\\/:*?"<>|'):
         return False
     (PROFILES_DIR / name).mkdir(parents=True, exist_ok=True)
+    return True
+
+
+def delete_profile(name: str) -> bool:
+    # removes a profile's entire data folder (settings, cookies, cache, stats, logs)
+    if not name or any(c in name for c in '\\/:*?"<>|'):
+        return False
+    path = PROFILES_DIR / name
+    if not path.exists() or not path.is_dir():
+        return False
+    shutil.rmtree(path, ignore_errors=True)
     return True
 
 

@@ -58,6 +58,7 @@ class GUIStatus(TypedDict):
     fetching_campaigns: str
     adding_campaigns: str
     paused: str
+    paused_until: str
     scheduled: str
 
 
@@ -82,6 +83,11 @@ class GUITray(TypedDict):
 class GUIDashboard(TypedDict):
     now_mining: str
     campaign: str
+    status: str
+    pause: str
+    resume: str
+    resume_at: str
+    pause_until: str
     weekly: str
     per_game: str
     total_drops: str
@@ -199,6 +205,8 @@ class GUISettingsAccounts(TypedDict):
     create: str
     launch: str
     switch: str
+    delete: str
+    delete_confirm: str
 
 
 class GUISettingsScheduler(TypedDict):
@@ -341,6 +349,7 @@ default_translation: Translation = {
             "fetching_campaigns": "Fetching campaigns...",
             "adding_campaigns": "Adding campaigns to inventory... {counter}",
             "paused": "Paused",
+            "paused_until": "Paused until {time}",
             "scheduled": "Outside scheduled hours",
         },
         "tabs": {
@@ -353,6 +362,11 @@ default_translation: Translation = {
         "dashboard": {
             "now_mining": "Currently Mining",
             "campaign": "Drop Campaign",
+            "status": "Status",
+            "pause": "Pause",
+            "resume": "Resume",
+            "resume_at": "Resume at: ",
+            "pause_until": "Pause until",
             "weekly": "Last 7 days",
             "per_game": "Drops per game",
             "total_drops": "Total drops claimed: {count}",
@@ -466,6 +480,8 @@ default_translation: Translation = {
                 "create": "Create",
                 "launch": "Launch (parallel)",
                 "switch": "Switch to",
+                "delete": "Delete",
+                "delete_confirm": "Permanently delete the profile \"{name}\" and all of its data (settings, cookies, cache, stats)? This can't be undone.",
             },
             "advanced": {
                 "name": "Advanced",
@@ -480,8 +496,8 @@ default_translation: Translation = {
             },
             "priority_modes": {
                 "priority_only": "Priority list only",
-                "ending_soonest": "Ending soonest",
-                "low_availability": "Low availability first",
+                "ending_soonest": "Priority list first, then ending soonest",
+                "low_availability": "Priority list first, then low availability",
             },
             "scheduler": {
                 "name": "Scheduler",
@@ -570,62 +586,54 @@ class Translator:
             self._langs.remove(DEFAULT_LANG)
         self._langs.insert(0, DEFAULT_LANG)
 
+    # Known-good filename (without .json) for every shipped language, keyed by the
+    # "english_name" stored inside each file. Used to robustly detect and repair/dedupe
+    # mis-decoded filenames (mojibake, "#Uxxxx" escapes, etc.) regardless of the exact
+    # corruption pattern, since content encoding is unaffected, only filenames can break.
+    _CANONICAL_LANG_NAMES: dict[str, str] = {
+        "English": "English", "Czech": "Čeština", "Russian": "Русский",
+        "Ukrainian": "Українська", "Arabic": "العربية", "Japanese": "日本語",
+        "Simplified Chinese": "简体中文", "Traditional Chinese": "繁體中文",
+        "Danish": "Dansk", "German": "Deutsch", "Spanish": "Español",
+        "French": "Français", "Indonesian": "Indonesian", "Italian": "Italiano",
+        "Hungarian": "Magyar", "Dutch": "Nederlandse", "Norwegian": "Norsk",
+        "Polish": "Polski", "Portuguese": "Português", "Romanian": "Română",
+        "Turkish": "Türkçe",
+    }
+
     def _cleanup_legacy_filenames(self) -> None:
         """
-        Older releases could end up with mis-decoded language filenames (accented
-        characters replaced by "#Uxxxx" escapes, or mangled into replacement/box glyphs,
-        due to a packaging bug). This removes duplicate/garbled leftovers so the language
-        list doesn't show multiple broken entries for the same language after an update.
+        Older releases could end up with mis-decoded language filenames (accented/CJK/
+        Cyrillic/Arabic characters replaced by "#Uxxxx" escapes or turned into mojibake,
+        due to a packaging bug). Filename content itself (the JSON) is unaffected, so this
+        reads each file's "english_name" and renames/dedupes it against a known-good
+        canonical filename, fixing any corruption pattern rather than just one specific case.
         """
-        import re
         import json as _json
-        pattern = re.compile(r"#U([0-9a-fA-F]{4})")
         try:
             files = list(LANG_PATH.glob("*.json"))
         except OSError:
             return
-        # first pass: repair simple "#Uxxxx" escapes back into real characters
-        names = {f.name for f in files}
-        for f in list(files):
-            if not pattern.search(f.name):
-                continue
-            fixed_name = pattern.sub(lambda m: chr(int(m.group(1), 16)), f.name)
-            try:
-                if fixed_name in names:
-                    f.unlink()
-                    files.remove(f)
-                else:
-                    new_path = f.rename(f.with_name(fixed_name))
-                    files[files.index(f)] = new_path
-                    names.add(fixed_name)
-            except OSError:
-                pass
-
-        # second pass: for any remaining duplicates of the same language (by english_name),
-        # keep only the one whose filename looks clean, drop the mangled others
-        def is_clean(name: str) -> bool:
-            return "#" not in name and "\ufffd" not in name and "\u25a1" not in name
-
-        by_lang: dict[str, list[Path]] = {}
+        existing_stems = {f.stem for f in files}
         for f in files:
             try:
                 with f.open(encoding="utf-8") as fh:
                     english_name = _json.load(fh).get("english_name")
             except (OSError, ValueError):
                 continue
-            if english_name:
-                by_lang.setdefault(english_name, []).append(f)
-        for group in by_lang.values():
-            if len(group) < 2:
+            canonical = self._CANONICAL_LANG_NAMES.get(english_name)
+            if canonical is None or f.stem == canonical:
                 continue
-            clean = [f for f in group if is_clean(f.stem)]
-            keep = clean[0] if clean else group[0]
-            for f in group:
-                if f != keep:
-                    try:
-                        f.unlink()
-                    except OSError:
-                        pass
+            try:
+                if canonical in existing_stems:
+                    # the correctly-named file already exists: this one is a stale duplicate
+                    f.unlink()
+                else:
+                    f.rename(f.with_name(f"{canonical}.json"))
+                    existing_stems.add(canonical)
+                existing_stems.discard(f.stem)
+            except OSError:
+                pass
 
     @property
     def languages(self) -> abc.Iterable[str]:

@@ -441,6 +441,8 @@ class Twitch:
         self._state_change = asyncio.Event()
         # manual pause (tray menu) takes priority over the schedule window
         self._paused: bool = False
+        # if set, pause automatically lifts once this time is reached (see pause_until)
+        self._resume_at: datetime | None = None
         # ensures the auto power action only fires once per "all drops done" event
         self._auto_action_done: bool = False
         self.wanted_games: list[Game] = []
@@ -468,6 +470,7 @@ class Twitch:
         self._mnt_task: asyncio.Task[None] | None = None
         # Periodic OAuth token validity check (auto-refresh)
         self._token_refresh_task: asyncio.Task[None] | None = None
+        self._memory_task: asyncio.Task[None] | None = None
 
     async def get_session(self) -> aiohttp.ClientSession:
         if (session := self._session) is not None:
@@ -516,6 +519,9 @@ class Twitch:
         if self._token_refresh_task is not None:
             self._token_refresh_task.cancel()
             self._token_refresh_task = None
+        if self._memory_task is not None:
+            self._memory_task.cancel()
+            self._memory_task = None
         # stop websocket, close session and save cookies
         await self.websocket.stop(clear_topics=True)
         if self._session is not None:
@@ -637,6 +643,9 @@ class Twitch:
         # token gets detected and re-authenticated before it breaks an active mining session
         if self._token_refresh_task is None or self._token_refresh_task.done():
             self._token_refresh_task = asyncio.create_task(self._token_refresh_loop())
+        # periodic light memory hygiene: helps keep RSS usage down over long (24h+) sessions
+        if self._memory_task is None or self._memory_task.done():
+            self._memory_task = asyncio.create_task(self._memory_maintenance_loop())
         # Add default topics
         self.websocket.add_topics([
             WebsocketTopic("User", "Drops", auth_state.user_id, self.process_drops),
@@ -648,16 +657,26 @@ class Twitch:
         channels: Final[OrderedDict[int, Channel]] = self.channels
         self.change_state(State.INVENTORY_FETCH)
         while True:
+            if self._paused and self._resume_at is not None and datetime.now() >= self._resume_at:
+                self.resume()
             if self._paused or not self._scheduler_allows_running():
                 # manual pause or outside the configured schedule window: stay idle
                 self.gui.tray.change_icon("idle")
-                reason = "paused" if self._paused else "scheduled"
-                self.gui.status.update(_("gui", "status", reason))
+                if self._paused and self._resume_at is not None:
+                    self.gui.status.update(
+                        _("gui", "status", "paused_until").format(
+                            time=self._resume_at.strftime("%H:%M")
+                        )
+                    )
+                else:
+                    reason = "paused" if self._paused else "scheduled"
+                    self.gui.status.update(_("gui", "status", reason))
                 self.stop_watching()
                 self._state_change.clear()
-                # wake up periodically to re-check the schedule window even without state changes
+                # wake up periodically to re-check the schedule/resume-at time even without
+                # an explicit state change
                 with suppress(asyncio.TimeoutError):
-                    await asyncio.wait_for(self._state_change.wait(), timeout=60)
+                    await asyncio.wait_for(self._state_change.wait(), timeout=15)
                 continue
             if self._state is State.IDLE:
                 if self.settings.dump:
@@ -1087,14 +1106,24 @@ class Twitch:
 
     def pause(self) -> None:
         self._paused = True
+        self._resume_at = None
         self._state_change.set()
 
     def resume(self) -> None:
         self._paused = False
+        self._resume_at = None
         self._state_change.set()
 
     def toggle_pause(self) -> None:
-        self._paused = not self._paused
+        if self._paused:
+            self.resume()
+        else:
+            self.pause()
+
+    def pause_until(self, resume_time: datetime) -> None:
+        # pauses now and automatically resumes once the given time is reached
+        self._paused = True
+        self._resume_at = resume_time
         self._state_change.set()
 
     def _scheduler_allows_running(self) -> bool:
@@ -1112,6 +1141,19 @@ class Twitch:
                 await self.get_auth()
             except Exception:
                 logger.exception("Periodic token validation failed")
+
+    async def _memory_maintenance_loop(self) -> None:
+        # runs a lightweight garbage-collection pass every 10 minutes, on top of the bounded
+        # image cache (see cache.py), to help keep memory usage from creeping up on long,
+        # multi-hour/24h+ mining sessions
+        import gc
+        MEMORY_CHECK_INTERVAL = 10 * 60  # seconds
+        while True:
+            await asyncio.sleep(MEMORY_CHECK_INTERVAL)
+            try:
+                gc.collect()
+            except Exception:
+                logger.exception("Periodic memory cleanup failed")
 
     @task_wrapper
     async def process_stream_state(self, channel_id: int, message: JsonType):

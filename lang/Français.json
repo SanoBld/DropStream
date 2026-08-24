@@ -44,7 +44,8 @@
             "fetching_campaigns": "Récupération des campagnes...",
             "adding_campaigns": "Ajout de la liste des campagnes à l'inventaire... {counter}",
             "paused": "En pause",
-            "scheduled": "Hors des horaires programmés"
+            "scheduled": "Hors des horaires programmés",
+            "paused_until": "En pause jusqu'à {time}"
         },
         "tabs": {
             "main": "Détails",
@@ -148,8 +149,8 @@
             },
             "priority_modes": {
                 "priority_only": "Liste de priorité uniquement",
-                "ending_soonest": "Se termine le plus tôt",
-                "low_availability": "Faible disponibilité en premier"
+                "ending_soonest": "Liste de priorité d'abord, puis fin la plus proche",
+                "low_availability": "Liste de priorité d'abord, puis faible disponibilité"
             },
             "game_name": "Nom du jeu",
             "priority": "Priorité",
@@ -169,7 +170,9 @@
                 "current": "Profil actif : {name}",
                 "create": "Créer",
                 "launch": "Lancer (parallèle)",
-                "switch": "Basculer vers"
+                "switch": "Basculer vers",
+                "delete": "Supprimer",
+                "delete_confirm": "Supprimer définitivement le profil « {name} » et toutes ses données (paramètres, cookies, cache, statistiques) ? Cette action est irréversible."
             },
             "scheduler": {
                 "name": "Planificateur",
@@ -213,7 +216,12 @@
             "hours_saved": "Heures de visionnage économisées : {hours}",
             "no_data": "Pas encore de données",
             "now_mining": "En cours de minage",
-            "campaign": "Campagne de drops"
+            "campaign": "Campagne de drops",
+            "status": "Statut",
+            "pause": "Pause",
+            "resume": "Reprendre",
+            "resume_at": "Reprendre à : ",
+            "pause_until": "Mettre en pause jusqu'à"
         }
     }
 }
