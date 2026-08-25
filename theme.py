@@ -90,13 +90,25 @@ def system_accent_color() -> str | None:
     try:
         if sys.platform == "win32":
             import winreg
+            # DWM's AccentColor reflects Settings > Personalization > Colors > Accent color
+            # directly, stored as a 0xAABBGGRR DWORD; this is more reliable than Explorer's key.
+            try:
+                key_path = r"Software\Microsoft\Windows\DWM"
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
+                    value, _type = winreg.QueryValueEx(key, "AccentColor")
+                    r = value & 0xFF
+                    g = (value >> 8) & 0xFF
+                    b = (value >> 16) & 0xFF
+                    return f"#{r:02x}{g:02x}{b:02x}"
+            except OSError:
+                pass
+            # fallback: Explorer's accent palette entry (same 0xAABBGGRR layout)
             key_path = r"Software\Microsoft\Windows\CurrentVersion\Explorer\Accent"
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
                 value, _type = winreg.QueryValueEx(key, "AccentColorMenu")
-                # value is a 32-bit ABGR DWORD
-                b = (value >> 8) & 0xFF
-                g = (value >> 16) & 0xFF
-                r = (value >> 24) & 0xFF
+                r = value & 0xFF
+                g = (value >> 8) & 0xFF
+                b = (value >> 16) & 0xFF
                 return f"#{r:02x}{g:02x}{b:02x}"
         elif sys.platform == "darwin":
             import subprocess

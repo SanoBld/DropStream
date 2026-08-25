@@ -87,6 +87,7 @@ class GUIDashboard(TypedDict):
     pause: str
     resume: str
     resume_at: str
+    resume_at_info: str
     pause_until: str
     weekly: str
     per_game: str
@@ -187,6 +188,7 @@ class GUISettingsGeneral(TypedDict):
     theme: str
     use_system_accent: str
     priority_mode: str
+    priority_mode_info: str
     proxy: str
 
 
@@ -366,6 +368,11 @@ default_translation: Translation = {
             "pause": "Pause",
             "resume": "Resume",
             "resume_at": "Resume at: ",
+            "resume_at_info": (
+                "Example: type 14:30 and click \"Pause until\" to pause mining now and "
+                "automatically resume at 2:30 PM (today, or tomorrow if that time already "
+                "passed today)."
+            ),
             "pause_until": "Pause until",
             "weekly": "Last 7 days",
             "per_game": "Drops per game",
@@ -464,6 +471,11 @@ default_translation: Translation = {
                 "theme": "Theme: ",
                 "use_system_accent": "Use system accent color: ",
                 "priority_mode": "Priority mode: ",
+                "priority_mode_info": (
+                    "Priority list games are always tried first, in the order you set them. "
+                    "\"Ending soonest\"/\"Low availability first\" only decide the order for "
+                    "everything else, once nothing from the priority list is available."
+                ),
                 "proxy": "Proxy (requires restart):",
             },
             "themes": {
@@ -496,8 +508,8 @@ default_translation: Translation = {
             },
             "priority_modes": {
                 "priority_only": "Priority list only",
-                "ending_soonest": "Priority list first, then ending soonest",
-                "low_availability": "Priority list first, then low availability",
+                "ending_soonest": "Ending soonest",
+                "low_availability": "Low availability first",
             },
             "scheduler": {
                 "name": "Scheduler",

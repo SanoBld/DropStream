@@ -85,16 +85,9 @@ class Settings:
     PASSTHROUGH = ("_settings", "_args", "_altered")
 
     def __init__(self, args: ParsedArgs):
-        settings_existed = SETTINGS_PATH.exists()
         self._settings: SettingsFile = json_load(SETTINGS_PATH, default_settings)
         self._args: ParsedArgs = args
         self._altered: bool = False
-        # one-time migration: pre-existing settings files only had a boolean dark_mode toggle;
-        # new installs keep the "auto" default instead
-        if settings_existed and self._settings.get("_migrated_theme") is not True:
-            self._settings["theme"] = "dark" if self._settings["dark_mode"] else "light"
-            self._settings["_migrated_theme"] = True  # type: ignore[typeddict-unknown-key]
-            self._altered = True
 
     # default logic of reading settings is to check args first, then the settings file
     def __getattr__(self, name: str, /) -> Any:

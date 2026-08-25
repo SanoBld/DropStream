@@ -350,6 +350,36 @@ class MouseOverLabel(ttk.Label):
         self.configure(*args, **kwargs)
 
 
+class InfoTooltip(ttk.Label):
+    """A small 'ⓘ' hint icon that shows an explanatory popup on hover."""
+
+    def __init__(self, master: tk.Misc, text: str, **kwargs) -> None:
+        super().__init__(master, text="ⓘ", cursor="question_arrow", **kwargs)
+        self._text = text
+        self._popup: tk.Toplevel | None = None
+        self.bind("<Enter>", self._show)
+        self.bind("<Leave>", self._hide)
+
+    def _show(self, event: tk.Event[tk.Misc]) -> None:
+        if self._popup is not None:
+            return
+        x = self.winfo_rootx() + 16
+        y = self.winfo_rooty() + self.winfo_height()
+        self._popup = popup = tk.Toplevel(self)
+        popup.wm_overrideredirect(True)
+        popup.wm_geometry(f"+{x}+{y}")
+        label = ttk.Label(
+            popup, text=self._text, justify="left", wraplength=320,
+            padding=(6, 4), relief="solid", borderwidth=1,
+        )
+        label.pack()
+
+    def _hide(self, event: tk.Event[tk.Misc]) -> None:
+        if self._popup is not None:
+            self._popup.destroy()
+            self._popup = None
+
+
 class LinkLabel(ttk.Label):
     def __init__(self, *args, link: str, **kwargs) -> None:
         self._link: str = link
@@ -1281,26 +1311,34 @@ class DashboardTab:
             master, text=_("gui", "dashboard", "status"), padding=(4, 4)
         )
         status_frame.grid(column=0, row=0, columnspan=2, sticky="nsew", pady=(0, 8))
-        self._status_dot = tk.Canvas(status_frame, width=14, height=14, highlightthickness=0)
+        # row 0: live status indicator + pause/resume toggle
+        top_row = ttk.Frame(status_frame)
+        top_row.grid(column=0, row=0, sticky="w")
+        self._status_dot = tk.Canvas(top_row, width=14, height=14, highlightthickness=0)
         self._status_dot.grid(column=0, row=0, padx=(2, 6))
         self._status_dot_id = self._status_dot.create_oval(2, 2, 12, 12, fill="#808080")
         ttk.Label(
-            status_frame, textvariable=manager.status.text_var
+            top_row, textvariable=manager.status.text_var
         ).grid(column=1, row=0, sticky="w")
         self._pause_btn = ttk.Button(
-            status_frame, text=_("gui", "dashboard", "pause"), command=self._toggle_pause
+            top_row, text=_("gui", "dashboard", "pause"), command=self._toggle_pause
         )
-        self._pause_btn.grid(column=2, row=0, padx=(12, 4))
+        self._pause_btn.grid(column=2, row=0, padx=(16, 0))
+        # row 1: "pause until HH:MM" - on its own line, with a hint bubble + placeholder
+        bottom_row = ttk.Frame(status_frame)
+        bottom_row.grid(column=0, row=1, sticky="w", pady=(6, 0))
         ttk.Label(
-            status_frame, text=_("gui", "dashboard", "resume_at")
-        ).grid(column=3, row=0, padx=(8, 2))
-        self._resume_at_var = StringVar(master, "")
-        ttk.Entry(
-            status_frame, width=6, textvariable=self._resume_at_var
-        ).grid(column=4, row=0)
+            bottom_row, text=_("gui", "dashboard", "resume_at")
+        ).grid(column=0, row=0, padx=(2, 4))
+        resume_entry = PlaceholderEntry(bottom_row, placeholder="14:30", width=8)
+        resume_entry.grid(column=1, row=0)
+        self._resume_at_entry = resume_entry
         ttk.Button(
-            status_frame, text=_("gui", "dashboard", "pause_until"), command=self._pause_until
-        ).grid(column=5, row=0, padx=(4, 0))
+            bottom_row, text=_("gui", "dashboard", "pause_until"), command=self._pause_until
+        ).grid(column=2, row=0, padx=(6, 4))
+        InfoTooltip(
+            bottom_row, text=_("gui", "dashboard", "resume_at_info")
+        ).grid(column=3, row=0)
         self._update_status_indicator()
         self._manager._root.after(2000, self._poll_status)
 
@@ -1387,7 +1425,9 @@ class DashboardTab:
         self._update_status_indicator()
 
     def _pause_until(self) -> None:
-        raw = self._resume_at_var.get().strip()
+        if self._resume_at_entry._ph:
+            return  # placeholder still showing, no real value entered
+        raw = self._resume_at_entry.get().strip()
         parsed = parse_hhmm(raw)
         if parsed is None:
             return
@@ -1469,12 +1509,24 @@ class DashboardTab:
                 style="green.TLabel" if campaign_drop.is_claimed else "TLabel",
             ).grid(column=0, row=1, pady=(4, 0))
 
+    def apply_theme(self, bg: str, fg: str) -> None:
+        # tk.Canvas isn't a ttk widget, so it doesn't pick up theme colors automatically
+        for canvas in (self._status_dot, self._week_canvas, self._game_canvas):
+            canvas.config(bg=bg)
+        self._chart_bg = bg
+        self._chart_fg = fg
+        self._draw_bars(self._week_canvas, self._stats.weekly_progress())
+        self._draw_bars(self._game_canvas, self._stats.drops_per_game())
+
     def _draw_bars(
         self, canvas: tk.Canvas, data: list[tuple[str, int]], *, w: int = 280, h: int = 160
     ) -> None:
         canvas.delete("all")
+        text_fg = getattr(self, "_chart_fg", "#000000")
         if not data:
-            canvas.create_text(w / 2, h / 2, text=_("gui", "dashboard", "no_data"))
+            canvas.create_text(
+                w / 2, h / 2, text=_("gui", "dashboard", "no_data"), fill=text_fg
+            )
             return
         max_val = max((v for _n, v in data), default=0) or 1
         pad_bottom = 24
@@ -1491,10 +1543,14 @@ class DashboardTab:
                 fill=self.BAR_COLOR, outline="",
             )
             if value:
-                canvas.create_text(x_center, y0 - 8, text=str(value), font=("", 8))
+                canvas.create_text(
+                    x_center, y0 - 8, text=str(value), font=("", 8), fill=text_fg
+                )
             # truncate long game names
             short_label = label if len(label) <= 10 else label[:9] + "…"
-            canvas.create_text(x_center, h - pad_bottom + 10, text=short_label, font=("", 8))
+            canvas.create_text(
+                x_center, h - pad_bottom + 10, text=short_label, font=("", 8), fill=text_fg
+            )
 
     def refresh(self) -> None:
         self.refresh_campaign()
@@ -2025,6 +2081,9 @@ class SettingsPanel:
             textvariable=self._vars["priority_mode"],
             values=list(self.PRIORITY_MODES.values()),
         ).grid(column=1, row=irow, sticky="w")
+        InfoTooltip(
+            checkboxes_frame, text=_("gui", "settings", "general", "priority_mode_info")
+        ).grid(column=2, row=irow, sticky="w", padx=(4, 0))
 
         # proxy frame
         proxy_frame = ttk.Frame(general_center)
@@ -3236,6 +3295,9 @@ class GUIManager:
             self.tabs.set_icons(build_tab_icons(fg))
         except Exception:
             logger.debug("Failed to build tab icons", exc_info=True)
+        # Dashboard's tk.Canvas charts aren't ttk widgets, so sync their colors manually
+        if hasattr(self, "dashboard"):
+            self.dashboard.apply_theme(surface, fg)
         # Entries/Combos
         s.configure(
             "TEntry", fieldbackground=fieldbg, background=fieldbg, foreground=fg, insertcolor=fg

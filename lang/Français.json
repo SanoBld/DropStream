@@ -145,12 +145,13 @@
                 "priority_mode": "Mode de priorité :",
                 "proxy": "Proxy (nécessite un redémarrage) :",
                 "theme": "Thème : ",
-                "use_system_accent": "Utiliser la couleur d'accentuation du système : "
+                "use_system_accent": "Utiliser la couleur d'accentuation du système : ",
+                "priority_mode_info": "Les jeux de la liste de priorité sont toujours essayés en premier, dans l'ordre défini. « Se termine le plus tôt »/« Faible disponibilité en premier » ne déterminent que l'ordre pour tout le reste, une fois qu'il n'y a plus rien à farmer dans la liste de priorité."
             },
             "priority_modes": {
                 "priority_only": "Liste de priorité uniquement",
-                "ending_soonest": "Liste de priorité d'abord, puis fin la plus proche",
-                "low_availability": "Liste de priorité d'abord, puis faible disponibilité"
+                "ending_soonest": "Se termine le plus tôt",
+                "low_availability": "Faible disponibilité en premier"
             },
             "game_name": "Nom du jeu",
             "priority": "Priorité",
@@ -221,7 +222,8 @@
             "pause": "Pause",
             "resume": "Reprendre",
             "resume_at": "Reprendre à : ",
-            "pause_until": "Mettre en pause jusqu'à"
+            "pause_until": "Mettre en pause jusqu'à",
+            "resume_at_info": "Exemple : tapez 14:30 puis cliquez sur « Mettre en pause jusqu'à » pour mettre en pause maintenant et reprendre automatiquement à 14h30 (aujourd'hui, ou demain si l'heure est déjà passée)."
         }
     }
 }
