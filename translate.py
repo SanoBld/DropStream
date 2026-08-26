@@ -83,6 +83,8 @@ class GUITray(TypedDict):
 class GUIDashboard(TypedDict):
     now_mining: str
     campaign: str
+    drop_remaining: str
+    campaign_remaining: str
     status: str
     pause: str
     resume: str
@@ -235,8 +237,11 @@ class GUISettingsAdvanced(TypedDict):
 
 class GUIPriorityModes(TypedDict):
     priority_only: str
+    priority_only_continue: str
     ending_soonest: str
+    priority_ending_soonest: str
     low_availability: str
+    priority_low_availability: str
 
 
 class GUISettings(TypedDict):
@@ -364,6 +369,8 @@ default_translation: Translation = {
         "dashboard": {
             "now_mining": "Currently Mining",
             "campaign": "Drop Campaign",
+            "drop_remaining": "Time left for this drop: ",
+            "campaign_remaining": "Time left for the campaign: ",
             "status": "Status",
             "pause": "Pause",
             "resume": "Resume",
@@ -508,8 +515,11 @@ default_translation: Translation = {
             },
             "priority_modes": {
                 "priority_only": "Priority list only",
+                "priority_only_continue": "Priority list only, then continue with the rest",
                 "ending_soonest": "Ending soonest",
+                "priority_ending_soonest": "Priority list first, then ending soonest",
                 "low_availability": "Low availability first",
+                "priority_low_availability": "Priority list first, then low availability",
             },
             "scheduler": {
                 "name": "Scheduler",

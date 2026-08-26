@@ -276,6 +276,9 @@ class PriorityMode(Enum):
     PRIORITY_ONLY = 0
     ENDING_SOONEST = 1
     LOW_AVBL_FIRST = 2
+    PRIORITY_ONLY_CONTINUE = 3
+    PRIORITY_ENDING_SOONEST = 4
+    PRIORITY_LOW_AVBL_FIRST = 5
 
 
 class GQLQuery(JsonType):

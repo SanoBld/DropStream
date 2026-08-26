@@ -708,27 +708,40 @@ class Twitch:
                 exclude = self.settings.exclude
                 priority = self.settings.priority
                 priority_mode = self.settings.priority_mode
-                priority_only = priority_mode is PriorityMode.PRIORITY_ONLY
+                # PRIORITY_ONLY is the only mode that ever excludes non-priority games entirely
+                restrict_to_priority = priority_mode is PriorityMode.PRIORITY_ONLY
+                # these modes sort priority-listed games first (in list order); the "pure"
+                # ENDING_SOONEST/LOW_AVBL_FIRST modes ignore the priority list entirely instead
+                apply_priority_sort = priority_mode in (
+                    PriorityMode.PRIORITY_ONLY,
+                    PriorityMode.PRIORITY_ONLY_CONTINUE,
+                    PriorityMode.PRIORITY_ENDING_SOONEST,
+                    PriorityMode.PRIORITY_LOW_AVBL_FIRST,
+                )
                 next_hour = datetime.now(timezone.utc) + timedelta(hours=1)
                 # sorted_campaigns: list[DropsCampaign] = list(self.inventory)
                 sorted_campaigns: list[DropsCampaign] = self.inventory
-                if not priority_only:
-                    if priority_mode is PriorityMode.ENDING_SOONEST:
-                        sorted_campaigns.sort(key=lambda c: c.ends_at)
-                    elif priority_mode is PriorityMode.LOW_AVBL_FIRST:
-                        sorted_campaigns.sort(key=lambda c: c.availability)
-                sorted_campaigns.sort(
-                    key=lambda c: (
-                        priority.index(c.game.name) if c.game.name in priority else MAX_INT
+                if priority_mode in (
+                    PriorityMode.ENDING_SOONEST, PriorityMode.PRIORITY_ENDING_SOONEST
+                ):
+                    sorted_campaigns.sort(key=lambda c: c.ends_at)
+                elif priority_mode in (
+                    PriorityMode.LOW_AVBL_FIRST, PriorityMode.PRIORITY_LOW_AVBL_FIRST
+                ):
+                    sorted_campaigns.sort(key=lambda c: c.availability)
+                if apply_priority_sort:
+                    sorted_campaigns.sort(
+                        key=lambda c: (
+                            priority.index(c.game.name) if c.game.name in priority else MAX_INT
+                        )
                     )
-                )
                 for campaign in sorted_campaigns:
                     game: Game = campaign.game
                     if (
                         game not in self.wanted_games  # isn't already there
                         # and isn't excluded by list or priority mode
                         and game.name not in exclude
-                        and (not priority_only or game.name in priority)
+                        and (not restrict_to_priority or game.name in priority)
                         # and can be progressed within the next hour
                         and campaign.can_earn_within(next_hour)
                     ):

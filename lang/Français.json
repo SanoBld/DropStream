@@ -151,7 +151,10 @@
             "priority_modes": {
                 "priority_only": "Liste de priorité uniquement",
                 "ending_soonest": "Se termine le plus tôt",
-                "low_availability": "Faible disponibilité en premier"
+                "low_availability": "Faible disponibilité en premier",
+                "priority_only_continue": "Liste de priorité uniquement, puis continuer avec le reste",
+                "priority_ending_soonest": "Liste de priorité d'abord, puis se termine le plus tôt",
+                "priority_low_availability": "Liste de priorité d'abord, puis faible disponibilité"
             },
             "game_name": "Nom du jeu",
             "priority": "Priorité",
@@ -223,7 +226,9 @@
             "resume": "Reprendre",
             "resume_at": "Reprendre à : ",
             "pause_until": "Mettre en pause jusqu'à",
-            "resume_at_info": "Exemple : tapez 14:30 puis cliquez sur « Mettre en pause jusqu'à » pour mettre en pause maintenant et reprendre automatiquement à 14h30 (aujourd'hui, ou demain si l'heure est déjà passée)."
+            "resume_at_info": "Exemple : tapez 14:30 puis cliquez sur « Mettre en pause jusqu'à » pour mettre en pause maintenant et reprendre automatiquement à 14h30 (aujourd'hui, ou demain si l'heure est déjà passée).",
+            "drop_remaining": "Temps restant pour ce drop : ",
+            "campaign_remaining": "Temps restant pour la campagne : "
         }
     }
 }

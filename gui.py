@@ -1340,7 +1340,7 @@ class DashboardTab:
             bottom_row, text=_("gui", "dashboard", "resume_at_info")
         ).grid(column=3, row=0)
         self._update_status_indicator()
-        self._manager._root.after(2000, self._poll_status)
+        self._manager._root.after(5000, self._poll_status)
 
         # "Currently mining" live card - reuses the same StringVars as the Details tab's
         # progress widget, so it updates live without any extra polling.
@@ -1374,6 +1374,18 @@ class DashboardTab:
             maximum=1,
             variable=progress_vars["drop"]["progress"],
         ).grid(column=0, row=3, columnspan=2, sticky="ew", pady=(2, 0))
+        ttk.Label(
+            now_frame, text=_("gui", "dashboard", "drop_remaining")
+        ).grid(column=0, row=4, sticky="w", pady=(6, 0))
+        ttk.Label(
+            now_frame, textvariable=progress_vars["drop"]["remaining"]
+        ).grid(column=1, row=4, sticky="w", pady=(6, 0))
+        ttk.Label(
+            now_frame, text=_("gui", "dashboard", "campaign_remaining")
+        ).grid(column=0, row=5, sticky="w")
+        ttk.Label(
+            now_frame, textvariable=progress_vars["campaign"]["remaining"]
+        ).grid(column=1, row=5, sticky="w")
 
         # Drop campaign section: every item obtainable in the current campaign, with images,
         # highlighting the drop currently being mined and marking already-claimed ones.
@@ -1447,10 +1459,23 @@ class DashboardTab:
 
     def _poll_status(self) -> None:
         self._update_status_indicator()
-        self._manager._root.after(2000, self._poll_status)
+        self._manager._root.after(5000, self._poll_status)
 
-    def refresh_campaign(self) -> None:
-        # schedules the async campaign rebuild (fetches/caches drop images)
+    def refresh_campaign(self, *, force: bool = False) -> None:
+        # schedules the async campaign rebuild (fetches/caches drop images).
+        # Skipped entirely when nothing actually changed (same current drop, same claim
+        # states) - display() is called on every progress tick (~once/minute) while mining,
+        # so rebuilding every widget and re-touching every image each time would be wasteful.
+        drop = self._manager.progress._drop
+        drop_id = drop.id if drop is not None else None
+        claimed_ids = (
+            frozenset(d.id for d in drop.campaign.drops if d.is_claimed)
+            if drop is not None else frozenset()
+        )
+        state = (drop_id, claimed_ids)
+        if not force and state == getattr(self, "_last_campaign_state", None):
+            return
+        self._last_campaign_state = state
         if self._campaign_refresh_task is not None and not self._campaign_refresh_task.done():
             self._campaign_refresh_task.cancel()
         self._campaign_refresh_task = asyncio.create_task(self._refresh_campaign_async())
@@ -1553,7 +1578,7 @@ class DashboardTab:
             )
 
     def refresh(self) -> None:
-        self.refresh_campaign()
+        self.refresh_campaign(force=True)
         self._total_var.set(
             _("gui", "dashboard", "total_drops").format(count=self._stats.total_drops_claimed())
         )
@@ -1937,11 +1962,15 @@ class SettingsPanel:
     def PRIORITY_MODES(self) -> dict[PriorityMode, str]:
         # NOTE: Translation calls have to be deferred here,
         # to allow changing the language before the settings panel is initialized.
+        pm = "priority_modes"
         return {
-            PriorityMode.PRIORITY_ONLY: _("gui", "settings", "priority_modes", "priority_only"),
-            PriorityMode.ENDING_SOONEST: _("gui", "settings", "priority_modes", "ending_soonest"),
-            PriorityMode.LOW_AVBL_FIRST: _(
-                "gui", "settings", "priority_modes", "low_availability"
+            PriorityMode.PRIORITY_ONLY: _("gui", "settings", pm, "priority_only"),
+            PriorityMode.PRIORITY_ONLY_CONTINUE: _("gui", "settings", pm, "priority_only_continue"),
+            PriorityMode.ENDING_SOONEST: _("gui", "settings", pm, "ending_soonest"),
+            PriorityMode.PRIORITY_ENDING_SOONEST: _("gui", "settings", pm, "priority_ending_soonest"),
+            PriorityMode.LOW_AVBL_FIRST: _("gui", "settings", pm, "low_availability"),
+            PriorityMode.PRIORITY_LOW_AVBL_FIRST: _(
+                "gui", "settings", pm, "priority_low_availability"
             ),
         }
 
@@ -3096,13 +3125,15 @@ class GUIManager:
         self.apply_theme(dark, style)
 
     def _theme_auto_check(self) -> None:
-        # every 30s, re-resolve the theme in case it's set to follow the OS and the OS changed
+        # every 60s, re-resolve the theme in case it's set to follow the OS and the OS changed.
+        # Cheap either way (a dict lookup unless the OS setting actually changed), but only
+        # worth checking at all when a theme is actually set to "auto".
         theme = self._twitch.settings.theme
         if theme.endswith("auto"):
             dark, _style = resolve_theme(theme)
             if dark != getattr(self, "_current_theme_dark", None):
                 self.apply_theme_choice(theme)
-        self._root.after(30_000, self._theme_auto_check)
+        self._root.after(60_000, self._theme_auto_check)
 
     def apply_theme(self, dark: bool, style: str = "classic") -> None:
         """

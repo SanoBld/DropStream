@@ -112,12 +112,28 @@ jobs:
           Copy-Item manual.txt $FolderName
           Compress-Archive -Path $FolderName -DestinationPath DropStream.Windows.zip
 
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build Windows installer
+        run: |
+          $Version = (Get-Content version.py) -Replace '^__version__\s*=\s*"([^"]+)".*', '$1'
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "/DMyAppVersion=$Version" installer\dropstream.iss
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: DropStream.Windows
           path: DropStream.Windows.zip
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          name: DropStream.Windows.Installer
+          path: installer\Output\DropStream-Setup.exe
 
   macos:
     name: macOS
