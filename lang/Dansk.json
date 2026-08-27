@@ -171,6 +171,16 @@
                 "end": "Slut (TT:MM): ",
                 "auto_action": "Når alle drops er klaret: "
             },
+            "remote": {
+                "name": "Fjernadgang",
+                "info": "Giver mulighed for at se live status og styre denne instans (pause/genoptag, prioritetstilstand) fra en browser på en anden enhed, via linket nedenfor. Alle med linket har fuld adgang, så del det kun med personer, du stoler på.",
+                "enabled": "Aktiver webdashboard: ",
+                "port": "Port: ",
+                "new_link": "Generer et nyt link",
+                "link": "Delingslink:",
+                "link_disabled": "Aktiver dashboardet for at generere et link.",
+                "copy_link": "Kopier link"
+            },
             "power_actions": {
                 "none": "Gør ingenting",
                 "sleep": "Sæt pc i dvale",

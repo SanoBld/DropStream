@@ -31,6 +31,10 @@ class SettingsFile(TypedDict):
     schedule_start: str  # "HH:MM"
     schedule_end: str  # "HH:MM"
     auto_action: PowerAction
+    # optional remote web dashboard: view/control this instance from another device
+    web_server_enabled: bool
+    web_server_port: int
+    web_server_token: str  # secret path segment, part of the share link; empty = not generated yet
 
 
 default_settings: SettingsFile = {
@@ -51,6 +55,9 @@ default_settings: SettingsFile = {
     "schedule_start": "",
     "schedule_end": "",
     "auto_action": PowerAction.NONE,
+    "web_server_enabled": False,
+    "web_server_port": 21000,
+    "web_server_token": "",
 }
 
 
@@ -81,6 +88,9 @@ class Settings:
     schedule_start: str
     schedule_end: str
     auto_action: PowerAction
+    web_server_enabled: bool
+    web_server_port: int
+    web_server_token: str
 
     PASSTHROUGH = ("_settings", "_args", "_altered")
 

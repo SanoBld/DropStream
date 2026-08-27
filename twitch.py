@@ -21,6 +21,7 @@ from scheduler import PowerAction, within_window, run_power_action
 from stats import StatsTracker
 from channel import Channel
 from websocket import WebsocketPool
+from webserver import WebDashboard
 from inventory import DropsCampaign
 from exceptions import (
     ExitRequest,
@@ -471,6 +472,8 @@ class Twitch:
         # Periodic OAuth token validity check (auto-refresh)
         self._token_refresh_task: asyncio.Task[None] | None = None
         self._memory_task: asyncio.Task[None] | None = None
+        # optional remote web dashboard (see webserver.py); off by default, toggled from Settings
+        self.web_server = WebDashboard(self)
 
     async def get_session(self) -> aiohttp.ClientSession:
         if (session := self._session) is not None:
@@ -522,6 +525,7 @@ class Twitch:
         if self._memory_task is not None:
             self._memory_task.cancel()
             self._memory_task = None
+        await self.web_server.stop()
         # stop websocket, close session and save cookies
         await self.websocket.stop(clear_topics=True)
         if self._session is not None:
@@ -646,6 +650,9 @@ class Twitch:
         # periodic light memory hygiene: helps keep RSS usage down over long (24h+) sessions
         if self._memory_task is None or self._memory_task.done():
             self._memory_task = asyncio.create_task(self._memory_maintenance_loop())
+        # optional remote dashboard, only if the user enabled it in Settings
+        if self.settings.web_server_enabled and not self.web_server.running:
+            await self.web_server.start()
         # Add default topics
         self.websocket.add_topics([
             WebsocketTopic("User", "Drops", auth_state.user_id, self.process_drops),
@@ -1137,6 +1144,16 @@ class Twitch:
             self.resume()
         else:
             self.pause()
+
+    def apply_web_server_settings(self) -> None:
+        # called from the Settings tab after the enable checkbox or port entry changes;
+        # (re)starts or stops the web dashboard live, without requiring an app restart
+        async def _apply():
+            if self.settings.web_server_enabled:
+                await self.web_server.restart()
+            else:
+                await self.web_server.stop()
+        asyncio.create_task(_apply())
 
     def pause_until(self, resume_time: datetime) -> None:
         # pauses now and automatically resumes once the given time is reached

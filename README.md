@@ -20,6 +20,8 @@
 - A **theme system**: Light/Dark/Auto, plus a "Twitch Colors" theme, with an option to follow your OS accent
   color, and real vector tab icons.
 - Automatic OAuth token re-validation, to catch and recover from an expired session before it breaks mining.
+- An optional **remote web dashboard**: host a small built-in web page that lets anyone with the link view
+  live status and control the app (pause/resume, priority mode) from a browser on another device.
 
 This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle.
 
@@ -51,6 +53,28 @@ Every few seconds, the application simulates watching a stream by requesting its
 ![Main](https://user-images.githubusercontent.com/4180725/164298155-c0880ad7-6423-4419-8d73-f3c053730a1b.png)
 ![Inventory](https://user-images.githubusercontent.com/4180725/164298315-81cae0d2-24a4-4822-a056-154fd763c284.png)
 ![Settings](https://user-images.githubusercontent.com/4180725/164298391-b13ad40d-3881-436c-8d4c-34e2bbe33a78.png)
+
+### Remote Web Dashboard:
+
+The Settings tab has a "Remote Access" section, off by default. Turning it on starts a small local web
+server built into the app and generates a private link (a random token embedded in the URL, e.g.
+`http://192.168.1.42:21000/8f3a.../`). Opening that link in a browser, on any device on the same network,
+shows a live view of the current drop/campaign progress, weekly stats, and lets you pause/resume mining or
+change the priority mode, without touching the desktop app itself.
+
+A few things worth knowing:
+
+- The link itself is the only thing standing between "just viewing" and "full control" of the app, so treat
+  it like a password: anyone who has it can pause your miner or change its settings. Use the "Generate a new
+  link" button any time you want to revoke a previously shared one.
+- By default this is reachable only from your local network (same Wi-Fi/router). To reach it from outside
+  your home network, you'd need to either forward the configured port on your router (not recommended, as it
+  exposes the link to the internet) or use a private tunnel/VPN (Tailscale, WireGuard, etc.) to your network
+  instead.
+- The port (`21000` by default) can be changed if it conflicts with something else already running on your
+  machine.
+- This dashboard is view/control only: it can't be used to log into your Twitch account or claim drops
+  through it directly, it just reflects and steers what the desktop app is already doing.
 
 ### Notes:
 

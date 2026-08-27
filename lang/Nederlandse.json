@@ -172,6 +172,16 @@
                 "end": "Einde (UU:MM): ",
                 "auto_action": "Wanneer alle drops klaar zijn: "
             },
+            "remote": {
+                "name": "Externe toegang",
+                "info": "Hiermee kun je de live status bekijken en deze instantie besturen (pauzeren/hervatten, prioriteitsmodus) vanaf een browser op een ander apparaat, via de onderstaande link. Iedereen met de link heeft volledige toegang, deel deze dus alleen met mensen die je vertrouwt.",
+                "enabled": "Webdashboard inschakelen: ",
+                "port": "Poort: ",
+                "new_link": "Nieuwe link genereren",
+                "link": "Deellink:",
+                "link_disabled": "Schakel het dashboard in om een link te genereren.",
+                "copy_link": "Link kopiëren"
+            },
             "power_actions": {
                 "none": "Niets doen",
                 "sleep": "PC in slaapstand",

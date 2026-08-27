@@ -1964,6 +1964,9 @@ class _SettingsVars(TypedDict):
     schedule_start: StringVar
     schedule_end: StringVar
     auto_action: StringVar
+    web_server_enabled: IntVar
+    web_server_port: StringVar
+    web_server_link: StringVar
 
 
 class SettingsPanel:
@@ -2036,6 +2039,9 @@ class SettingsPanel:
             "schedule_start": StringVar(master, self._settings.schedule_start),
             "schedule_end": StringVar(master, self._settings.schedule_end),
             "auto_action": StringVar(master, self.POWER_ACTIONS[self._settings.auto_action]),
+            "web_server_enabled": IntVar(master, int(self._settings.web_server_enabled)),
+            "web_server_port": StringVar(master, str(self._settings.web_server_port)),
+            "web_server_link": StringVar(master, ""),
         }
         self._game_names: set[str] = set()
         master.rowconfigure(0, weight=1)
@@ -2225,11 +2231,55 @@ class SettingsPanel:
             values=list(self.POWER_ACTIONS.values()),
         ).grid(column=1, row=irow, sticky="w")
 
+        # Remote access section (optional local web dashboard)
+        remote_frame = ttk.LabelFrame(
+            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "remote", "name")
+        )
+        remote_frame.grid(column=0, row=3, sticky="nsew")
+        remote_frame.columnconfigure(0, weight=1)
+        remote_frame.rowconfigure(0, weight=1)
+        remote_center = ttk.Frame(remote_frame)
+        remote_center.grid(column=0, row=0)
+        ttk.Label(
+            remote_center, text=_("gui", "settings", "remote", "info"),
+            foreground="goldenrod", wraplength=280, justify="left",
+        ).grid(column=0, row=(irow := 0), columnspan=2, sticky="w")
+        ttk.Label(
+            remote_center, text=_("gui", "settings", "remote", "enabled")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Checkbutton(
+            remote_center, variable=self._vars["web_server_enabled"], command=self.update_web_server
+        ).grid(column=1, row=irow, sticky="w")
+        ttk.Label(
+            remote_center, text=_("gui", "settings", "remote", "port")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        port_entry = ttk.Entry(remote_center, width=8, textvariable=self._vars["web_server_port"])
+        port_entry.grid(column=1, row=irow, sticky="w")
+        port_entry.bind("<FocusOut>", lambda e: self.update_web_server())
+        ttk.Button(
+            remote_center,
+            text=_("gui", "settings", "remote", "new_link"),
+            command=self.regenerate_web_token,
+        ).grid(column=0, row=(irow := irow + 1), columnspan=2, pady=(4, 0))
+        ttk.Label(
+            remote_center, text=_("gui", "settings", "remote", "link")
+        ).grid(column=0, row=(irow := irow + 1), columnspan=2, sticky="w", pady=(6, 0))
+        link_entry = ttk.Entry(
+            remote_center, textvariable=self._vars["web_server_link"], width=34, state="readonly"
+        )
+        link_entry.grid(column=0, row=(irow := irow + 1), columnspan=2, sticky="ew")
+        ttk.Button(
+            remote_center,
+            text=_("gui", "settings", "remote", "copy_link"),
+            command=self.copy_web_link,
+        ).grid(column=0, row=(irow := irow + 1), columnspan=2, pady=(4, 0))
+        self._update_web_link_display()
+
         # Advanced section
         advanced_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "advanced", "name")
         )
-        advanced_frame.grid(column=0, row=3, sticky="nsew")
+        advanced_frame.grid(column=0, row=4, sticky="nsew")
         advanced_frame.columnconfigure(0, weight=1)
         advanced_frame.rowconfigure(0, weight=1)
         advanced_center = ttk.Frame(advanced_frame)
@@ -2274,7 +2324,7 @@ class SettingsPanel:
         priority_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "priority")
         )
-        priority_frame.grid(column=1, row=0, rowspan=4, sticky="nsew")
+        priority_frame.grid(column=1, row=0, rowspan=5, sticky="nsew")
         self._priority_entry = PlaceholderCombobox(
             priority_frame, placeholder=_("gui", "settings", "game_name"), width=30
         )
@@ -2336,7 +2386,7 @@ class SettingsPanel:
         exclude_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
         )
-        exclude_frame.grid(column=2, row=0, rowspan=4, sticky="nsew")
+        exclude_frame.grid(column=2, row=0, rowspan=5, sticky="nsew")
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
@@ -2632,6 +2682,43 @@ class SettingsPanel:
             if action_name == name:
                 self._settings.auto_action = value
                 break
+
+    def _update_web_link_display(self) -> None:
+        from webserver import local_ip
+        token = self._settings.web_server_token
+        if not token or not self._settings.web_server_enabled:
+            self._vars["web_server_link"].set(_("gui", "settings", "remote", "link_disabled"))
+            return
+        port = self._settings.web_server_port
+        self._vars["web_server_link"].set(f"http://{local_ip()}:{port}/{token}")
+
+    def update_web_server(self) -> None:
+        self._settings.web_server_enabled = bool(self._vars["web_server_enabled"].get())
+        try:
+            port = int(self._vars["web_server_port"].get())
+            if not (1 <= port <= 65535):
+                raise ValueError
+        except ValueError:
+            port = self._settings.web_server_port
+            self._vars["web_server_port"].set(str(port))
+        else:
+            self._settings.web_server_port = port
+        self._update_web_link_display()
+        self._manager._twitch.apply_web_server_settings()
+
+    def regenerate_web_token(self) -> None:
+        from webserver import new_token
+        self._settings.web_server_token = new_token()
+        self._update_web_link_display()
+        if self._settings.web_server_enabled:
+            self._manager._twitch.apply_web_server_settings()
+
+    def copy_web_link(self) -> None:
+        link = self._vars["web_server_link"].get()
+        if not link.startswith("http"):
+            return
+        self._manager._root.clipboard_clear()
+        self._manager._root.clipboard_append(link)
 
     def exclude_add(self) -> None:
         game_name: str = self._exclude_entry.get()

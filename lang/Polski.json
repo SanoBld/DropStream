@@ -185,6 +185,16 @@
                 "end": "Koniec (GG:MM): ",
                 "auto_action": "Gdy wszystkie dropy zostaną odebrane: "
             },
+            "remote": {
+                "name": "Dostęp zdalny",
+                "info": "Umożliwia podgląd stanu na żywo i sterowanie tą instancją (pauza/wznowienie, tryb priorytetu) z przeglądarki na innym urządzeniu, za pomocą poniższego linku. Każdy, kto ma ten link, ma pełny dostęp, więc udostępniaj go wyłącznie zaufanym osobom.",
+                "enabled": "Włącz panel webowy: ",
+                "port": "Port: ",
+                "new_link": "Wygeneruj nowy link",
+                "link": "Link do udostępnienia:",
+                "link_disabled": "Włącz panel, aby wygenerować link.",
+                "copy_link": "Kopiuj link"
+            },
             "power_actions": {
                 "none": "Nic nie rób",
                 "sleep": "Uśpij komputer",

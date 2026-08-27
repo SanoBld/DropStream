@@ -20,6 +20,7 @@ class StatusMessages(TypedDict):
     claimed_drop: str
     no_channel: str
     no_campaign: str
+    auto_action: str
 
 
 class ChromeMessages(TypedDict):
@@ -221,6 +222,17 @@ class GUISettingsScheduler(TypedDict):
     auto_action: str
 
 
+class GUISettingsRemote(TypedDict):
+    name: str
+    info: str
+    enabled: str
+    port: str
+    new_link: str
+    link: str
+    link_disabled: str
+    copy_link: str
+
+
 class GUIPowerActions(TypedDict):
     none: str
     sleep: str
@@ -249,6 +261,7 @@ class GUISettings(TypedDict):
     themes: GUIThemes
     accounts: GUISettingsAccounts
     scheduler: GUISettingsScheduler
+    remote: GUISettingsRemote
     power_actions: GUIPowerActions
     advanced: GUISettingsAdvanced
     priority_modes: GUIPriorityModes
@@ -528,6 +541,21 @@ default_translation: Translation = {
                 "end": "End (HH:MM): ",
                 "auto_action": "When all drops are done: ",
             },
+            "remote": {
+                "name": "Remote Access",
+                "info": (
+                    "Lets you view live status and control this instance (pause/resume, "
+                    "priority mode) from a browser on another device, using the link below. "
+                    "Anyone with the link has full access, so only share it with people you "
+                    "trust."
+                ),
+                "enabled": "Enable web dashboard: ",
+                "port": "Port: ",
+                "new_link": "Generate a new link",
+                "link": "Share link:",
+                "link_disabled": "Enable the dashboard to generate a link.",
+                "copy_link": "Copy link",
+            },
             "power_actions": {
                 "none": "Do nothing",
                 "sleep": "Sleep PC",
@@ -663,12 +691,12 @@ class Translator:
 
     @property
     def current(self) -> str:
-        return self._translation["language_name"]
+        return self._translation.get("language_name", DEFAULT_LANG)
 
     def set_language(self, language: str):
         if language not in self._langs:
             raise ValueError("Unrecognized language")
-        elif self._translation["language_name"] == language:
+        elif self._translation.get("language_name", DEFAULT_LANG) == language:
             # same language as loaded selected
             return
         elif language == DEFAULT_LANG:

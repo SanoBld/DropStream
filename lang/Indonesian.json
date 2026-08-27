@@ -171,6 +171,16 @@
                 "end": "Selesai (JJ:MM): ",
                 "auto_action": "Saat semua drop selesai: "
             },
+            "remote": {
+                "name": "Akses Jarak Jauh",
+                "info": "Memungkinkan Anda melihat status secara langsung dan mengendalikan instans ini (jeda/lanjutkan, mode prioritas) dari peramban di perangkat lain, menggunakan tautan di bawah ini. Siapa pun yang memiliki tautan ini memiliki akses penuh, jadi bagikan hanya kepada orang yang Anda percaya.",
+                "enabled": "Aktifkan dasbor web: ",
+                "port": "Port: ",
+                "new_link": "Buat tautan baru",
+                "link": "Tautan berbagi:",
+                "link_disabled": "Aktifkan dasbor untuk membuat tautan.",
+                "copy_link": "Salin tautan"
+            },
             "power_actions": {
                 "none": "Jangan lakukan apa pun",
                 "sleep": "Tidurkan PC",

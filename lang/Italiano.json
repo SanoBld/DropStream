@@ -171,6 +171,16 @@
                 "end": "Fine (HH:MM): ",
                 "auto_action": "Quando tutti i drop sono completati: "
             },
+            "remote": {
+                "name": "Accesso remoto",
+                "info": "Consente di visualizzare lo stato in tempo reale e controllare questa istanza (pausa/ripresa, modalità priorità) da un browser su un altro dispositivo, tramite il link qui sotto. Chiunque possieda il link ha accesso completo, quindi condividilo solo con persone di fiducia.",
+                "enabled": "Attiva pannello web: ",
+                "port": "Porta: ",
+                "new_link": "Genera un nuovo link",
+                "link": "Link di condivisione:",
+                "link_disabled": "Attiva il pannello per generare un link.",
+                "copy_link": "Copia link"
+            },
             "power_actions": {
                 "none": "Non fare nulla",
                 "sleep": "Metti il PC in sospensione",
