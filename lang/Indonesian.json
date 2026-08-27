@@ -7,7 +7,8 @@
         "goes_offline": "{channel} menjadi OFF-LINE, ubah...",
         "claimed_drop": "Drop dipulihkan : {drop}",
         "no_channel": "Tidak ada saluran yang tersedia untuk ditonton. Menunggu saluran secara ONLINE...",
-        "no_campaign": "Tidak ada kampanye aktif yang bisa ditambang. Menunggu kampanye aktif..."
+        "no_campaign": "Tidak ada kampanye aktif yang bisa ditambang. Menunggu kampanye aktif...",
+        "auto_action": "Semua drop selesai untuk saat ini, menjalankan tindakan yang dikonfigurasi: {action}"
     },
     "login": {
         "chrome": {
@@ -41,19 +42,26 @@
             "switching": "Koleksi saluran yang sedang berlangsung...",
             "fetching_inventory": "Mmengambil inventaris...",
             "fetching_campaigns": "Mengambil kampanye...",
-            "adding_campaigns": "Menambahkan daftar kampanye ke inventaris... {counter}"
+            "adding_campaigns": "Menambahkan daftar kampanye ke inventaris... {counter}",
+            "paused": "Dijeda",
+            "paused_until": "Dijeda hingga {time}",
+            "scheduled": "Di luar jam terjadwal"
         },
         "tabs": {
             "main": "Umum",
             "inventory": "Inventaris",
             "settings": "Parameter",
-            "help": "Bantuan"
+            "help": "Bantuan",
+            "dashboard": "Dasbor"
         },
         "tray": {
             "notification_title": "Tambang drop",
             "minimize": "Meminimalkan di bilah tugas",
             "show": "Lihat",
-            "quit": "Keluar"
+            "quit": "Keluar",
+            "pause": "Jeda",
+            "resume": "Lanjutkan",
+            "switch_channel": "Ganti saluran"
         },
         "login": {
             "name": "Formulir masuk",
@@ -136,13 +144,61 @@
                 "tray_notifications": "Pemberitahuan bilah tugas :",
                 "dark_mode": "Mode gelap: ",
                 "priority_only": "Prioritas saja :",
-                "proxy": "Proksi (harus dimulai ulang) :"
+                "proxy": "Proksi (harus dimulai ulang) :",
+                "theme": "Tema: ",
+                "use_system_accent": "Gunakan warna aksen sistem: ",
+                "priority_mode": "Mode prioritas: ",
+                "priority_mode_info": "Game dalam daftar prioritas selalu dicoba lebih dulu, sesuai urutan yang Anda tetapkan. \"Berakhir tercepat\"/\"Ketersediaan rendah dulu\" hanya menentukan urutan untuk sisanya, setelah tidak ada lagi yang tersedia dari daftar prioritas."
             },
             "game_name": "Nama game",
             "priority": "Prioritas",
             "exclude": "Kecualikan",
             "reload": "Muat Ulang",
-            "reload_text": "Sebagian besar perubahan memerlukan pemuatan ulang untuk segera diterapkan : "
+            "reload_text": "Sebagian besar perubahan memerlukan pemuatan ulang untuk segera diterapkan : ",
+            "accounts": {
+                "name": "Akun",
+                "current": "Profil aktif: {name}",
+                "create": "Buat",
+                "launch": "Jalankan (paralel)",
+                "switch": "Alihkan ke",
+                "delete": "Hapus",
+                "delete_confirm": "Hapus permanen profil \"{name}\" beserta semua datanya (pengaturan, cookie, cache, statistik)? Tindakan ini tidak dapat dibatalkan."
+            },
+            "scheduler": {
+                "name": "Penjadwal",
+                "enabled": "Aktifkan jadwal: ",
+                "start": "Mulai (JJ:MM): ",
+                "end": "Selesai (JJ:MM): ",
+                "auto_action": "Saat semua drop selesai: "
+            },
+            "power_actions": {
+                "none": "Jangan lakukan apa pun",
+                "sleep": "Tidurkan PC",
+                "shutdown": "Matikan PC"
+            },
+            "themes": {
+                "auto": "Terang/Gelap (Otomatis)",
+                "light": "Terang",
+                "dark": "Gelap",
+                "modern_auto": "Warna Twitch (Otomatis)",
+                "modern_light": "Warna Twitch, Terang",
+                "modern_dark": "Warna Twitch, Gelap"
+            },
+            "priority_modes": {
+                "priority_only": "Hanya daftar prioritas",
+                "priority_only_continue": "Hanya daftar prioritas, lalu lanjutkan dengan sisanya",
+                "ending_soonest": "Berakhir tercepat",
+                "priority_ending_soonest": "Daftar prioritas dulu, lalu berakhir tercepat",
+                "low_availability": "Ketersediaan rendah dulu",
+                "priority_low_availability": "Daftar prioritas dulu, lalu ketersediaan rendah"
+            },
+            "advanced": {
+                "name": "Lanjutan",
+                "warning": "Peringatan!",
+                "warning_text": "Opsi ini dapat menyebabkan miner tidak berfungsi dengan benar.\nJika mengalami masalah, pastikan semua opsi ini dinonaktifkan.",
+                "enable_badges_emotes": "Aktifkan dukungan parsial untuk lencana dan emote: ",
+                "available_drops_check": "Aktifkan pemeriksaan tambahan drop yang tersedia: "
+            }
         },
         "help": {
             "links": {
@@ -153,7 +209,28 @@
             "how_it_works": "Cara kerja",
             "how_it_works_text": "Kira-kira setiap ~60 detik, aplikasi ini mengirimkan \"menit ditonton\" ke saluran yang sedang ditonton - yang cukup untuk membuat drop terus bergerak. Perhatikan bahwa hal ini sepenuhnya mengabaikan kebutuhan untuk mengunduh video dan audio dari streaming yang sebenarnya. Untuk menjaga agar status (ONLINE atau OFFLINE) saluran tetap terbaru, koneksi websocket dibuat untuk menerima peristiwa tentang streaming yang naik atau turun, atau pembaruan tentang jumlah penonton saat ini",
             "getting_started": "Mulai",
-            "getting_started_text": "1. Masuk ke aplikasi.\n2. Pastikan akun Twitch Anda ditautkan ke semua kampanye yang Anda minati.\n3. Jika Anda hanya ingin menambang semuanya, hapus centang pada \"Hanya Prioritas\" dan tekan \"Muat Ulang\".\n4. Jika Anda ingin menambang game tertentu terlebih dahulu, gunakan daftar \"Prioritas\" untuk menentukan daftar game pilihan Anda. Game yang berada di bagian atas daftar akan tergoda untuk ditambang terlebih dahulu, sebelum game yang berada di bagian bawah daftar.\n5. Biarkan opsi \"Prioritas saja\" dicentang untuk menghindari menambang game yang tidak ada dalam daftar prioritas. Atau tidak - terserah Anda.\n6. Gunakan daftar \"Kecualikan\" untuk memberi tahu aplikasi game mana yang tidak boleh ditambang.\n7. Untuk memodifikasi konten dari salah satu daftar atau mengubah status opsi \"Hanya Prioritas\", Anda perlu menekan \"Muat Ulang\" agar perubahan dapat diterapkan."
+            "getting_started_text": "1. Masuk ke aplikasi.\n2. Pastikan akun Twitch Anda ditautkan ke semua kampanye yang Anda minati.\n3. Jika Anda hanya ingin menambang semuanya, hapus centang pada \"Hanya Prioritas\" dan tekan \"Muat Ulang\".\n4. Jika Anda ingin menambang game tertentu terlebih dahulu, gunakan daftar \"Prioritas\" untuk menentukan daftar game pilihan Anda. Game yang berada di bagian atas daftar akan tergoda untuk ditambang terlebih dahulu, sebelum game yang berada di bagian bawah daftar.\n5. Biarkan opsi \"Prioritas saja\" dicentang untuk menghindari menambang game yang tidak ada dalam daftar prioritas. Atau tidak - terserah Anda.\n6. Gunakan daftar \"Kecualikan\" untuk memberi tahu aplikasi game mana yang tidak boleh ditambang.\n7. Untuk memodifikasi konten dari salah satu daftar atau mengubah status opsi \"Hanya Prioritas\", Anda perlu menekan \"Muat Ulang\" agar perubahan dapat diterapkan.",
+            "invalidate": {
+                "button": "Batalkan token otorisasi",
+                "text": "Gunakan ini jika Anda perlu login ulang, misalnya untuk berganti akun. Ini akan membatalkan token otorisasi saat ini dan mengeluarkan Anda."
+            }
+        },
+        "dashboard": {
+            "now_mining": "Sedang Menambang",
+            "campaign": "Kampanye Drop",
+            "status": "Status",
+            "pause": "Jeda",
+            "resume": "Lanjutkan",
+            "resume_at": "Lanjutkan pukul: ",
+            "resume_at_info": "Contoh: ketik 14:30 lalu klik \"Jeda hingga\" untuk menjeda penambangan sekarang dan otomatis melanjutkan pukul 14:30 (hari ini, atau besok jika waktu tersebut sudah lewat).",
+            "pause_until": "Jeda hingga",
+            "drop_remaining": "Waktu tersisa untuk drop ini: ",
+            "campaign_remaining": "Waktu tersisa untuk kampanye: ",
+            "weekly": "7 Hari Terakhir",
+            "per_game": "Drop per Game",
+            "total_drops": "Total drop diklaim: {count}",
+            "hours_saved": "Jam tonton yang dihemat: {hours}",
+            "no_data": "Belum ada data"
         }
     }
 }

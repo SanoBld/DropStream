@@ -7,7 +7,8 @@
         "goes_offline": "{channel} is OFFLINE gegaan, wijzig...",
         "claimed_drop": "Drop verkregen: {drop}",
         "no_channel": "Geen deelnemende kanalen online. Wachten op streamers...",
-        "no_campaign": "Geen actieve campagnes beschikbaar. Wachten op nieuwe campagne..."
+        "no_campaign": "Geen actieve campagnes beschikbaar. Wachten op nieuwe campagne...",
+        "auto_action": "Alle drops zijn voor nu voltooid, actie wordt uitgevoerd: {action}"
     },
     "login": {
         "chrome": {
@@ -41,19 +42,26 @@
             "switching": "Het kanaal wijzigen...",
             "fetching_inventory": "Ophalen van inventaris...",
             "fetching_campaigns": "Ophalen van de campagne...",
-            "adding_campaigns": "De campagnelijst toevoegen aan de inventaris... {counter}"
+            "adding_campaigns": "De campagnelijst toevoegen aan de inventaris... {counter}",
+            "paused": "Gepauzeerd",
+            "paused_until": "Gepauzeerd tot {time}",
+            "scheduled": "Buiten geplande uren"
         },
         "tabs": {
             "main": "Algemeen",
             "inventory": "Inventaris",
             "settings": "Instellingen",
-            "help": "Help"
+            "help": "Help",
+            "dashboard": "Dashboard"
         },
         "tray": {
             "notification_title": "Drop verkregen",
             "minimize": "Minimaliseren naar taakbalk",
             "show": "Weergeven",
-            "quit": "Sluiten"
+            "quit": "Sluiten",
+            "pause": "Pauzeren",
+            "resume": "Hervatten",
+            "switch_channel": "Kanaal wisselen"
         },
         "login": {
             "name": "Login",
@@ -109,7 +117,8 @@
                 "expired": "Verlopen",
                 "excluded": "Uitgesloten",
                 "finished": "Voltooid",
-                "refresh": "Vernieuwen"
+                "refresh": "Vernieuwen",
+                "not_linked": "Niet gekoppeld"
             },
             "status": {
                 "linked": "Gekoppeld ✔",
@@ -135,13 +144,62 @@
                 "tray": "Automatisch starten in de taakbalk: ",
                 "priority_only": "Alleen prioriteit: ",
                 "dark_mode": "Donkere modus: ",
-                "proxy": "Proxy (Vereist opnieuw opstarten):"
+                "proxy": "Proxy (Vereist opnieuw opstarten):",
+                "theme": "Thema: ",
+                "use_system_accent": "Systeem-accentkleur gebruiken: ",
+                "priority_mode": "Prioriteitsmodus: ",
+                "priority_mode_info": "Games op de prioriteitslijst worden altijd eerst geprobeerd, in de door jou ingestelde volgorde. \"Eindigt het snelst\"/\"Lage beschikbaarheid eerst\" bepalen alleen de volgorde voor de rest, zodra er niets meer beschikbaar is van de prioriteitslijst.",
+                "tray_notifications": "Systeemvakmeldingen: "
             },
             "game_name": "Spel",
             "priority": "Prioriteit",
             "exclude": "Uitsluiten",
             "reload": "Herladen",
-            "reload_text": "Voor de meeste wijzigingen is een herlaadbeurt vereist om onmiddellijk van kracht te zijn: "
+            "reload_text": "Voor de meeste wijzigingen is een herlaadbeurt vereist om onmiddellijk van kracht te zijn: ",
+            "accounts": {
+                "name": "Accounts",
+                "current": "Actief profiel: {name}",
+                "create": "Aanmaken",
+                "launch": "Starten (parallel)",
+                "switch": "Wisselen naar",
+                "delete": "Verwijderen",
+                "delete_confirm": "Profiel \"{name}\" en alle bijbehorende gegevens (instellingen, cookies, cache, statistieken) permanent verwijderen? Dit kan niet ongedaan worden gemaakt."
+            },
+            "scheduler": {
+                "name": "Planner",
+                "enabled": "Planning inschakelen: ",
+                "start": "Start (UU:MM): ",
+                "end": "Einde (UU:MM): ",
+                "auto_action": "Wanneer alle drops klaar zijn: "
+            },
+            "power_actions": {
+                "none": "Niets doen",
+                "sleep": "PC in slaapstand",
+                "shutdown": "PC uitschakelen"
+            },
+            "themes": {
+                "auto": "Licht/Donker (Auto)",
+                "light": "Licht",
+                "dark": "Donker",
+                "modern_auto": "Twitch-kleuren (Auto)",
+                "modern_light": "Twitch-kleuren, licht",
+                "modern_dark": "Twitch-kleuren, donker"
+            },
+            "priority_modes": {
+                "priority_only": "Alleen prioriteitslijst",
+                "priority_only_continue": "Alleen prioriteitslijst, daarna doorgaan met de rest",
+                "ending_soonest": "Eindigt het snelst",
+                "priority_ending_soonest": "Eerst prioriteitslijst, dan eindigt het snelst",
+                "low_availability": "Lage beschikbaarheid eerst",
+                "priority_low_availability": "Eerst prioriteitslijst, dan lage beschikbaarheid"
+            },
+            "advanced": {
+                "name": "Geavanceerd",
+                "warning": "Waarschuwing!",
+                "warning_text": "Deze opties kunnen ervoor zorgen dat de miner niet goed werkt.\nAls je problemen ondervindt, zorg dan dat al deze opties zijn uitgeschakeld.",
+                "enable_badges_emotes": "Gedeeltelijke ondersteuning voor badges en emotes inschakelen: ",
+                "available_drops_check": "Extra controle van beschikbare drops inschakelen: "
+            }
         },
         "help": {
             "links": {
@@ -152,7 +210,28 @@
             "how_it_works": "Dit is hoe het werkt",
             "how_it_works_text": "Elke ~60 seconden verzendt de applicatie een \"minuut gekeken\" gebeurtenis naar het kanaal waar deze momenteel naar kijkt.\nDit is voldoende om voortgang te boeken voor drops. Opmerking: op deze manier is het niet nodig om de stream te downloaden en wordt er bandbreedte bespaard. \nOm de online of offline status van de kanalen up-to-date te houden, wordt er een websocket verbinding opgezet\ndie de kanalen controleert op hun status.",
             "getting_started": "Eerste stappen",
-            "getting_started_text": "• Meld je aan bij de applicatie.\n• Zorg ervoor dat het Twitch-account is gekoppeld aan alle campagnes waarin je geïnteresseerd bent.\n• Als je alle drops wilt verwerken, verwijder je het vinkje bij \"Alleen prioriteit\" en druk je op \"Herladen\" .\n• Als je alleen bepaalde games wilt overwegen, gebruik dan de lijst \"Prioriteit\" om de keuze per game te verfijnen.\n• De lijst geeft prioriteit van boven naar beneden.\n• De optie \"Alleen prioriteit\" verhindert dat games die niet op de prioriteitenlijst staan, worden verwerkt.\n• Met de lijst \"Uitsluiten\" is het mogelijk om games te filteren die nooit in overweging mogen worden genomen.\n• Als lijsten of opties zijn aangepast, moet je op \"Herladen\" drukken zodat de wijzigingen van kracht worden."
+            "getting_started_text": "• Meld je aan bij de applicatie.\n• Zorg ervoor dat het Twitch-account is gekoppeld aan alle campagnes waarin je geïnteresseerd bent.\n• Als je alle drops wilt verwerken, verwijder je het vinkje bij \"Alleen prioriteit\" en druk je op \"Herladen\" .\n• Als je alleen bepaalde games wilt overwegen, gebruik dan de lijst \"Prioriteit\" om de keuze per game te verfijnen.\n• De lijst geeft prioriteit van boven naar beneden.\n• De optie \"Alleen prioriteit\" verhindert dat games die niet op de prioriteitenlijst staan, worden verwerkt.\n• Met de lijst \"Uitsluiten\" is het mogelijk om games te filteren die nooit in overweging mogen worden genomen.\n• Als lijsten of opties zijn aangepast, moet je op \"Herladen\" drukken zodat de wijzigingen van kracht worden.",
+            "invalidate": {
+                "button": "Autorisatietoken ongeldig maken",
+                "text": "Gebruik dit als je opnieuw moet inloggen, bijvoorbeeld om van account te wisselen. Dit maakt het huidige autorisatietoken ongeldig en logt je uit."
+            }
+        },
+        "dashboard": {
+            "now_mining": "Nu aan het minen",
+            "campaign": "Drop-campagne",
+            "status": "Status",
+            "pause": "Pauzeren",
+            "resume": "Hervatten",
+            "resume_at": "Hervatten om: ",
+            "resume_at_info": "Voorbeeld: typ 14:30 en klik op \"Pauzeren tot\" om het minen nu te pauzeren en automatisch om 14:30 te hervatten (vandaag, of morgen als die tijd al voorbij is).",
+            "pause_until": "Pauzeren tot",
+            "drop_remaining": "Resterende tijd voor deze drop: ",
+            "campaign_remaining": "Resterende tijd voor de campagne: ",
+            "weekly": "Laatste 7 dagen",
+            "per_game": "Drops per game",
+            "total_drops": "Totaal geclaimde drops: {count}",
+            "hours_saved": "Bespaarde kijkuren: {hours}",
+            "no_data": "Nog geen gegevens"
         }
     }
 }

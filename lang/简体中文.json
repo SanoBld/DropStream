@@ -7,7 +7,8 @@
         "goes_offline": "“{channel}”频道已离线, 正在切换...",
         "claimed_drop": "已领取掉宝：“{drop}”",
         "no_channel": "没有可观看的频道，正在等待直播频道上线...",
-        "no_campaign": "没有可用于掉宝的活动，正在等待掉宝活动开放..."
+        "no_campaign": "没有可用于掉宝的活动，正在等待掉宝活动开放...",
+        "auto_action": "目前所有掉落均已领取，正在执行已配置的操作：{action}"
     },
     "login": {
         "unexpected_content": "返回的内容类型异常，这通常是由于网页被重定向。\n您是否需要先设置VPN或登录到当前网络？",
@@ -41,19 +42,26 @@
             "switching": "切换直播频道中...",
             "fetching_inventory": "获取库存中...",
             "fetching_campaigns": "获取掉宝活动中...",
-            "adding_campaigns": "正在将掉宝活动列表添加至库存...{counter}"
+            "adding_campaigns": "正在将掉宝活动列表添加至库存...{counter}",
+            "paused": "已暂停",
+            "paused_until": "暂停至 {time}",
+            "scheduled": "不在计划时间内"
         },
         "tabs": {
             "main": "主面板",
             "inventory": "掉宝库存",
             "settings": "设置",
-            "help": "帮助"
+            "help": "帮助",
+            "dashboard": "仪表盘"
         },
         "tray": {
             "notification_title": "已领取掉宝",
             "minimize": "最小化窗口",
             "show": "打开主面板",
-            "quit": "退出"
+            "quit": "退出",
+            "pause": "暂停",
+            "resume": "恢复",
+            "switch_channel": "切换频道"
         },
         "login": {
             "name": "登录Twitch账户",
@@ -136,7 +144,10 @@
                 "tray_notifications": "启用托盘通知",
                 "dark_mode": "夜间模式",
                 "priority_mode": "掉宝挖掘模式",
-                "proxy": "代理地址（需要重启）："
+                "proxy": "代理地址（需要重启）：",
+                "theme": "主题：",
+                "use_system_accent": "使用系统强调色：",
+                "priority_mode_info": "优先级列表中的游戏总是按您设定的顺序优先尝试。「最快结束」/「低可用性优先」仅在优先级列表中没有可farm内容时，决定其余游戏的顺序。"
             },
             "advanced": {
                 "name": "高级设置",
@@ -148,13 +159,45 @@
             "priority_modes": {
                 "priority_only": "仅观看优先列表中的游戏",
                 "ending_soonest": "优先挖掘即将结束的掉宝",
-                "low_availability": "优先挖掘频道少的掉宝      "
+                "low_availability": "优先挖掘频道少的掉宝      ",
+                "priority_only_continue": "仅优先级列表，之后继续farm其余项目",
+                "priority_ending_soonest": "优先级列表优先，然后按最快结束排序",
+                "priority_low_availability": "优先级列表优先，然后按低可用性排序"
             },
             "game_name": "游戏名称",
             "priority": "优先列表-优先挖掘以下游戏的掉宝",
             "exclude": "排除列表-永不挖掘以下游戏的掉宝",
             "reload": "刷新",
-            "reload_text": "大多数设置改动需要刷新或重启软件后才能生效："
+            "reload_text": "大多数设置改动需要刷新或重启软件后才能生效：",
+            "accounts": {
+                "name": "账户",
+                "current": "当前配置文件：{name}",
+                "create": "创建",
+                "launch": "启动（并行）",
+                "switch": "切换到",
+                "delete": "删除",
+                "delete_confirm": "确定要永久删除配置文件「{name}」及其所有数据（设置、Cookie、缓存、统计信息）吗？此操作无法撤销。"
+            },
+            "scheduler": {
+                "name": "调度器",
+                "enabled": "启用运行时间表：",
+                "start": "开始（时:分）：",
+                "end": "结束（时:分）：",
+                "auto_action": "所有掉落完成后："
+            },
+            "power_actions": {
+                "none": "不执行任何操作",
+                "sleep": "使电脑进入睡眠",
+                "shutdown": "关闭电脑"
+            },
+            "themes": {
+                "auto": "浅色/深色（自动）",
+                "light": "浅色",
+                "dark": "深色",
+                "modern_auto": "Twitch 配色（自动）",
+                "modern_light": "Twitch 配色，浅色",
+                "modern_dark": "Twitch 配色，深色"
+            }
         },
         "help": {
             "links": {
@@ -170,6 +213,23 @@
                 "button": "退出登录",
                 "text": "使身份验证令牌失效（退出Twitch账号登录）："
             }
+        },
+        "dashboard": {
+            "now_mining": "正在挖取",
+            "campaign": "掉落活动",
+            "status": "状态",
+            "pause": "暂停",
+            "resume": "恢复",
+            "resume_at": "恢复时间：",
+            "resume_at_info": "示例：输入 14:30 并点击「暂停至」，即可立即暂停挖矿，并在 14:30 自动恢复（今天，若该时间已过则为明天）。",
+            "pause_until": "暂停至",
+            "drop_remaining": "此掉落物剩余时间：",
+            "campaign_remaining": "活动剩余时间：",
+            "weekly": "过去7天",
+            "per_game": "按游戏统计掉落",
+            "total_drops": "已领取掉落总数：{count}",
+            "hours_saved": "节省观看时间：{hours}",
+            "no_data": "暂无数据"
         }
     }
 }

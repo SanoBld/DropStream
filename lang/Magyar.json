@@ -7,7 +7,8 @@
         "goes_offline": "{channel} OFFLINE lett, átváltás...",
         "claimed_drop": "Átvett drop: {drop}",
         "no_channel": "Nincs nézhető csatorna. Várakozás egy ONLINE csatornára...",
-        "no_campaign": "Nincs aktív kampány, amelyből dropokat lehetne bányászni. Várakozás aktív kampányra..."
+        "no_campaign": "Nincs aktív kampány, amelyből dropokat lehetne bányászni. Várakozás aktív kampányra...",
+        "auto_action": "Egyelőre minden drop kész, a beállított művelet végrehajtása: {action}"
     },
     "login": {
         "unexpected_content": "Váratlan tartalomtípus érkezett, ez általában átirányítás miatt történik. Nem kell esetleg bejelentkezned az internet eléréséhez?",
@@ -41,19 +42,26 @@
             "switching": "Csatornaváltás...",
             "fetching_inventory": "Készlet lekérése...",
             "fetching_campaigns": "Kampányok lekérése...",
-            "adding_campaigns": "Kampányok hozzáadása a készlethez... {counter}"
+            "adding_campaigns": "Kampányok hozzáadása a készlethez... {counter}",
+            "paused": "Szüneteltetve",
+            "paused_until": "Szüneteltetve eddig: {time}",
+            "scheduled": "Az ütemezett időn kívül"
         },
         "tabs": {
             "main": "Főoldal",
             "inventory": "Készlet",
             "settings": "Beállítások",
-            "help": "Súgó"
+            "help": "Súgó",
+            "dashboard": "Irányítópult"
         },
         "tray": {
             "notification_title": "Kibányászott drop",
             "minimize": "Kicsinyítés a tálcára",
             "show": "Megjelenítés",
-            "quit": "Kilépés"
+            "quit": "Kilépés",
+            "pause": "Szünet",
+            "resume": "Folytatás",
+            "switch_channel": "Csatornaváltás"
         },
         "login": {
             "name": "Bejelentkezés",
@@ -136,7 +144,10 @@
                 "tray_notifications": "Tálcaértesítések: ",
                 "dark_mode": "Sötét mód: ",
                 "priority_mode": "Prioritási mód: ",
-                "proxy": "Proxy (újraindítást igényel):"
+                "proxy": "Proxy (újraindítást igényel):",
+                "theme": "Téma: ",
+                "use_system_accent": "Rendszer kiemelő színének használata: ",
+                "priority_mode_info": "A prioritási lista játékai mindig előbb próbálkoznak, a beállított sorrendben. A \"Leghamarabb véget érő\"/\"Alacsony elérhetőség előbb\" csak a többi sorrendjét határozza meg, ha már semmi sincs elérhető a prioritási listáról."
             },
             "advanced": {
                 "name": "Haladó",
@@ -148,13 +159,45 @@
             "priority_modes": {
                 "priority_only": "Csak a prioritási lista",
                 "ending_soonest": "A leghamarabb véget érő először",
-                "low_availability": "A legkevésbé elérhető először"
+                "low_availability": "A legkevésbé elérhető először",
+                "priority_only_continue": "Csak prioritási lista, majd folytatás a többivel",
+                "priority_ending_soonest": "Előbb a prioritási lista, majd a leghamarabb véget érő",
+                "priority_low_availability": "Előbb a prioritási lista, majd alacsony elérhetőség"
             },
             "game_name": "Játék neve",
             "priority": "Prioritás",
             "exclude": "Kizárás",
             "reload": "Újratöltés",
-            "reload_text": "A legtöbb módosítás életbe lépéséhez újratöltés szükséges: "
+            "reload_text": "A legtöbb módosítás életbe lépéséhez újratöltés szükséges: ",
+            "accounts": {
+                "name": "Fiókok",
+                "current": "Aktív profil: {name}",
+                "create": "Létrehozás",
+                "launch": "Indítás (párhuzamosan)",
+                "switch": "Váltás erre",
+                "delete": "Törlés",
+                "delete_confirm": "Végleg törlöd a(z) \"{name}\" profilt és minden hozzá tartozó adatot (beállítások, sütik, gyorsítótár, statisztika)? Ez nem vonható vissza."
+            },
+            "scheduler": {
+                "name": "Ütemező",
+                "enabled": "Ütemezés engedélyezése: ",
+                "start": "Kezdés (ÓÓ:PP): ",
+                "end": "Vége (ÓÓ:PP): ",
+                "auto_action": "Amikor minden drop kész: "
+            },
+            "power_actions": {
+                "none": "Nincs teendő",
+                "sleep": "Számítógép alvó állapotba",
+                "shutdown": "Számítógép leállítása"
+            },
+            "themes": {
+                "auto": "Világos/Sötét (Auto)",
+                "light": "Világos",
+                "dark": "Sötét",
+                "modern_auto": "Twitch színek (Auto)",
+                "modern_light": "Twitch színek, világos",
+                "modern_dark": "Twitch színek, sötét"
+            }
         },
         "help": {
             "links": {
@@ -165,7 +208,28 @@
             "how_it_works": "Hogyan működik",
             "how_it_works_text": "Az alkalmazás néhány másodpercenként úgy tesz, mintha nézne egy adott streamet: lekéri a stream metaadatait – ennyi elég a dropok gyűjtéséhez. Így egyáltalán nem kell letölteni a tényleges videó- és hangfolyamot. A csatornák állapotának (ONLINE vagy OFFLINE) naprakészen tartásához websocket-kapcsolat épül ki, amelyen keresztül az alkalmazás értesül a streamek indulásáról és leállásáról, valamint a nézőszám változásairól.",
             "getting_started": "Első lépések",
-            "getting_started_text": "1. Jelentkezz be az alkalmazásba.\n2. Győződj meg róla, hogy a Twitch-fiókod össze van kapcsolva minden olyan kampánnyal, amelyet bányászni szeretnél.\n3. Ha mindent bányásznál, ami csak lehetséges, állítsd a Prioritási módot bármire a „Csak a prioritási lista” kivételével, majd nyomd meg az „Újratöltés” gombot.\n4. Ha bizonyos játékokat előbb szeretnél bányászni, a „Prioritás” listában állíts össze egy sorrendet a kívánt játékokból. A lista tetején lévő játékokat az alkalmazás előbb próbálja bányászni, mint a lejjebb lévőket.\n5. Hagyd a „Prioritási módot” a „Csak a prioritási lista” beállításon, ha nem szeretnél a listán nem szereplő játékokat bányászni. Vagy mégis – ahogy szeretnéd.\n6. A „Kizárás” listával adhatod meg, mely játékokat ne bányássza soha az alkalmazás.\n7. A listák tartalmának vagy a „Prioritási mód” módosítása után nyomd meg az „Újratöltés” gombot, hogy a változtatások életbe lépjenek."
+            "getting_started_text": "1. Jelentkezz be az alkalmazásba.\n2. Győződj meg róla, hogy a Twitch-fiókod össze van kapcsolva minden olyan kampánnyal, amelyet bányászni szeretnél.\n3. Ha mindent bányásznál, ami csak lehetséges, állítsd a Prioritási módot bármire a „Csak a prioritási lista” kivételével, majd nyomd meg az „Újratöltés” gombot.\n4. Ha bizonyos játékokat előbb szeretnél bányászni, a „Prioritás” listában állíts össze egy sorrendet a kívánt játékokból. A lista tetején lévő játékokat az alkalmazás előbb próbálja bányászni, mint a lejjebb lévőket.\n5. Hagyd a „Prioritási módot” a „Csak a prioritási lista” beállításon, ha nem szeretnél a listán nem szereplő játékokat bányászni. Vagy mégis – ahogy szeretnéd.\n6. A „Kizárás” listával adhatod meg, mely játékokat ne bányássza soha az alkalmazás.\n7. A listák tartalmának vagy a „Prioritási mód” módosítása után nyomd meg az „Újratöltés” gombot, hogy a változtatások életbe lépjenek.",
+            "invalidate": {
+                "button": "Hitelesítési token érvénytelenítése",
+                "text": "Ezt akkor használd, ha újra be kell jelentkezned, például fiókváltáshoz. Ez érvényteleníti a jelenlegi hitelesítési tokent, és kijelentkeztet."
+            }
+        },
+        "dashboard": {
+            "now_mining": "Jelenleg bányászva",
+            "campaign": "Drop kampány",
+            "status": "Állapot",
+            "pause": "Szünet",
+            "resume": "Folytatás",
+            "resume_at": "Folytatás ekkor: ",
+            "resume_at_info": "Példa: írd be, hogy 14:30, majd kattints a \"Szüneteltetés eddig\" gombra, hogy most szüneteltesd a bányászatot, és automatikusan folytatódjon 14:30-kor (ma, vagy holnap, ha az időpont már elmúlt).",
+            "pause_until": "Szüneteltetés eddig",
+            "drop_remaining": "Hátralévő idő ehhez a drophoz: ",
+            "campaign_remaining": "Hátralévő idő a kampányhoz: ",
+            "weekly": "Elmúlt 7 nap",
+            "per_game": "Dropok játékonként",
+            "total_drops": "Összesen begyűjtött dropok: {count}",
+            "hours_saved": "Megspórolt nézési órák: {hours}",
+            "no_data": "Még nincs adat"
         }
     }
 }

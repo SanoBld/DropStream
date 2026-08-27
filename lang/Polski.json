@@ -7,7 +7,8 @@
         "goes_offline": "Kanał {channel} jest teraz OFFLINE, przełączam kanał...",
         "claimed_drop": "Odebrano drop: {drop}",
         "no_channel": "Brak dostępnych kanałów do oglądania. Czekam na dostępne kanały lub kampanie...",
-        "no_campaign": "Brak dostępnych aktywnych kampanii. Czekam na dostępne kampanie..."
+        "no_campaign": "Brak dostępnych aktywnych kampanii. Czekam na dostępne kampanie...",
+        "auto_action": "Wszystkie dropy odebrane na razie, wykonywanie skonfigurowanej akcji: {action}"
     },
     "login": {
         "unexpected_content": "Otrzymano nieoczekiwaną zawartość, zwykle z powodu przekierowania.\nUpewnij się, że nie jest wymagane dodatkowe logowanie lub potwierdzenie dostępu do Internetu.",
@@ -41,19 +42,26 @@
             "switching": "Zmiana kanałów...",
             "fetching_inventory": "Pobieranie ekwipunku...",
             "fetching_campaigns": "Pobieranie kampanii...",
-            "adding_campaigns": "Dodawanie kampanii do ekwipunku... {counter}"
+            "adding_campaigns": "Dodawanie kampanii do ekwipunku... {counter}",
+            "paused": "Wstrzymano",
+            "paused_until": "Wstrzymano do {time}",
+            "scheduled": "Poza zaplanowanymi godzinami"
         },
         "tabs": {
             "main": "Główna",
             "inventory": "Ekwipunek",
             "settings": "Ustawienia",
-            "help": "Pomoc"
+            "help": "Pomoc",
+            "dashboard": "Panel"
         },
         "tray": {
             "notification_title": "Drop odebrany",
             "minimize": "Zminimalizuj",
             "show": "Pokaż",
-            "quit": "Wyjdź"
+            "quit": "Wyjdź",
+            "pause": "Wstrzymaj",
+            "resume": "Wznów",
+            "switch_channel": "Zmień kanał"
         },
         "login": {
             "name": "Logowanie",
@@ -136,7 +144,10 @@
                 "tray_notifications": "Powiadomienia z zasobnika: ",
                 "dark_mode": "Tryb ciemny: ",
                 "priority_mode": "Tryb priorytetu: ",
-                "proxy": "Proxy (wymaga restartu):"
+                "proxy": "Proxy (wymaga restartu):",
+                "theme": "Motyw: ",
+                "use_system_accent": "Użyj koloru akcentu systemu: ",
+                "priority_mode_info": "Gry z listy priorytetów są zawsze próbowane jako pierwsze, w ustalonej przez Ciebie kolejności. \"Kończy się najwcześniej\"/\"Najpierw niska dostępność\" określają tylko kolejność dla reszty, gdy nic z listy priorytetów nie jest już dostępne."
             },
             "advanced": {
                 "name": "Zaawansowane",
@@ -148,13 +159,45 @@
             "priority_modes": {
                 "priority_only": "Tylko lista priorytetów",
                 "ending_soonest": "Kończące się najwcześniej",
-                "low_availability": "Najniższa dostępność"
+                "low_availability": "Najniższa dostępność",
+                "priority_only_continue": "Tylko lista priorytetów, potem kontynuuj z resztą",
+                "priority_ending_soonest": "Najpierw lista priorytetów, potem kończy się najwcześniej",
+                "priority_low_availability": "Najpierw lista priorytetów, potem niska dostępność"
             },
             "game_name": "Nazwa gry",
             "priority": "Priorytety",
             "exclude": "Wykluczone",
             "reload": "Przeładuj",
-            "reload_text": "Większość zmian wymaga przeładowania, które natychmiastowo je zastosuje: "
+            "reload_text": "Większość zmian wymaga przeładowania, które natychmiastowo je zastosuje: ",
+            "accounts": {
+                "name": "Konta",
+                "current": "Aktywny profil: {name}",
+                "create": "Utwórz",
+                "launch": "Uruchom (równolegle)",
+                "switch": "Przełącz na",
+                "delete": "Usuń",
+                "delete_confirm": "Trwale usunąć profil \"{name}\" i wszystkie jego dane (ustawienia, ciasteczka, pamięć podręczna, statystyki)? Tej operacji nie można cofnąć."
+            },
+            "scheduler": {
+                "name": "Harmonogram",
+                "enabled": "Włącz harmonogram: ",
+                "start": "Początek (GG:MM): ",
+                "end": "Koniec (GG:MM): ",
+                "auto_action": "Gdy wszystkie dropy zostaną odebrane: "
+            },
+            "power_actions": {
+                "none": "Nic nie rób",
+                "sleep": "Uśpij komputer",
+                "shutdown": "Wyłącz komputer"
+            },
+            "themes": {
+                "auto": "Jasny/Ciemny (Auto)",
+                "light": "Jasny",
+                "dark": "Ciemny",
+                "modern_auto": "Kolory Twitch (Auto)",
+                "modern_light": "Kolory Twitch, jasny",
+                "modern_dark": "Kolory Twitch, ciemny"
+            }
         },
         "help": {
             "links": {
@@ -165,11 +208,32 @@
             "how_it_works": "Jak to działa?",
             "how_it_works_text": "Co kilkanaście sekund aplikacja pobiera metadane strumienia, udając oglądanie streamu - to wystarczy, aby uzyskać postęp dropu. Zauważ, że w ten sposób możesz całkowicie pominąć konieczność pobierania rzeczywistego strumienia wideo i dźwięku. Do utrzymania statusu ONLINE lub OFFLINE kanałów używane jest połączenie WebSocket, które odbiera zdarzenia o zmianie statusu kanałów oraz na bieżąco aktualizuje liczbę widzów.",
             "getting_started": "Pierwsze kroki",
-            "getting_started_text": "1. Zaloguj się do aplikacji.\n2. Upewnij się, że Twoje konto Twitch jest połączone ze wszystkimi kampaniami, z których chcesz otrzymywać dropy.\n3. Zmień tryb priorytetu na coś innego niż „Tylko lista priorytetów” i kliknij „Przeładuj”, jeśli chcesz otrzymywać dropy ze wszystkich aktywnych kampanii.\n4. Użyj listy „Priorytety”, aby wybrać uporządkowaną listę gier, z których chcesz otrzymać dropy. Gry znajdujące się wyżej na liście będą miały wyższy priorytet przy zdobywaniu dropów.\n5. Wybierz opcję „Tylko lista priorytetów”, aby wykluczyć gry, które nie znajdują się na liście priorytetowej.\n6. Użyj listy „Wykluczone”, aby wskazać gry, z których przedmioty nigdy nie powinny być zdobywane.\n7. Zmiana zawartości list „Priorytety” i „Wykluczone” oraz opcji „Tryb priorytetu” wymaga kliknięcia „Przeładuj”, aby aplikacja mogła zastosować wprowadzone zmiany."
+            "getting_started_text": "1. Zaloguj się do aplikacji.\n2. Upewnij się, że Twoje konto Twitch jest połączone ze wszystkimi kampaniami, z których chcesz otrzymywać dropy.\n3. Zmień tryb priorytetu na coś innego niż „Tylko lista priorytetów” i kliknij „Przeładuj”, jeśli chcesz otrzymywać dropy ze wszystkich aktywnych kampanii.\n4. Użyj listy „Priorytety”, aby wybrać uporządkowaną listę gier, z których chcesz otrzymać dropy. Gry znajdujące się wyżej na liście będą miały wyższy priorytet przy zdobywaniu dropów.\n5. Wybierz opcję „Tylko lista priorytetów”, aby wykluczyć gry, które nie znajdują się na liście priorytetowej.\n6. Użyj listy „Wykluczone”, aby wskazać gry, z których przedmioty nigdy nie powinny być zdobywane.\n7. Zmiana zawartości list „Priorytety” i „Wykluczone” oraz opcji „Tryb priorytetu” wymaga kliknięcia „Przeładuj”, aby aplikacja mogła zastosować wprowadzone zmiany.",
+            "invalidate": {
+                "button": "Unieważnij token autoryzacji",
+                "text": "Użyj tego, jeśli musisz zalogować się ponownie, np. aby zmienić konto. To unieważni bieżący token autoryzacji i wyloguje Cię."
+            }
         },
         "invalidate": {
             "button": "Unieważnij",
             "text": "Unieważnij token uwierzytelniający (wyloguj się):"
+        },
+        "dashboard": {
+            "now_mining": "Aktualnie wydobywane",
+            "campaign": "Kampania dropów",
+            "status": "Status",
+            "pause": "Wstrzymaj",
+            "resume": "Wznów",
+            "resume_at": "Wznów o: ",
+            "resume_at_info": "Przykład: wpisz 14:30 i kliknij \"Wstrzymaj do\", aby wstrzymać wydobywanie teraz i automatycznie wznowić o 14:30 (dziś, lub jutro, jeśli ta godzina już minęła).",
+            "pause_until": "Wstrzymaj do",
+            "drop_remaining": "Pozostały czas do tego dropu: ",
+            "campaign_remaining": "Pozostały czas do kampanii: ",
+            "weekly": "Ostatnie 7 dni",
+            "per_game": "Dropy na grę",
+            "total_drops": "Łącznie odebranych dropów: {count}",
+            "hours_saved": "Zaoszczędzone godziny oglądania: {hours}",
+            "no_data": "Brak danych"
         }
     }
 }

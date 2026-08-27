@@ -799,7 +799,10 @@ class CampaignProgress:
     def display(self, drop: TimedDrop | None, *, countdown: bool = True, subone: bool = False):
         self._drop = drop
         if hasattr(self._manager, "dashboard"):
-            self._manager.dashboard.refresh_campaign()
+            try:
+                self._manager.dashboard.refresh_campaign()
+            except Exception:
+                logger.exception("Failed to refresh the dashboard's campaign view")
         vars_drop = self._vars["drop"]
         vars_campaign = self._vars["campaign"]
         self.stop_timer()
@@ -1666,6 +1669,7 @@ class InventoryOverview:
         ).grid(column=(icolumn := icolumn + 1), row=0)
         # Inventory view
         self._canvas = tk.Canvas(master, scrollregion=(0, 0, 0, 0), highlightthickness=0)
+        self._redraw_after_id: str | None = None
         self._canvas.grid(column=0, row=1, sticky="nsew")
         master.rowconfigure(1, weight=1)
         master.columnconfigure(0, weight=1)
@@ -1766,8 +1770,16 @@ class InventoryOverview:
 
     def _force_redraw(self) -> None:
         # Windows-only ttk-in-Canvas ghosting workaround: force everything to repaint
-        # after a scroll, otherwise stale duplicate copies of the widgets can linger.
-        self._canvas.after_idle(self._canvas.update_idletasks)
+        # after scrolling stops, otherwise stale duplicate copies of the widgets can linger.
+        # Debounced (rather than firing on every single wheel notch/drag tick) so fast
+        # scrolling stays smooth instead of forcing a full idletasks pass on every event.
+        if self._redraw_after_id is not None:
+            self._canvas.after_cancel(self._redraw_after_id)
+        self._redraw_after_id = self._canvas.after(80, self._do_redraw)
+
+    def _do_redraw(self) -> None:
+        self._redraw_after_id = None
+        self._canvas.update_idletasks()
 
     async def add_campaign(self, campaign: DropsCampaign) -> None:
         campaign_frame = ttk.Frame(self._main_frame, relief="ridge", borderwidth=1, padding=4)

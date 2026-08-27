@@ -179,8 +179,17 @@ class BaseDrop:
                 _("status", "claimed_drop").format(drop=claim_text.replace('\n', ' '))
             )
             self._twitch.gui.tray.notify(claim_text, _("gui", "tray", "notification_title"))
-            self._twitch.stats.record_claim(self.campaign.game.name, self.required_minutes)
-            self._twitch.gui.dashboard.refresh()
+            # NOTE: stats/dashboard updates are UI-side extras - any failure here must never
+            # be allowed to propagate up and kill the core mining loop (claim() is called
+            # directly from the main state machine, which isn't wrapped in a task_wrapper).
+            try:
+                self._twitch.stats.record_claim(self.campaign.game.name, self.required_minutes)
+            except Exception:
+                logger.exception("Failed to record stats for a claimed drop")
+            try:
+                self._twitch.gui.dashboard.refresh()
+            except Exception:
+                logger.exception("Failed to refresh the dashboard after claiming a drop")
         else:
             logger.error(f"Drop claim has potentially failed! Drop ID: {self.id}")
         return result

@@ -7,7 +7,8 @@
         "goes_offline": "{channel} ist OFFLINE gegangen, wechseln...",
         "claimed_drop": "Drop abgeholt: {drop}",
         "no_channel": "Keine teilnehmenden Kanäle online. Warten auf Kanäle...",
-        "no_campaign": "Keine aktiven Kampagnen verfügbar. Warten auf neue Kampagne..."
+        "no_campaign": "Keine aktiven Kampagnen verfügbar. Warten auf neue Kampagne...",
+        "auto_action": "Alle Drops sind vorerst erledigt, konfigurierte Aktion wird ausgeführt: {action}"
     },
     "login": {
         "chrome": {
@@ -41,19 +42,26 @@
             "switching": "Wechsel des Kanals...",
             "fetching_inventory": "Lade Inventar...",
             "fetching_campaigns": "Lade Kampagnen...",
-            "adding_campaigns": "Kampagnen dem Inventar hinzufügen... {counter}"
+            "adding_campaigns": "Kampagnen dem Inventar hinzufügen... {counter}",
+            "paused": "Pausiert",
+            "paused_until": "Pausiert bis {time}",
+            "scheduled": "Außerhalb der geplanten Zeiten"
         },
         "tabs": {
             "main": "Hauptseite",
             "inventory": "Inventar",
             "settings": "Einstellungen",
-            "help": "Hilfe"
+            "help": "Hilfe",
+            "dashboard": "Übersicht"
         },
         "tray": {
             "notification_title": "Drop abgeholt",
             "minimize": "Minimiere ins System Tray",
             "show": "Anzeigen",
-            "quit": "Beenden"
+            "quit": "Beenden",
+            "pause": "Pause",
+            "resume": "Fortsetzen",
+            "switch_channel": "Kanal wechseln"
         },
         "login": {
             "name": "Login",
@@ -135,13 +143,62 @@
                 "tray": "Autostart ins System Tray: ",
                 "priority_only": "Nur Priorität: ",
                 "dark_mode": "Dunkler Modus: ",
-                "proxy": "Proxy (Erfordert Neustart):"
+                "proxy": "Proxy (Erfordert Neustart):",
+                "theme": "Thema: ",
+                "use_system_accent": "Systemakzentfarbe verwenden: ",
+                "priority_mode": "Prioritätsmodus: ",
+                "priority_mode_info": "Spiele der Prioritätsliste werden immer zuerst in der von Ihnen festgelegten Reihenfolge versucht. \"Endet am frühesten\"/\"Geringe Verfügbarkeit zuerst\" bestimmt nur die Reihenfolge für alles andere, sobald nichts aus der Prioritätsliste verfügbar ist.",
+                "tray_notifications": "Taskleisten-Benachrichtigungen: "
             },
             "game_name": "Spiel",
             "priority": "Priorität",
             "exclude": "Ausschließen",
             "reload": "Neu laden",
-            "reload_text": "Die meisten Änderungen erfordern ein neu laden, um sofort wirksam zu werden: "
+            "reload_text": "Die meisten Änderungen erfordern ein neu laden, um sofort wirksam zu werden: ",
+            "accounts": {
+                "name": "Konten",
+                "current": "Aktives Profil: {name}",
+                "create": "Erstellen",
+                "launch": "Starten (parallel)",
+                "switch": "Wechseln zu",
+                "delete": "Löschen",
+                "delete_confirm": "Profil \"{name}\" und alle zugehörigen Daten (Einstellungen, Cookies, Cache, Statistiken) dauerhaft löschen? Dies kann nicht rückgängig gemacht werden."
+            },
+            "scheduler": {
+                "name": "Zeitplan",
+                "enabled": "Zeitplan aktivieren: ",
+                "start": "Start (HH:MM): ",
+                "end": "Ende (HH:MM): ",
+                "auto_action": "Wenn alle Drops erledigt sind: "
+            },
+            "power_actions": {
+                "none": "Nichts tun",
+                "sleep": "PC in Ruhezustand versetzen",
+                "shutdown": "PC herunterfahren"
+            },
+            "themes": {
+                "auto": "Hell/Dunkel (Auto)",
+                "light": "Hell",
+                "dark": "Dunkel",
+                "modern_auto": "Twitch-Farben (Auto)",
+                "modern_light": "Twitch-Farben, hell",
+                "modern_dark": "Twitch-Farben, dunkel"
+            },
+            "priority_modes": {
+                "priority_only": "Nur Prioritätsliste",
+                "priority_only_continue": "Nur Prioritätsliste, dann mit dem Rest fortfahren",
+                "ending_soonest": "Endet am frühesten",
+                "priority_ending_soonest": "Prioritätsliste zuerst, dann am frühesten endend",
+                "low_availability": "Geringe Verfügbarkeit zuerst",
+                "priority_low_availability": "Prioritätsliste zuerst, dann geringe Verfügbarkeit"
+            },
+            "advanced": {
+                "name": "Erweitert",
+                "warning": "Warnung!",
+                "warning_text": "Diese Optionen können dazu führen, dass der Miner nicht mehr richtig funktioniert.\nWenn Probleme auftreten, stellen Sie sicher, dass alle diese Optionen deaktiviert sind.",
+                "enable_badges_emotes": "Teilweise Unterstützung für Badges und Emotes aktivieren: ",
+                "available_drops_check": "Zusätzliche Prüfung verfügbarer Drops aktivieren: "
+            }
         },
         "help": {
             "links": {
@@ -152,7 +209,28 @@
             "how_it_works": "So funktioniert's",
             "how_it_works_text": "Alle ~60 Sekunden sendet die Anwendung ein \"Minute zugesehen\" Ereignis an den Kanal, dem gerade zugesehen wird.\nDies reicht aus, um den Drop voranzutreiben. Auf diese Weise ist es nicht nötig den Stream herunterzuladen und spart Bandbreite.\nUm den Online- oder Offline-Status der Kanäle aktuell zu halten, wird eine Websocket-Verbindung eingerichtet,\ndie die Kanäle auf ihren Status überprüft.",
             "getting_started": "Erste Schritte",
-            "getting_started_text": "• In der Anwendung anmelden.\n• Stelle sicher, dass das Twitch-Konto mit allen Kampagnen verknüpft ist, an denen Interesse besteht.\n• Sollen alle Drops bearbeitet werden, entferne den Haken bei \"Nur Priorität\" und drücke \"Neu laden\".\n• Sollen nur bestimmte Spiele in betracht gezogen werden, verwende die \"Priorität\" Liste um die Wahl nach Spielen einzugrenzen.\n• Die Liste priorisiert von oben nach unten.\n• Die Option \"Nur Priorität\" verhindert, dass Spiele, die nicht auf der Prioritätenliste stehen, bearbeitet werden.\n• Mit der Liste \"Ausschließen\", ist es möglich Spiele zu filtern, die niemals in betracht gezogen werden sollen.\n• Wenn Listen oder Optionen angepasst wurden, muss \"Neu laden\" gedrückt werden, damit die Änderungen übernommen werden."
+            "getting_started_text": "• In der Anwendung anmelden.\n• Stelle sicher, dass das Twitch-Konto mit allen Kampagnen verknüpft ist, an denen Interesse besteht.\n• Sollen alle Drops bearbeitet werden, entferne den Haken bei \"Nur Priorität\" und drücke \"Neu laden\".\n• Sollen nur bestimmte Spiele in betracht gezogen werden, verwende die \"Priorität\" Liste um die Wahl nach Spielen einzugrenzen.\n• Die Liste priorisiert von oben nach unten.\n• Die Option \"Nur Priorität\" verhindert, dass Spiele, die nicht auf der Prioritätenliste stehen, bearbeitet werden.\n• Mit der Liste \"Ausschließen\", ist es möglich Spiele zu filtern, die niemals in betracht gezogen werden sollen.\n• Wenn Listen oder Optionen angepasst wurden, muss \"Neu laden\" gedrückt werden, damit die Änderungen übernommen werden.",
+            "invalidate": {
+                "button": "Autorisierungstoken ungültig machen",
+                "text": "Verwenden Sie dies, wenn Sie sich erneut anmelden müssen, z. B. um das Konto zu wechseln. Dadurch wird das aktuelle Autorisierungstoken ungültig gemacht und Sie werden abgemeldet."
+            }
+        },
+        "dashboard": {
+            "now_mining": "Aktuell im Abbau",
+            "campaign": "Drop-Kampagne",
+            "status": "Status",
+            "pause": "Pause",
+            "resume": "Fortsetzen",
+            "resume_at": "Fortsetzen um: ",
+            "resume_at_info": "Beispiel: 14:30 eingeben und auf \"Pausieren bis\" klicken, um das Mining jetzt zu pausieren und automatisch um 14:30 Uhr fortzusetzen (heute, oder morgen falls die Zeit bereits vorbei ist).",
+            "pause_until": "Pausieren bis",
+            "drop_remaining": "Verbleibende Zeit für diesen Drop: ",
+            "campaign_remaining": "Verbleibende Zeit für die Kampagne: ",
+            "weekly": "Letzte 7 Tage",
+            "per_game": "Drops pro Spiel",
+            "total_drops": "Insgesamt eingelöste Drops: {count}",
+            "hours_saved": "Gesparte Zuschauerstunden: {hours}",
+            "no_data": "Noch keine Daten"
         }
     }
 }

@@ -7,7 +7,8 @@
         "goes_offline": "{channel} går OFFLINE, skifter...",
         "claimed_drop": "Hentet belønning: {drop}",
         "no_channel": "Ingen tilgængelige kanaler at se. Venter på en ONLINE kanal...",
-        "no_campaign": "Der er ingen aktive kampagner at hente. Venter på en aktiv kampagne..."
+        "no_campaign": "Der er ingen aktive kampagner at hente. Venter på en aktiv kampagne...",
+        "auto_action": "Alle drops er klaret for nu, kører konfigureret handling: {action}"
     },
     "login": {
         "unexpected_content": "Uventet indholdstype returneres, normalt på grund af at blive omdirigeret. Skal du logge ind for internetadgang?",
@@ -41,19 +42,26 @@
             "switching": "Skifter kanal...",
             "fetching_inventory": "Henter beholdning...",
             "fetching_campaigns": "Henter kampagner...",
-            "adding_campaigns": "Tilføjer kampagner til beholdning... {counter}"
+            "adding_campaigns": "Tilføjer kampagner til beholdning... {counter}",
+            "paused": "Sat på pause",
+            "paused_until": "Sat på pause indtil {time}",
+            "scheduled": "Uden for planlagte timer"
         },
         "tabs": {
             "main": "Main",
             "inventory": "Beholdning",
             "settings": "Indstillinger",
-            "help": "Hjælp"
+            "help": "Hjælp",
+            "dashboard": "Instrumentbræt"
         },
         "tray": {
             "notification_title": "Mined Belønning",
             "minimize": "Minimer til systembakken",
             "show": "Vis",
-            "quit": "Afslut"
+            "quit": "Afslut",
+            "pause": "Pause",
+            "resume": "Genoptag",
+            "switch_channel": "Skift kanal"
         },
         "login": {
             "name": "Login formular",
@@ -90,9 +98,9 @@
         "channels": {
             "name": "Kanaler",
             "switch": "Skift",
-            "online": "ONLINE  \u2714",
-            "pending": "OFFLINE \u23f3",
-            "offline": "OFFLINE \u274c",
+            "online": "ONLINE  ✔",
+            "pending": "OFFLINE ⏳",
+            "offline": "OFFLINE ❌",
             "headings": {
                 "channel": "Kanal",
                 "status": "Status",
@@ -112,13 +120,13 @@
                 "refresh": "Opdater"
             },
             "status": {
-                "linked": "Forbundet \u2714",
-                "not_linked": "Ikke forbundet \u274c",
-                "active": "Aktiv \u2714",
-                "upcoming": "Kommende \u23f3",
-                "expired": "Udløbet \u274c",
-                "claimed": "Hentet \u2714",
-                "ready_to_claim": "Klar til at hente \u23f3"
+                "linked": "Forbundet ✔",
+                "not_linked": "Ikke forbundet ❌",
+                "active": "Aktiv ✔",
+                "upcoming": "Kommende ⏳",
+                "expired": "Udløbet ❌",
+                "claimed": "Hentet ✔",
+                "ready_to_claim": "Klar til at hente ⏳"
             },
             "starts": "Starter: {time}",
             "ends": "Slutter: {time}",
@@ -136,13 +144,61 @@
                 "tray_notifications": "Bakkemeddelelser: ",
                 "priority_only": "Kun prioritet: ",
                 "dark_mode": "Mørk tilstand: ",
-                "proxy": "Proxy (kræver genstart):"
+                "proxy": "Proxy (kræver genstart):",
+                "theme": "Tema: ",
+                "use_system_accent": "Brug systemets accentfarve: ",
+                "priority_mode": "Prioritetstilstand: ",
+                "priority_mode_info": "Spil på prioritetslisten forsøges altid først, i den rækkefølge du har angivet. \"Slutter snarest\"/\"Lav tilgængelighed først\" bestemmer kun rækkefølgen for alt andet, når intet fra prioritetslisten er tilgængeligt."
             },
             "game_name": "Spilnavn",
             "priority": "Prioritet",
             "exclude": "Udelukke",
             "reload": "Genindlæs",
-            "reload_text": "De fleste ændringer kræver en genindlæsning for at få en øjeblikkelig virkning: "
+            "reload_text": "De fleste ændringer kræver en genindlæsning for at få en øjeblikkelig virkning: ",
+            "accounts": {
+                "name": "Konti",
+                "current": "Aktiv profil: {name}",
+                "create": "Opret",
+                "launch": "Start (parallelt)",
+                "switch": "Skift til",
+                "delete": "Slet",
+                "delete_confirm": "Slet profilen \"{name}\" og alle dens data (indstillinger, cookies, cache, statistik) permanent? Dette kan ikke fortrydes."
+            },
+            "scheduler": {
+                "name": "Tidsplan",
+                "enabled": "Aktivér tidsplan: ",
+                "start": "Start (TT:MM): ",
+                "end": "Slut (TT:MM): ",
+                "auto_action": "Når alle drops er klaret: "
+            },
+            "power_actions": {
+                "none": "Gør ingenting",
+                "sleep": "Sæt pc i dvale",
+                "shutdown": "Sluk pc"
+            },
+            "themes": {
+                "auto": "Lys/Mørk (Auto)",
+                "light": "Lys",
+                "dark": "Mørk",
+                "modern_auto": "Twitch-farver (Auto)",
+                "modern_light": "Twitch-farver, lys",
+                "modern_dark": "Twitch-farver, mørk"
+            },
+            "priority_modes": {
+                "priority_only": "Kun prioritetsliste",
+                "priority_only_continue": "Kun prioritetsliste, derefter fortsæt med resten",
+                "ending_soonest": "Slutter snarest",
+                "priority_ending_soonest": "Prioritetsliste først, derefter slutter snarest",
+                "low_availability": "Lav tilgængelighed først",
+                "priority_low_availability": "Prioritetsliste først, derefter lav tilgængelighed"
+            },
+            "advanced": {
+                "name": "Avanceret",
+                "warning": "Advarsel!",
+                "warning_text": "Disse indstillinger kan få minearbejderen til at fungere forkert.\nHvis du oplever problemer, skal du sørge for, at alle disse indstillinger er deaktiveret.",
+                "enable_badges_emotes": "Aktivér delvis support til badges og emotes: ",
+                "available_drops_check": "Aktivér ekstra kontrol af tilgængelige drops: "
+            }
         },
         "help": {
             "links": {
@@ -153,7 +209,28 @@
             "how_it_works": "Hvordan virker det?",
             "how_it_works_text": "Hvert ~60. sekund sender applikationen en \"set minut\"-begivenhed til den kanal, der i øjeblikket bliver set - dette er nok til at øge faldet. Bemærk, at dette helt omgår behovet for at downloade enhver faktisk stream video og lyd. For at holde status (ONLINE eller OFFLINE) for kanalerne opdateret, er der etableret en websocket-forbindelse, der modtager begivenheder om streams, der går op eller ned, eller opdateringer vedrørende det aktuelle antal seere.",
             "getting_started": "Kom igang",
-            "getting_started_text": "1. Log ind på applikationen.\n2. Sørg for, at din Twitch-konto er linket til alle kampagner, du er interesseret i at mine.\n3. Hvis du bare er interesseret i at mine alt, skal du fjerne markeringen i \"Kun prioritet\" og trykke på \"Genindlæs\".\n4. Hvis du ønsker at mine specifikke spil først, skal du bruge listen \"Prioritet\" til at opsætte en ordnet liste over spil efter eget valg. Spil fra toppen af ​​listen vil blive forsøgt at blive minet først, før dem nederst på listen.\n5. Hold indstillingen \"Kun prioritet\" markeret for at undgå at mine spil, der ikke er på prioritetslisten. Eller ej - det er op til dig.\n6. Brug listen \"Ekskluder\" til at fortælle applikationen, hvilke spil der aldrig bør mines.\n7. Ændring af indholdet af en af ​​listerne eller ændring af tilstanden for \"Kun prioritet\"-indstillingen kræver, at du trykker på \"Genindlæs\" for at ændringerne træder i kraft."
+            "getting_started_text": "1. Log ind på applikationen.\n2. Sørg for, at din Twitch-konto er linket til alle kampagner, du er interesseret i at mine.\n3. Hvis du bare er interesseret i at mine alt, skal du fjerne markeringen i \"Kun prioritet\" og trykke på \"Genindlæs\".\n4. Hvis du ønsker at mine specifikke spil først, skal du bruge listen \"Prioritet\" til at opsætte en ordnet liste over spil efter eget valg. Spil fra toppen af ​​listen vil blive forsøgt at blive minet først, før dem nederst på listen.\n5. Hold indstillingen \"Kun prioritet\" markeret for at undgå at mine spil, der ikke er på prioritetslisten. Eller ej - det er op til dig.\n6. Brug listen \"Ekskluder\" til at fortælle applikationen, hvilke spil der aldrig bør mines.\n7. Ændring af indholdet af en af ​​listerne eller ændring af tilstanden for \"Kun prioritet\"-indstillingen kræver, at du trykker på \"Genindlæs\" for at ændringerne træder i kraft.",
+            "invalidate": {
+                "button": "Ugyldiggør autorisationstoken",
+                "text": "Brug denne funktion, hvis du skal logge ind igen, f.eks. for at skifte konto. Dette ugyldiggør det nuværende autorisationstoken og logger dig ud."
+            }
+        },
+        "dashboard": {
+            "now_mining": "Miner nu",
+            "campaign": "Drop-kampagne",
+            "status": "Status",
+            "pause": "Pause",
+            "resume": "Genoptag",
+            "resume_at": "Genoptag kl.: ",
+            "resume_at_info": "Eksempel: skriv 14:30 og klik på \"Sæt pause indtil\" for at sætte minedrift på pause nu og automatisk genoptage kl. 14:30 (i dag, eller i morgen hvis tidspunktet allerede er passeret).",
+            "pause_until": "Sæt pause indtil",
+            "drop_remaining": "Resterende tid til dette drop: ",
+            "campaign_remaining": "Resterende tid til kampagnen: ",
+            "weekly": "Sidste 7 dage",
+            "per_game": "Drops pr. spil",
+            "total_drops": "Drops indløst i alt: {count}",
+            "hours_saved": "Sparede seertimer: {hours}",
+            "no_data": "Ingen data endnu"
         }
     }
 }

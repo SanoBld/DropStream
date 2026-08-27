@@ -702,7 +702,12 @@ class Twitch:
                     if not campaign.upcoming:
                         for drop in campaign.drops:
                             if drop.can_claim:
-                                await drop.claim()
+                                try:
+                                    await drop.claim()
+                                except Exception:
+                                    # a failure claiming (or in any UI-side hook it triggers)
+                                    # must never stop mining from continuing with other drops
+                                    logger.exception(f"Failed to claim drop {drop.id}")
                 # figure out which games we want
                 self.wanted_games.clear()
                 exclude = self.settings.exclude

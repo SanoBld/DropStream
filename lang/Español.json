@@ -7,7 +7,8 @@
         "goes_offline": "El canal {channel} se ha desconectado, cambiando...",
         "claimed_drop": "Drop reclamado: {drop}",
         "no_channel": "No se ha encontrado un canal en vivo para mirar. \nEsperando un canal en vivo...",
-        "no_campaign": "No se ha encontrado una campaña activa. \nEsperando una nueva campaña..."
+        "no_campaign": "No se ha encontrado una campaña activa. \nEsperando una nueva campaña...",
+        "auto_action": "Todos los drops están listos por ahora, ejecutando la acción configurada: {action}"
     },
     "login": {
         "unexpected_content": "Se produjo un error inesperado, \ngeneralmente debido a una redirección.\n¿Necesitas un VPN o iniciar sesión para acceder a internet?",
@@ -41,19 +42,26 @@
             "switching": "Cambiando de canal...",
             "fetching_inventory": "Obteniendo inventario...",
             "fetching_campaigns": "Obteniendo campañas...",
-            "adding_campaigns": "Agregando lista de campañas al inventario... {counter}"
+            "adding_campaigns": "Agregando lista de campañas al inventario... {counter}",
+            "paused": "Pausado",
+            "paused_until": "Pausado hasta {time}",
+            "scheduled": "Fuera del horario programado"
         },
         "tabs": {
             "main": "General",
             "inventory": "Inventario",
             "settings": "Configuración",
-            "help": "Ayuda"
+            "help": "Ayuda",
+            "dashboard": "Panel"
         },
         "tray": {
             "notification_title": "Drop minado",
             "minimize": "Minimizar a la bandeja",
             "show": "Mostrar",
-            "quit": "Salir"
+            "quit": "Salir",
+            "pause": "Pausar",
+            "resume": "Reanudar",
+            "switch_channel": "Cambiar de canal"
         },
         "login": {
             "name": "Inicio de sesión",
@@ -136,7 +144,10 @@
                 "tray_notifications": "Mostrar notificaciones: ",
                 "dark_mode": "Modo oscuro: ",
                 "priority_mode": "Modo de prioridad: ",
-                "proxy": "Proxy (requiere reinicio):"
+                "proxy": "Proxy (requiere reinicio):",
+                "theme": "Tema: ",
+                "use_system_accent": "Usar color de acento del sistema: ",
+                "priority_mode_info": "Los juegos de la lista de prioridad siempre se intentan primero, en el orden que hayas definido. \"Finaliza antes\"/\"Baja disponibilidad primero\" solo determinan el orden para todo lo demás, una vez que no queda nada disponible en la lista de prioridad."
             },
             "advanced": {
                 "name": "Avanzado",
@@ -148,13 +159,45 @@
             "priority_modes": {
                 "priority_only": "Solo juegos preferidos",
                 "ending_soonest": "Terminando pronto",
-                "low_availability": "Poca disponibilidad primero"
+                "low_availability": "Poca disponibilidad primero",
+                "priority_only_continue": "Solo lista de prioridad, luego continuar con el resto",
+                "priority_ending_soonest": "Lista de prioridad primero, luego finaliza antes",
+                "priority_low_availability": "Lista de prioridad primero, luego baja disponibilidad"
             },
             "game_name": "Nombre del juego",
             "priority": "Lista de juegos preferidos",
             "exclude": "Lista de juegos excluidos",
             "reload": "Recargar",
-            "reload_text": "La mayoría de los cambios requieren recargar o reiniciar la aplicación para que sean aplicados: "
+            "reload_text": "La mayoría de los cambios requieren recargar o reiniciar la aplicación para que sean aplicados: ",
+            "accounts": {
+                "name": "Cuentas",
+                "current": "Perfil activo: {name}",
+                "create": "Crear",
+                "launch": "Iniciar (en paralelo)",
+                "switch": "Cambiar a",
+                "delete": "Eliminar",
+                "delete_confirm": "¿Eliminar permanentemente el perfil \"{name}\" y todos sus datos (ajustes, cookies, caché, estadísticas)? Esto no se puede deshacer."
+            },
+            "scheduler": {
+                "name": "Planificador",
+                "enabled": "Activar horario: ",
+                "start": "Inicio (HH:MM): ",
+                "end": "Fin (HH:MM): ",
+                "auto_action": "Cuando todos los drops estén listos: "
+            },
+            "power_actions": {
+                "none": "No hacer nada",
+                "sleep": "Suspender el PC",
+                "shutdown": "Apagar el PC"
+            },
+            "themes": {
+                "auto": "Claro/Oscuro (Auto)",
+                "light": "Claro",
+                "dark": "Oscuro",
+                "modern_auto": "Colores de Twitch (Auto)",
+                "modern_light": "Colores de Twitch, claro",
+                "modern_dark": "Colores de Twitch, oscuro"
+            }
         },
         "help": {
             "links": {
@@ -170,6 +213,23 @@
                 "button": "Invalidar",
                 "text": "Invalidar el token de autenticación (cerrar sesión):"
             }
+        },
+        "dashboard": {
+            "now_mining": "Minando actualmente",
+            "campaign": "Campaña de drops",
+            "status": "Estado",
+            "pause": "Pausar",
+            "resume": "Reanudar",
+            "resume_at": "Reanudar a las: ",
+            "resume_at_info": "Ejemplo: escribe 14:30 y haz clic en \"Pausar hasta\" para pausar la minería ahora y reanudarla automáticamente a las 14:30 (hoy, o mañana si esa hora ya pasó).",
+            "pause_until": "Pausar hasta",
+            "drop_remaining": "Tiempo restante para este drop: ",
+            "campaign_remaining": "Tiempo restante para la campaña: ",
+            "weekly": "Últimos 7 días",
+            "per_game": "Drops por juego",
+            "total_drops": "Drops totales reclamados: {count}",
+            "hours_saved": "Horas de visionado ahorradas: {hours}",
+            "no_data": "Aún no hay datos"
         }
     }
 }
