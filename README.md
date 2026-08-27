@@ -2,14 +2,16 @@
 
 > **DropStream is an unofficial, community-made update of [Twitch Drops Miner (TDM), created by DevilXD](https://github.com/DevilXD/TwitchDropsMiner).**
 > All of the original design, the core drop-mining engine, and the vast majority of this codebase come directly
-> from DevilXD's project — full credit goes to them. This fork only adds a handful of extra features on top
-> (see below). If you find this fork useful, please consider
+> from DevilXD's project — full credit goes to them. This fork is based on TDM release **v15** (the latest
+> tagged release at the time of writing) and only adds a handful of extra features on top (see below). If you
+> find this fork useful, please consider
 > [supporting DevilXD, the original author](https://www.buymeacoffee.com/DevilXD), whose work this is built on.
 
 ### What DropStream adds on top of the original TDM:
 
-- A **Dashboard** tab: weekly mining activity, drops per game, currently-mining summary, and the full drop
-  campaign progress (all items to collect, with images) for the game currently being mined.
+- A **Dashboard** tab: weekly mining activity, drops per game, total drops claimed, watch-hours saved,
+  currently-mining summary, and the full drop campaign progress (all items to collect, with images) for the
+  game currently being mined.
 - **Multi-account profiles**: isolated settings/cookies/cache per account, with the ability to launch several
   accounts in parallel or quickly switch between them, each with its own proxy.
 - A **scheduler**: restrict mining to specific hours, and optionally sleep/shut down the PC once all of today's
@@ -23,7 +25,7 @@ This application allows you to AFK mine timed Twitch drops, without having to wo
 
 ### How It Works:
 
-Every several seconds, the application pretends to watch a particular stream by fetching stream metadata - this is enough to advance the drops. Note that this completely bypasses the need to download any actual stream video and sound. To keep the status (ONLINE or OFFLINE) of the channels up-to-date, there's a websocket connection established that receives events about streams going up or down, or updates regarding the current amount of viewers.
+Every few seconds, the application simulates watching a stream by requesting its metadata, which is enough to make progress on active drops. This approach avoids downloading any actual video or audio data. A persistent websocket connection keeps each channel's status (ONLINE or OFFLINE) up to date, along with live viewer counts.
 
 ### Features:
 

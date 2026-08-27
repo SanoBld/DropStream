@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-from utils import json_load, json_save
 from constants import STATS_PATH
 
 
@@ -15,7 +15,28 @@ class StatsTracker:
 
     def __init__(self) -> None:
         # each event: {"date": "YYYY-MM-DD", "game": str, "minutes": int}
-        self._events: list[dict] = json_load(STATS_PATH, [])  # type: ignore[assignment]
+        # NOTE: json_load/json_save (utils.py) are built for dict-shaped
+        # settings files, not plain lists: json_load(path, []) silently
+        # turns the default [] into {} via dict(defaults), and merge_json
+        # calls .items() on the loaded list and crashes. That crash was
+        # swallowed by the try/except around record_claim(), so no claim
+        # was ever saved. Load/save the list ourselves instead.
+        self._events: list[dict] = self._load()
+
+    @staticmethod
+    def _load() -> list[dict]:
+        if not STATS_PATH.exists():
+            return []
+        try:
+            with STATS_PATH.open("r", encoding="utf8") as file:
+                data = json.load(file)
+        except (json.JSONDecodeError, OSError):
+            return []
+        return data if isinstance(data, list) else []
+
+    def _save(self) -> None:
+        with STATS_PATH.open("w", encoding="utf8") as file:
+            json.dump(self._events, file, indent=4)
 
     def record_claim(self, game_name: str, minutes: int) -> None:
         self._events.append({
@@ -23,7 +44,7 @@ class StatsTracker:
             "game": game_name,
             "minutes": max(0, minutes),
         })
-        json_save(STATS_PATH, self._events)
+        self._save()
 
     def weekly_progress(self) -> list[tuple[str, int]]:
         # returns [(day_label, claim_count), ...] for the last 7 days, oldest first
