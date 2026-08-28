@@ -52,7 +52,8 @@
             "inventory": "Inventar",
             "settings": "Einstellungen",
             "help": "Hilfe",
-            "dashboard": "Übersicht"
+            "dashboard": "Übersicht",
+            "remote": "Fernzugriff"
         },
         "tray": {
             "notification_title": "Drop abgeholt",
@@ -171,16 +172,6 @@
                 "end": "Ende (HH:MM): ",
                 "auto_action": "Wenn alle Drops erledigt sind: "
             },
-            "remote": {
-                "name": "Fernzugriff",
-                "info": "Ermöglicht es, den aktuellen Status live einzusehen und diese Instanz (Pause/Fortsetzen, Prioritätsmodus) über einen Browser auf einem anderen Gerät zu steuern, mithilfe des unten stehenden Links. Jeder mit diesem Link hat vollen Zugriff, also teilen Sie ihn nur mit vertrauenswürdigen Personen.",
-                "enabled": "Web-Dashboard aktivieren: ",
-                "port": "Port: ",
-                "new_link": "Neuen Link erzeugen",
-                "link": "Freigabelink:",
-                "link_disabled": "Aktivieren Sie das Dashboard, um einen Link zu erzeugen.",
-                "copy_link": "Link kopieren"
-            },
             "power_actions": {
                 "none": "Nichts tun",
                 "sleep": "PC in Ruhezustand versetzen",
@@ -241,6 +232,20 @@
             "total_drops": "Insgesamt eingelöste Drops: {count}",
             "hours_saved": "Gesparte Zuschauerstunden: {hours}",
             "no_data": "Noch keine Daten"
+        },
+        "remote": {
+            "info": "Ermöglicht es, den Live-Status einzusehen und, falls gewünscht, diese Instanz (Pause/Fortsetzen, Prioritätsmodus) über einen Browser auf einem anderen Gerät zu steuern, mithilfe des unten stehenden Links. Jeder mit dem Link kann einsehen; jeder mit dem Link und dem Passwort (falls gesetzt) kann auch steuern, also teilen Sie ihn nur mit vertrauenswürdigen Personen.",
+            "enabled": "Web-Dashboard aktivieren: ",
+            "port": "Port: ",
+            "mode_label": "Zugriffsmodus: ",
+            "mode_view": "Nur ansehen",
+            "mode_control": "Ansehen und steuern",
+            "password_label": "Steuerungspasswort: ",
+            "password_placeholder": "Optional, für kein Passwort leer lassen",
+            "new_link": "Neuen Link erzeugen",
+            "link": "Freigabelink:",
+            "link_disabled": "Aktivieren Sie das Dashboard, um einen Link zu erzeugen.",
+            "copy_link": "Link kopieren"
         }
     }
 }

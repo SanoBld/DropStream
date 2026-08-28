@@ -52,7 +52,8 @@
             "inventory": "Inventar",
             "settings": "Innstillinger",
             "help": "Hjelp",
-            "dashboard": "Oversikt"
+            "dashboard": "Oversikt",
+            "remote": "Fjern"
         },
         "tray": {
             "notification_title": "Utvunnet Drop",
@@ -185,16 +186,6 @@
                 "end": "Slutt (TT:MM): ",
                 "auto_action": "Når alle drops er ferdige: "
             },
-            "remote": {
-                "name": "Fjerntilgang",
-                "info": "Lar deg se live status og styre denne forekomsten (pause/gjenoppta, prioritetsmodus) fra en nettleser på en annen enhet, ved hjelp av lenken nedenfor. Alle med lenken har full tilgang, så del den kun med personer du stoler på.",
-                "enabled": "Aktiver webdashboard: ",
-                "port": "Port: ",
-                "new_link": "Generer en ny lenke",
-                "link": "Delingslenke:",
-                "link_disabled": "Aktiver dashbordet for å generere en lenke.",
-                "copy_link": "Kopier lenke"
-            },
             "power_actions": {
                 "none": "Ikke gjør noe",
                 "sleep": "Sett PC i hvilemodus",
@@ -240,6 +231,20 @@
             "total_drops": "Totalt innløste drops: {count}",
             "hours_saved": "Sparte seertimer: {hours}",
             "no_data": "Ingen data ennå"
+        },
+        "remote": {
+            "info": "Lar deg se live status og, hvis du velger det, styre denne forekomsten (pause/gjenoppta, prioritetsmodus) fra en nettleser på en annen enhet, ved hjelp av lenken nedenfor. Alle med lenken kan se den; alle med lenken og passordet (hvis angitt) kan også styre den, så del den kun med personer du stoler på.",
+            "enabled": "Aktiver webdashboard: ",
+            "port": "Port: ",
+            "mode_label": "Tilgangsmodus: ",
+            "mode_view": "Kun visning",
+            "mode_control": "Visning og styring",
+            "password_label": "Styringspassord: ",
+            "password_placeholder": "Valgfritt, la stå tomt for ingen",
+            "new_link": "Generer en ny lenke",
+            "link": "Delingslenke:",
+            "link_disabled": "Aktiver dashbordet for å generere en lenke.",
+            "copy_link": "Kopier lenke"
         }
     }
 }

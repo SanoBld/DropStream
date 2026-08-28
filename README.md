@@ -20,8 +20,10 @@
 - A **theme system**: Light/Dark/Auto, plus a "Twitch Colors" theme, with an option to follow your OS accent
   color, and real vector tab icons.
 - Automatic OAuth token re-validation, to catch and recover from an expired session before it breaks mining.
-- An optional **remote web dashboard**: host a small built-in web page that lets anyone with the link view
-  live status and control the app (pause/resume, priority mode) from a browser on another device.
+- An optional **remote web dashboard** (its own **Remote** tab): host a small built-in web page
+  that lets anyone with the link view live status, in read-only or view-and-control mode
+  (pause/resume, priority mode), optionally password-protected, from a browser on another
+  device.
 
 This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle.
 
@@ -56,25 +58,42 @@ Every few seconds, the application simulates watching a stream by requesting its
 
 ### Remote Web Dashboard:
 
-The Settings tab has a "Remote Access" section, off by default. Turning it on starts a small local web
-server built into the app and generates a private link (a random token embedded in the URL, e.g.
-`http://192.168.1.42:21000/8f3a.../`). Opening that link in a browser, on any device on the same network,
-shows a live view of the current drop/campaign progress, weekly stats, and lets you pause/resume mining or
-change the priority mode, without touching the desktop app itself.
+The **Remote** tab (its own tab, not buried in Settings) lets you turn on a small local web
+server built into the app and generates a private link (a random token embedded in the URL,
+e.g. `http://192.168.1.42:21000/8f3a.../`). Opening that link in a browser, on any device on
+the same network, shows a live view of the current drop/campaign progress and weekly stats.
+
+From that same tab you choose the **access mode**:
+
+- **View only** (default): visitors can watch progress, nothing else.
+- **View and control**: visitors can also pause/resume mining and change the priority mode.
+  In this mode you can optionally set a **control password**; without one, anyone with the
+  link can control the app, with one, they additionally need the password for any control
+  action (viewing still only requires the link).
 
 A few things worth knowing:
 
-- The link itself is the only thing standing between "just viewing" and "full control" of the app, so treat
-  it like a password: anyone who has it can pause your miner or change its settings. Use the "Generate a new
-  link" button any time you want to revoke a previously shared one.
-- By default this is reachable only from your local network (same Wi-Fi/router). To reach it from outside
-  your home network, you'd need to either forward the configured port on your router (not recommended, as it
-  exposes the link to the internet) or use a private tunnel/VPN (Tailscale, WireGuard, etc.) to your network
+- The link is the only thing standing between a stranger and "just viewing" your instance, so
+  treat it like a password: anyone who has it can see your activity. Use the "Generate a new
+  link" button any time you want to revoke a previously shared one. If you also enabled
+  control, set a control password unless you fully trust everyone you're sharing the link with.
+- By default this is reachable only from your local network (same Wi-Fi/router). To reach it
+  from outside your home network, you'd need to either forward the configured port on your
+  router (this exposes the link to the whole internet, including scanners; only do this if you
+  understand the risk) or use a private tunnel/VPN (Tailscale, WireGuard, etc.) to your network
   instead.
-- The port (`21000` by default) can be changed if it conflicts with something else already running on your
-  machine.
-- This dashboard is view/control only: it can't be used to log into your Twitch account or claim drops
-  through it directly, it just reflects and steers what the desktop app is already doing.
+- The port (`21000` by default) can be changed if it conflicts with something else already
+  running on your machine.
+- **Performance, especially if exposed to the internet:** the dashboard shares the same
+  asyncio event loop as the drop-mining logic, so it's built to stay light no matter who's
+  hitting it: requests are rate-limited per visitor (a generous cap well above what the page's
+  own 4-second polling needs), the tracked-IP table is bounded so random internet scanning
+  can't grow memory over time, POST bodies are capped to a few KB, and access logging is
+  disabled. Under normal use (a handful of people checking in occasionally) none of this is
+  noticeable; it exists specifically so exposing the port doesn't become a liability.
+- This dashboard is view/control only: it can't be used to log into your Twitch account or
+  claim drops through it directly, it just reflects and steers what the desktop app is already
+  doing.
 
 ### Notes:
 

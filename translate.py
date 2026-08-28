@@ -68,6 +68,7 @@ class GUITabs(TypedDict):
     dashboard: str
     inventory: str
     settings: str
+    remote: str
     help: str
 
 
@@ -222,11 +223,15 @@ class GUISettingsScheduler(TypedDict):
     auto_action: str
 
 
-class GUISettingsRemote(TypedDict):
-    name: str
+class GUIRemote(TypedDict):
     info: str
     enabled: str
     port: str
+    mode_label: str
+    mode_view: str
+    mode_control: str
+    password_label: str
+    password_placeholder: str
     new_link: str
     link: str
     link_disabled: str
@@ -261,7 +266,6 @@ class GUISettings(TypedDict):
     themes: GUIThemes
     accounts: GUISettingsAccounts
     scheduler: GUISettingsScheduler
-    remote: GUISettingsRemote
     power_actions: GUIPowerActions
     advanced: GUISettingsAdvanced
     priority_modes: GUIPriorityModes
@@ -303,6 +307,7 @@ class GUIMessages(TypedDict):
     channels: GUIChannels
     inventory: GUIInventory
     settings: GUISettings
+    remote: GUIRemote
     help: GUIHelp
     dashboard: GUIDashboard
 
@@ -377,6 +382,7 @@ default_translation: Translation = {
             "dashboard": "Dashboard",
             "inventory": "Inventory",
             "settings": "Settings",
+            "remote": "Remote",
             "help": "Help",
         },
         "dashboard": {
@@ -541,21 +547,6 @@ default_translation: Translation = {
                 "end": "End (HH:MM): ",
                 "auto_action": "When all drops are done: ",
             },
-            "remote": {
-                "name": "Remote Access",
-                "info": (
-                    "Lets you view live status and control this instance (pause/resume, "
-                    "priority mode) from a browser on another device, using the link below. "
-                    "Anyone with the link has full access, so only share it with people you "
-                    "trust."
-                ),
-                "enabled": "Enable web dashboard: ",
-                "port": "Port: ",
-                "new_link": "Generate a new link",
-                "link": "Share link:",
-                "link_disabled": "Enable the dashboard to generate a link.",
-                "copy_link": "Copy link",
-            },
             "power_actions": {
                 "none": "Do nothing",
                 "sleep": "Sleep PC",
@@ -566,6 +557,26 @@ default_translation: Translation = {
             "exclude": "Exclude",
             "reload": "Reload",
             "reload_text": "Most changes require a reload to take an immediate effect: ",
+        },
+        "remote": {
+            "info": (
+                "Lets you view live status and, if you choose to, control this instance "
+                "(pause/resume, priority mode) from a browser on another device, using the "
+                "link below. Anyone with the link can view; anyone with the link and the "
+                "password (if one is set) can also control it, so only share it with people "
+                "you trust."
+            ),
+            "enabled": "Enable web dashboard: ",
+            "port": "Port: ",
+            "mode_label": "Access mode:",
+            "mode_view": "View only",
+            "mode_control": "View and control",
+            "password_label": "Control password:",
+            "password_placeholder": "Optional, leave empty for none",
+            "new_link": "Generate a new link",
+            "link": "Share link:",
+            "link_disabled": "Enable the dashboard to generate a link.",
+            "copy_link": "Copy link",
         },
         "help": {
             "links": {

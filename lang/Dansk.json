@@ -52,7 +52,8 @@
             "inventory": "Beholdning",
             "settings": "Indstillinger",
             "help": "Hjælp",
-            "dashboard": "Instrumentbræt"
+            "dashboard": "Instrumentbræt",
+            "remote": "Fjern"
         },
         "tray": {
             "notification_title": "Mined Belønning",
@@ -171,16 +172,6 @@
                 "end": "Slut (TT:MM): ",
                 "auto_action": "Når alle drops er klaret: "
             },
-            "remote": {
-                "name": "Fjernadgang",
-                "info": "Giver mulighed for at se live status og styre denne instans (pause/genoptag, prioritetstilstand) fra en browser på en anden enhed, via linket nedenfor. Alle med linket har fuld adgang, så del det kun med personer, du stoler på.",
-                "enabled": "Aktiver webdashboard: ",
-                "port": "Port: ",
-                "new_link": "Generer et nyt link",
-                "link": "Delingslink:",
-                "link_disabled": "Aktiver dashboardet for at generere et link.",
-                "copy_link": "Kopier link"
-            },
             "power_actions": {
                 "none": "Gør ingenting",
                 "sleep": "Sæt pc i dvale",
@@ -241,6 +232,20 @@
             "total_drops": "Drops indløst i alt: {count}",
             "hours_saved": "Sparede seertimer: {hours}",
             "no_data": "Ingen data endnu"
+        },
+        "remote": {
+            "info": "Lader dig se live status og, hvis du vælger det, styre denne instans (pause/genoptag, prioritetstilstand) fra en browser på en anden enhed, via linket nedenfor. Alle med linket kan se det; alle med linket og adgangskoden (hvis angivet) kan også styre det, så del det kun med personer, du stoler på.",
+            "enabled": "Aktiver webdashboard: ",
+            "port": "Port: ",
+            "mode_label": "Adgangstilstand: ",
+            "mode_view": "Kun visning",
+            "mode_control": "Visning og styring",
+            "password_label": "Styringsadgangskode: ",
+            "password_placeholder": "Valgfri, lad stå tom for ingen",
+            "new_link": "Generer et nyt link",
+            "link": "Delingslink:",
+            "link_disabled": "Aktiver dashboardet for at generere et link.",
+            "copy_link": "Kopier link"
         }
     }
 }

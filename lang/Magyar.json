@@ -52,7 +52,8 @@
             "inventory": "Készlet",
             "settings": "Beállítások",
             "help": "Súgó",
-            "dashboard": "Irányítópult"
+            "dashboard": "Irányítópult",
+            "remote": "Távoli"
         },
         "tray": {
             "notification_title": "Kibányászott drop",
@@ -185,16 +186,6 @@
                 "end": "Vége (ÓÓ:PP): ",
                 "auto_action": "Amikor minden drop kész: "
             },
-            "remote": {
-                "name": "Távoli hozzáférés",
-                "info": "Lehetővé teszi az élő állapot megtekintését és ezen példány vezérlését (szüneteltetés/folytatás, prioritási mód) egy másik eszköz böngészőjéből, az alábbi hivatkozás segítségével. Bárki, akinek megvan a hivatkozás, teljes hozzáféréssel rendelkezik, ezért csak megbízható emberekkel oszd meg.",
-                "enabled": "Webes irányítópult engedélyezése: ",
-                "port": "Port: ",
-                "new_link": "Új hivatkozás generálása",
-                "link": "Megosztási hivatkozás:",
-                "link_disabled": "Engedélyezd az irányítópultot a hivatkozás létrehozásához.",
-                "copy_link": "Hivatkozás másolása"
-            },
             "power_actions": {
                 "none": "Nincs teendő",
                 "sleep": "Számítógép alvó állapotba",
@@ -240,6 +231,20 @@
             "total_drops": "Összesen begyűjtött dropok: {count}",
             "hours_saved": "Megspórolt nézési órák: {hours}",
             "no_data": "Még nincs adat"
+        },
+        "remote": {
+            "info": "Lehetővé teszi az élő állapot megtekintését, és ha úgy döntesz, ezen példány vezérlését (szüneteltetés/folytatás, prioritási mód) egy másik eszköz böngészőjéből, az alábbi hivatkozás segítségével. Bárki, akinek megvan a hivatkozás, megtekintheti; akinek megvan a hivatkozás és a jelszó is (ha be van állítva), az vezérelheti is, ezért csak megbízható emberekkel oszd meg.",
+            "enabled": "Webes irányítópult engedélyezése: ",
+            "port": "Port: ",
+            "mode_label": "Hozzáférési mód: ",
+            "mode_view": "Csak megtekintés",
+            "mode_control": "Megtekintés és vezérlés",
+            "password_label": "Vezérlési jelszó: ",
+            "password_placeholder": "Nem kötelező, hagyd üresen, ha nincs",
+            "new_link": "Új hivatkozás generálása",
+            "link": "Megosztási hivatkozás:",
+            "link_disabled": "Engedélyezd az irányítópultot a hivatkozás létrehozásához.",
+            "copy_link": "Hivatkozás másolása"
         }
     }
 }

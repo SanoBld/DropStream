@@ -276,6 +276,18 @@ def build_tab_icons(color: str, size: int = 18):
             d.line([(line_x0, S * ly), (w, S * ly)], fill=fg, width=max(2, int(S * 0.055)))
         return finish(img)
 
+    def draw_remote(fg):
+        img, d = canvas()
+        cx, cy = S / 2, S * 0.60
+        lw = max(2, int(S * 0.09))
+        # signal arcs (like a wifi/broadcast icon), plus a dot representing the device
+        r_dot = S * 0.07
+        d.ellipse([cx - r_dot, cy - r_dot, cx + r_dot, cy + r_dot], fill=fg)
+        for i, r in enumerate((S * 0.20, S * 0.34, S * 0.48)):
+            box = [cx - r, cy - r, cx + r, cy + r]
+            d.arc(box, start=215, end=325, fill=fg, width=lw)
+        return finish(img)
+
     builders = {
         "main": draw_home,
         "details": draw_details,
@@ -283,6 +295,7 @@ def build_tab_icons(color: str, size: int = 18):
         "inventory": draw_inventory,
         "settings": draw_settings,
         "help": draw_help,
+        "remote": draw_remote,
     }
     fg = _hex_to_rgb(color) + (255,)
     return {key: ImageTk.PhotoImage(builder(fg)) for key, builder in builders.items()}

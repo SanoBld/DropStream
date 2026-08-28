@@ -35,6 +35,8 @@ class SettingsFile(TypedDict):
     web_server_enabled: bool
     web_server_port: int
     web_server_token: str  # secret path segment, part of the share link; empty = not generated yet
+    web_server_allow_control: bool  # False = visitors can only view; True = they can also act
+    web_server_password: str  # optional extra check gating control actions; empty = no password
 
 
 default_settings: SettingsFile = {
@@ -58,6 +60,8 @@ default_settings: SettingsFile = {
     "web_server_enabled": False,
     "web_server_port": 21000,
     "web_server_token": "",
+    "web_server_allow_control": False,
+    "web_server_password": "",
 }
 
 
@@ -91,6 +95,8 @@ class Settings:
     web_server_enabled: bool
     web_server_port: int
     web_server_token: str
+    web_server_allow_control: bool
+    web_server_password: str
 
     PASSTHROUGH = ("_settings", "_args", "_altered")
 

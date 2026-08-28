@@ -52,7 +52,8 @@
             "inventory": "Ekwipunek",
             "settings": "Ustawienia",
             "help": "Pomoc",
-            "dashboard": "Panel"
+            "dashboard": "Panel",
+            "remote": "Zdalny"
         },
         "tray": {
             "notification_title": "Drop odebrany",
@@ -185,16 +186,6 @@
                 "end": "Koniec (GG:MM): ",
                 "auto_action": "Gdy wszystkie dropy zostaną odebrane: "
             },
-            "remote": {
-                "name": "Dostęp zdalny",
-                "info": "Umożliwia podgląd stanu na żywo i sterowanie tą instancją (pauza/wznowienie, tryb priorytetu) z przeglądarki na innym urządzeniu, za pomocą poniższego linku. Każdy, kto ma ten link, ma pełny dostęp, więc udostępniaj go wyłącznie zaufanym osobom.",
-                "enabled": "Włącz panel webowy: ",
-                "port": "Port: ",
-                "new_link": "Wygeneruj nowy link",
-                "link": "Link do udostępnienia:",
-                "link_disabled": "Włącz panel, aby wygenerować link.",
-                "copy_link": "Kopiuj link"
-            },
             "power_actions": {
                 "none": "Nic nie rób",
                 "sleep": "Uśpij komputer",
@@ -244,6 +235,20 @@
             "total_drops": "Łącznie odebranych dropów: {count}",
             "hours_saved": "Zaoszczędzone godziny oglądania: {hours}",
             "no_data": "Brak danych"
+        },
+        "remote": {
+            "info": "Umożliwia podgląd stanu na żywo, a jeśli zdecydujesz, także sterowanie tą instancją (pauza/wznowienie, tryb priorytetu) z przeglądarki na innym urządzeniu, za pomocą poniższego linku. Każdy z linkiem może podglądać; każdy, kto ma link i hasło (jeśli ustawione), może również sterować, więc udostępniaj go wyłącznie zaufanym osobom.",
+            "enabled": "Włącz panel webowy: ",
+            "port": "Port: ",
+            "mode_label": "Tryb dostępu: ",
+            "mode_view": "Tylko podgląd",
+            "mode_control": "Podgląd i sterowanie",
+            "password_label": "Hasło sterowania: ",
+            "password_placeholder": "Opcjonalne, zostaw puste, aby wyłączyć",
+            "new_link": "Wygeneruj nowy link",
+            "link": "Link do udostępnienia:",
+            "link_disabled": "Włącz panel, aby wygenerować link.",
+            "copy_link": "Kopiuj link"
         }
     }
 }

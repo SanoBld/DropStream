@@ -52,7 +52,8 @@
             "inventory": "Inventaris",
             "settings": "Instellingen",
             "help": "Help",
-            "dashboard": "Dashboard"
+            "dashboard": "Dashboard",
+            "remote": "Extern"
         },
         "tray": {
             "notification_title": "Drop verkregen",
@@ -172,16 +173,6 @@
                 "end": "Einde (UU:MM): ",
                 "auto_action": "Wanneer alle drops klaar zijn: "
             },
-            "remote": {
-                "name": "Externe toegang",
-                "info": "Hiermee kun je de live status bekijken en deze instantie besturen (pauzeren/hervatten, prioriteitsmodus) vanaf een browser op een ander apparaat, via de onderstaande link. Iedereen met de link heeft volledige toegang, deel deze dus alleen met mensen die je vertrouwt.",
-                "enabled": "Webdashboard inschakelen: ",
-                "port": "Poort: ",
-                "new_link": "Nieuwe link genereren",
-                "link": "Deellink:",
-                "link_disabled": "Schakel het dashboard in om een link te genereren.",
-                "copy_link": "Link kopiëren"
-            },
             "power_actions": {
                 "none": "Niets doen",
                 "sleep": "PC in slaapstand",
@@ -242,6 +233,20 @@
             "total_drops": "Totaal geclaimde drops: {count}",
             "hours_saved": "Bespaarde kijkuren: {hours}",
             "no_data": "Nog geen gegevens"
+        },
+        "remote": {
+            "info": "Hiermee kun je de live status bekijken en, indien gewenst, deze instantie besturen (pauzeren/hervatten, prioriteitsmodus) vanaf een browser op een ander apparaat, via de onderstaande link. Iedereen met de link kan bekijken; iedereen met de link en het wachtwoord (indien ingesteld) kan ook besturen, deel deze dus alleen met mensen die je vertrouwt.",
+            "enabled": "Webdashboard inschakelen: ",
+            "port": "Poort: ",
+            "mode_label": "Toegangsmodus: ",
+            "mode_view": "Alleen bekijken",
+            "mode_control": "Bekijken en besturen",
+            "password_label": "Besturingswachtwoord: ",
+            "password_placeholder": "Optioneel, laat leeg voor geen",
+            "new_link": "Nieuwe link genereren",
+            "link": "Deellink:",
+            "link_disabled": "Schakel het dashboard in om een link te genereren.",
+            "copy_link": "Link kopiëren"
         }
     }
 }

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import time
 import socket
 import secrets
 import logging
+from collections import OrderedDict
 from typing import TYPE_CHECKING, Any
 
 from aiohttp import web
@@ -45,19 +47,60 @@ PRIORITY_MODE_LABELS: dict[int, str] = {
 }
 
 
+class _RateLimiter:
+    """
+    Small fixed-window, per-IP rate limiter, applied as middleware.
+
+    The whole app - the mining loop included - runs on a single asyncio event loop, so if
+    this dashboard ends up reachable from the internet, a scanner or an impatient client
+    hammering it could add latency to everything else the loop is doing. This keeps each
+    visitor to a generous but bounded request rate, and evicts old entries so tracking many
+    distinct IPs (random internet scans, if the port ends up exposed) can't grow memory
+    unbounded.
+    """
+
+    WINDOW_SECONDS = 10.0
+    MAX_REQUESTS = 40  # generous: the page polls every 4s, this allows many browser tabs too
+    MAX_TRACKED_IPS = 500
+
+    def __init__(self) -> None:
+        # ip -> (window_start, count); OrderedDict so the oldest entry is evictable in O(1)
+        self._hits: OrderedDict[str, tuple[float, int]] = OrderedDict()
+
+    def allow(self, ip: str) -> bool:
+        now = time.monotonic()
+        entry = self._hits.get(ip)
+        if entry is None or now - entry[0] >= self.WINDOW_SECONDS:
+            self._hits[ip] = (now, 1)
+            self._hits.move_to_end(ip)
+            if len(self._hits) > self.MAX_TRACKED_IPS:
+                self._hits.popitem(last=False)
+            return True
+        window_start, count = entry
+        if count >= self.MAX_REQUESTS:
+            return False
+        self._hits[ip] = (window_start, count + 1)
+        self._hits.move_to_end(ip)
+        return True
+
+
 class WebDashboard:
     """
-    Optional, local HTTP server exposing a small read/control dashboard, meant to be
-    reached from other devices on the same network (or a remote one, through port
-    forwarding/a tunnel, at the user's own risk). Disabled by default.
-    Every route is namespaced under the current secret token, so the link itself is
-    what grants access - there's no separate login step.
+    Optional, local HTTP server exposing a small view/control dashboard, meant to be reached
+    from other devices on the same network (or a remote one, through port forwarding/a tunnel,
+    at the user's own risk). Disabled by default.
+
+    Every route is namespaced under the current secret token, so the link itself is what
+    grants viewing access - there's no separate login step for that. Control actions
+    (pause/resume, changing the priority mode) are only exposed at all if the user opted into
+    "view and control" mode, and can additionally be gated behind a password.
     """
 
     def __init__(self, twitch: Twitch) -> None:
         self._twitch: Twitch = twitch
         self._runner: web.AppRunner | None = None
         self._site: web.TCPSite | None = None
+        self._limiter = _RateLimiter()
 
     @property
     def running(self) -> bool:
@@ -70,15 +113,22 @@ class WebDashboard:
         if not settings.web_server_token:
             settings.web_server_token = new_token()
         token = settings.web_server_token
-        app = web.Application()
-        app.add_routes([
+        # cap request body size (only the priority-mode POST has a body, and it's tiny) and
+        # register the rate-limit middleware ahead of routing, so throttled requests never
+        # reach the (slightly heavier) state-building code below
+        app = web.Application(client_max_size=1024 * 8, middlewares=[self._rate_limit_middleware])
+        routes = [
             web.get(f"/{token}", self._handle_index),
             web.get(f"/{token}/", self._handle_index),
             web.get(f"/{token}/api/state", self._handle_state),
-            web.post(f"/{token}/api/pause", self._handle_pause),
-            web.post(f"/{token}/api/resume", self._handle_resume),
-            web.post(f"/{token}/api/priority_mode", self._handle_priority_mode),
-        ])
+        ]
+        if settings.web_server_allow_control:
+            routes += [
+                web.post(f"/{token}/api/pause", self._handle_pause),
+                web.post(f"/{token}/api/resume", self._handle_resume),
+                web.post(f"/{token}/api/priority_mode", self._handle_priority_mode),
+            ]
+        app.add_routes(routes)
         self._runner = web.AppRunner(app, access_log=None)
         await self._runner.setup()
         self._site = web.TCPSite(self._runner, "0.0.0.0", settings.web_server_port)
@@ -98,6 +148,24 @@ class WebDashboard:
     async def restart(self) -> None:
         await self.stop()
         await self.start()
+
+    # -- middleware --
+
+    @web.middleware
+    async def _rate_limit_middleware(self, request: web.Request, handler):
+        ip = request.remote or "unknown"
+        if not self._limiter.allow(ip):
+            return web.json_response({"error": "rate limited"}, status=429)
+        return await handler(request)
+
+    # -- auth helper --
+
+    def _password_ok(self, request: web.Request) -> bool:
+        password = self._twitch.settings.web_server_password
+        if not password:
+            return True
+        supplied = request.headers.get("X-Dashboard-Password", "")
+        return secrets.compare_digest(supplied, password)
 
     # -- state snapshot --
 
@@ -129,6 +197,10 @@ class WebDashboard:
         priority_value = priority_mode.value if hasattr(priority_mode, "value") else priority_mode
         return {
             "app": {"name": "DropStream", "version": self._version()},
+            "control_enabled": settings.web_server_allow_control,
+            "password_required": bool(
+                settings.web_server_allow_control and settings.web_server_password
+            ),
             "paused": twitch.paused,
             "resume_at": (
                 twitch._resume_at.isoformat() if twitch._resume_at is not None else None
@@ -163,14 +235,20 @@ class WebDashboard:
         return web.json_response(self._state_dict())
 
     async def _handle_pause(self, request: web.Request) -> web.Response:
+        if not self._password_ok(request):
+            return web.json_response({"error": "wrong password"}, status=401)
         self._twitch.pause()
         return web.json_response(self._state_dict())
 
     async def _handle_resume(self, request: web.Request) -> web.Response:
+        if not self._password_ok(request):
+            return web.json_response({"error": "wrong password"}, status=401)
         self._twitch.resume()
         return web.json_response(self._state_dict())
 
     async def _handle_priority_mode(self, request: web.Request) -> web.Response:
+        if not self._password_ok(request):
+            return web.json_response({"error": "wrong password"}, status=401)
         try:
             body = await request.json()
             mode_value = int(body["mode"])
@@ -201,6 +279,10 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .wrap { max-width: 760px; margin: 0 auto; }
   h1 { font-size: 20px; margin: 0 0 4px; }
   .sub { color: var(--dim); font-size: 13px; margin-bottom: 20px; }
+  .badge {
+    display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px;
+    background: #303034; color: var(--dim); margin-left: 8px; vertical-align: middle;
+  }
   .card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     padding: 16px; margin-bottom: 14px;
@@ -217,8 +299,9 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     padding: 10px 16px; font-size: 14px; cursor: pointer;
   }
   button:hover { opacity: .9; }
+  button:disabled { opacity: .4; cursor: not-allowed; }
   button.secondary { background: #303034; }
-  select {
+  select, input[type=password] {
     background: #303034; color: var(--fg); border: 1px solid var(--border);
     border-radius: 6px; padding: 8px; font-size: 13px; width: 100%;
   }
@@ -226,12 +309,23 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   ul.chips li { background: #303034; padding: 4px 10px; border-radius: 999px; font-size: 12px; }
   .muted { color: var(--dim); font-size: 13px; }
   .err { color: #ff6b6b; font-size: 13px; margin-top: 8px; display: none; }
+  .inline { display: flex; gap: 8px; }
+  .inline input { flex: 1; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>DropStream</h1>
-  <div class="sub">Remote dashboard - anyone with this link can view and control this instance.</div>
+  <h1>DropStream <span class="badge" id="mode-badge">-</span></h1>
+  <div class="sub">Remote dashboard for this instance.</div>
+
+  <div class="card" id="password-card" style="display:none">
+    <div class="label">Control password</div>
+    <div class="inline" style="margin-top:8px">
+      <input type="password" id="password-input" placeholder="Enter password">
+      <button id="unlock-btn">Unlock</button>
+    </div>
+    <div class="err" id="password-err">Incorrect password.</div>
+  </div>
 
   <div class="card">
     <div class="row">
@@ -300,8 +394,26 @@ for (const [value, label] of PRIORITY_MODES) {
   modeSelect.appendChild(opt);
 }
 let applyingMode = false;
+let password = "";
 
 function pct(x) { return (x * 100).toFixed(1) + "%"; }
+
+function setControlsEnabled(enabled) {
+  document.getElementById("pause-btn").disabled = !enabled;
+  document.getElementById("resume-btn").disabled = !enabled;
+  modeSelect.disabled = !enabled;
+}
+
+async function post(path, body) {
+  const headers = { "Content-Type": "application/json" };
+  if (password) headers["X-Dashboard-Password"] = password;
+  const res = await fetch(base + path, { method: "POST", headers, body: body ? JSON.stringify(body) : "{}" });
+  if (res.status === 401) {
+    password = "";
+    document.getElementById("password-err").style.display = "block";
+  }
+  return res;
+}
 
 async function refresh() {
   try {
@@ -309,6 +421,12 @@ async function refresh() {
     if (!res.ok) throw new Error("bad response");
     const s = await res.json();
     document.getElementById("error-box").style.display = "none";
+
+    const badge = document.getElementById("mode-badge");
+    badge.textContent = s.control_enabled ? "View & control" : "View only";
+    const needsPassword = s.password_required && !password;
+    document.getElementById("password-card").style.display = needsPassword ? "block" : "none";
+    setControlsEnabled(s.control_enabled && !needsPassword);
 
     const dot = document.getElementById("status-dot");
     const text = document.getElementById("status-text");
@@ -358,21 +476,23 @@ async function refresh() {
   }
 }
 
+document.getElementById("unlock-btn").addEventListener("click", () => {
+  password = document.getElementById("password-input").value;
+  document.getElementById("password-err").style.display = "none";
+  refresh();
+});
+
 document.getElementById("pause-btn").addEventListener("click", async () => {
-  await fetch(base + "/api/pause", { method: "POST" });
+  await post("/api/pause");
   refresh();
 });
 document.getElementById("resume-btn").addEventListener("click", async () => {
-  await fetch(base + "/api/resume", { method: "POST" });
+  await post("/api/resume");
   refresh();
 });
 modeSelect.addEventListener("change", async () => {
   applyingMode = true;
-  await fetch(base + "/api/priority_mode", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode: parseInt(modeSelect.value, 10) }),
-  });
+  await post("/api/priority_mode", { mode: parseInt(modeSelect.value, 10) });
   applyingMode = false;
   refresh();
 });
