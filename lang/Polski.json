@@ -8,7 +8,9 @@
         "claimed_drop": "Odebrano drop: {drop}",
         "no_channel": "Brak dostępnych kanałów do oglądania. Czekam na dostępne kanały lub kampanie...",
         "no_campaign": "Brak dostępnych aktywnych kampanii. Czekam na dostępne kampanie...",
-        "auto_action": "Wszystkie dropy odebrane na razie, wykonywanie skonfigurowanej akcji: {action}"
+        "auto_action": "Wszystkie dropy odebrane na razie, wykonywanie skonfigurowanej akcji: {action}",
+        "auto_restart": "Automatyczny restart jest włączony: ponowne uruchomienie za {minutes} minut(y), chyba że najpierw zamkniesz to okno.",
+        "auto_restart_now": "Uruchamianie ponownie..."
     },
     "login": {
         "unexpected_content": "Otrzymano nieoczekiwaną zawartość, zwykle z powodu przekierowania.\nUpewnij się, że nie jest wymagane dodatkowe logowanie lub potwierdzenie dostępu do Internetu.",
@@ -45,7 +47,8 @@
             "adding_campaigns": "Dodawanie kampanii do ekwipunku... {counter}",
             "paused": "Wstrzymano",
             "paused_until": "Wstrzymano do {time}",
-            "scheduled": "Poza zaplanowanymi godzinami"
+            "scheduled": "Poza zaplanowanymi godzinami",
+            "auto_restart": "Zakończono - restart za {minutes} min"
         },
         "tabs": {
             "main": "Główna",
@@ -198,6 +201,12 @@
                 "modern_auto": "Kolory Twitch (Auto)",
                 "modern_light": "Kolory Twitch, jasny",
                 "modern_dark": "Kolory Twitch, ciemny"
+            },
+            "reliability": {
+                "name": "Niezawodność",
+                "info": "Aplikacja już automatycznie ponawia próbę kilka razy, zanim się podda. Jeśli mimo to trafi na ekran „Zakończono”, ta opcja opcjonalnie uruchamia ją ponownie automatycznie po opóźnieniu.",
+                "enabled": "Automatyczny restart po awarii: ",
+                "minutes": "Restart po (minutach): "
             }
         },
         "help": {

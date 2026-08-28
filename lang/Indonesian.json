@@ -8,7 +8,9 @@
         "claimed_drop": "Drop dipulihkan : {drop}",
         "no_channel": "Tidak ada saluran yang tersedia untuk ditonton. Menunggu saluran secara ONLINE...",
         "no_campaign": "Tidak ada kampanye aktif yang bisa ditambang. Menunggu kampanye aktif...",
-        "auto_action": "Semua drop selesai untuk saat ini, menjalankan tindakan yang dikonfigurasi: {action}"
+        "auto_action": "Semua drop selesai untuk saat ini, menjalankan tindakan yang dikonfigurasi: {action}",
+        "auto_restart": "Mulai ulang otomatis diaktifkan: akan diluncurkan ulang dalam {minutes} menit kecuali Anda menutup jendela ini terlebih dahulu.",
+        "auto_restart_now": "Meluncurkan ulang sekarang..."
     },
     "login": {
         "chrome": {
@@ -45,7 +47,8 @@
             "adding_campaigns": "Menambahkan daftar kampanye ke inventaris... {counter}",
             "paused": "Dijeda",
             "paused_until": "Dijeda hingga {time}",
-            "scheduled": "Di luar jam terjadwal"
+            "scheduled": "Di luar jam terjadwal",
+            "auto_restart": "Dihentikan - mulai ulang dalam {minutes} mnt"
         },
         "tabs": {
             "main": "Umum",
@@ -199,6 +202,12 @@
                 "warning_text": "Opsi ini dapat menyebabkan miner tidak berfungsi dengan benar.\nJika mengalami masalah, pastikan semua opsi ini dinonaktifkan.",
                 "enable_badges_emotes": "Aktifkan dukungan parsial untuk lencana dan emote: ",
                 "available_drops_check": "Aktifkan pemeriksaan tambahan drop yang tersedia: "
+            },
+            "reliability": {
+                "name": "Keandalan",
+                "info": "Aplikasi sudah mencoba lagi beberapa kali secara otomatis sebelum menyerah. Jika tetap berakhir di layar \"Dihentikan\", opsi ini akan meluncurkannya kembali secara otomatis setelah jeda waktu.",
+                "enabled": "Mulai ulang otomatis saat crash: ",
+                "minutes": "Mulai ulang setelah (menit): "
             }
         },
         "help": {

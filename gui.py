@@ -2036,6 +2036,8 @@ class SettingsPanel:
             "schedule_start": StringVar(master, self._settings.schedule_start),
             "schedule_end": StringVar(master, self._settings.schedule_end),
             "auto_action": StringVar(master, self.POWER_ACTIONS[self._settings.auto_action]),
+            "auto_restart_enabled": IntVar(master, int(self._settings.auto_restart_enabled)),
+            "auto_restart_minutes": StringVar(master, str(self._settings.auto_restart_minutes)),
         }
         self._game_names: set[str] = set()
         master.rowconfigure(0, weight=1)
@@ -2225,11 +2227,42 @@ class SettingsPanel:
             values=list(self.POWER_ACTIONS.values()),
         ).grid(column=1, row=irow, sticky="w")
 
+        # Reliability section (auto-retry is automatic and unconditional; this only covers
+        # the last-resort case where the app gives up and shows a "Terminated" screen)
+        reliability_frame = ttk.LabelFrame(
+            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "reliability", "name")
+        )
+        reliability_frame.grid(column=0, row=3, sticky="nsew")
+        reliability_frame.columnconfigure(0, weight=1)
+        reliability_frame.rowconfigure(0, weight=1)
+        reliability_center = ttk.Frame(reliability_frame)
+        reliability_center.grid(column=0, row=0)
+        ttk.Label(
+            reliability_center, text=_("gui", "settings", "reliability", "info"),
+            foreground="goldenrod", wraplength=280, justify="left",
+        ).grid(column=0, row=(irow := 0), columnspan=2, sticky="w", pady=(0, 4))
+        ttk.Label(
+            reliability_center, text=_("gui", "settings", "reliability", "enabled")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Checkbutton(
+            reliability_center,
+            variable=self._vars["auto_restart_enabled"],
+            command=self.update_auto_restart,
+        ).grid(column=1, row=irow, sticky="w")
+        ttk.Label(
+            reliability_center, text=_("gui", "settings", "reliability", "minutes")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        minutes_entry = ttk.Entry(
+            reliability_center, width=6, textvariable=self._vars["auto_restart_minutes"]
+        )
+        minutes_entry.grid(column=1, row=irow, sticky="w")
+        minutes_entry.bind("<FocusOut>", lambda e: self.update_auto_restart())
+
         # Advanced section
         advanced_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "advanced", "name")
         )
-        advanced_frame.grid(column=0, row=3, sticky="nsew")
+        advanced_frame.grid(column=0, row=4, sticky="nsew")
         advanced_frame.columnconfigure(0, weight=1)
         advanced_frame.rowconfigure(0, weight=1)
         advanced_center = ttk.Frame(advanced_frame)
@@ -2274,7 +2307,7 @@ class SettingsPanel:
         priority_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "priority")
         )
-        priority_frame.grid(column=1, row=0, rowspan=4, sticky="nsew")
+        priority_frame.grid(column=1, row=0, rowspan=5, sticky="nsew")
         self._priority_entry = PlaceholderCombobox(
             priority_frame, placeholder=_("gui", "settings", "game_name"), width=30
         )
@@ -2336,7 +2369,7 @@ class SettingsPanel:
         exclude_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
         )
-        exclude_frame.grid(column=2, row=0, rowspan=4, sticky="nsew")
+        exclude_frame.grid(column=2, row=0, rowspan=5, sticky="nsew")
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
@@ -2632,6 +2665,18 @@ class SettingsPanel:
             if action_name == name:
                 self._settings.auto_action = value
                 break
+
+    def update_auto_restart(self) -> None:
+        self._settings.auto_restart_enabled = bool(self._vars["auto_restart_enabled"].get())
+        try:
+            minutes = int(self._vars["auto_restart_minutes"].get())
+            if minutes < 1:
+                raise ValueError
+        except ValueError:
+            minutes = self._settings.auto_restart_minutes
+            self._vars["auto_restart_minutes"].set(str(minutes))
+        else:
+            self._settings.auto_restart_minutes = minutes
 
     def exclude_add(self) -> None:
         game_name: str = self._exclude_entry.get()

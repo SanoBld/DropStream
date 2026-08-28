@@ -8,7 +8,9 @@
         "claimed_drop": "Hentet belønning: {drop}",
         "no_channel": "Ingen tilgjengelige kanaler å se på. Venter på en ONLINE kanal...",
         "no_campaign": "Ingen aktive kampanjer å få belønninger fra. Venter på en aktiv kampanje...",
-        "auto_action": "Alle drops er ferdige for nå, kjører konfigurert handling: {action}"
+        "auto_action": "Alle drops er ferdige for nå, kjører konfigurert handling: {action}",
+        "auto_restart": "Automatisk omstart er aktivert: starter på nytt om {minutes} minutt(er), med mindre du lukker dette vinduet først.",
+        "auto_restart_now": "Starter på nytt nå..."
     },
     "login": {
         "unexpected_content": "Uventet innholdstype returnert, vanligvis på grunn av omdirigering. Trenger du å logge inn for internettilgang?",
@@ -45,7 +47,8 @@
             "adding_campaigns": "Legger til kampanjer i inventar... {counter}",
             "paused": "Satt på pause",
             "paused_until": "Satt på pause til {time}",
-            "scheduled": "Utenfor planlagte timer"
+            "scheduled": "Utenfor planlagte timer",
+            "auto_restart": "Avsluttet - omstart om {minutes} min"
         },
         "tabs": {
             "main": "Hoved",
@@ -198,6 +201,12 @@
                 "modern_auto": "Twitch-farger (Auto)",
                 "modern_light": "Twitch-farger, lys",
                 "modern_dark": "Twitch-farger, mørk"
+            },
+            "reliability": {
+                "name": "Pålitelighet",
+                "info": "Appen prøver allerede automatisk på nytt et par ganger før den gir opp. Hvis den likevel havner på en \"Avsluttet\"-skjerm, starter dette valget den eventuelt automatisk på nytt etter en forsinkelse.",
+                "enabled": "Automatisk omstart ved krasj: ",
+                "minutes": "Start på nytt etter (minutter): "
             }
         },
         "help": {

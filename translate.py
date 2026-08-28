@@ -21,6 +21,8 @@ class StatusMessages(TypedDict):
     no_channel: str
     no_campaign: str
     auto_action: str
+    auto_restart: str
+    auto_restart_now: str
 
 
 class ChromeMessages(TypedDict):
@@ -61,6 +63,7 @@ class GUIStatus(TypedDict):
     paused: str
     paused_until: str
     scheduled: str
+    auto_restart: str
 
 
 class GUITabs(TypedDict):
@@ -223,6 +226,13 @@ class GUISettingsScheduler(TypedDict):
     auto_action: str
 
 
+class GUISettingsReliability(TypedDict):
+    name: str
+    info: str
+    enabled: str
+    minutes: str
+
+
 class GUIRemote(TypedDict):
     info: str
     enabled: str
@@ -266,6 +276,7 @@ class GUISettings(TypedDict):
     themes: GUIThemes
     accounts: GUISettingsAccounts
     scheduler: GUISettingsScheduler
+    reliability: GUISettingsReliability
     power_actions: GUIPowerActions
     advanced: GUISettingsAdvanced
     priority_modes: GUIPriorityModes
@@ -332,6 +343,11 @@ default_translation: Translation = {
         "no_channel": "No available channels to watch. Waiting for an ONLINE channel...",
         "no_campaign": "No active campaigns to mine drops for. Waiting for an active campaign...",
         "auto_action": "All drops claimed for now, running configured action: {action}",
+        "auto_restart": (
+            "Auto-restart is enabled: relaunching in {minutes} minute(s) "
+            "unless you close this window first."
+        ),
+        "auto_restart_now": "Relaunching now...",
     },
     "login": {
         "unexpected_content": (
@@ -376,6 +392,7 @@ default_translation: Translation = {
             "paused": "Paused",
             "paused_until": "Paused until {time}",
             "scheduled": "Outside scheduled hours",
+            "auto_restart": "Terminated - restarting in {minutes}m",
         },
         "tabs": {
             "main": "Details",
@@ -546,6 +563,16 @@ default_translation: Translation = {
                 "start": "Start (HH:MM): ",
                 "end": "End (HH:MM): ",
                 "auto_action": "When all drops are done: ",
+            },
+            "reliability": {
+                "name": "Reliability",
+                "info": (
+                    "The app already retries a few times on its own before giving up. If it "
+                    "still ends up on a \"Terminated\" screen, this optionally relaunches it "
+                    "automatically after a delay."
+                ),
+                "enabled": "Auto-restart on crash: ",
+                "minutes": "Restart after (minutes): ",
             },
             "power_actions": {
                 "none": "Do nothing",

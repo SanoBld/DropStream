@@ -8,7 +8,9 @@
         "claimed_drop": "Átvett drop: {drop}",
         "no_channel": "Nincs nézhető csatorna. Várakozás egy ONLINE csatornára...",
         "no_campaign": "Nincs aktív kampány, amelyből dropokat lehetne bányászni. Várakozás aktív kampányra...",
-        "auto_action": "Egyelőre minden drop kész, a beállított művelet végrehajtása: {action}"
+        "auto_action": "Egyelőre minden drop kész, a beállított művelet végrehajtása: {action}",
+        "auto_restart": "Az automatikus újraindítás engedélyezve van: újraindítás {minutes} perc múlva, hacsak nem zárod be előbb ezt az ablakot.",
+        "auto_restart_now": "Újraindítás folyamatban..."
     },
     "login": {
         "unexpected_content": "Váratlan tartalomtípus érkezett, ez általában átirányítás miatt történik. Nem kell esetleg bejelentkezned az internet eléréséhez?",
@@ -45,7 +47,8 @@
             "adding_campaigns": "Kampányok hozzáadása a készlethez... {counter}",
             "paused": "Szüneteltetve",
             "paused_until": "Szüneteltetve eddig: {time}",
-            "scheduled": "Az ütemezett időn kívül"
+            "scheduled": "Az ütemezett időn kívül",
+            "auto_restart": "Leállítva - újraindítás {minutes} perc múlva"
         },
         "tabs": {
             "main": "Főoldal",
@@ -198,6 +201,12 @@
                 "modern_auto": "Twitch színek (Auto)",
                 "modern_light": "Twitch színek, világos",
                 "modern_dark": "Twitch színek, sötét"
+            },
+            "reliability": {
+                "name": "Megbízhatóság",
+                "info": "Az alkalmazás feladás előtt már magától is megpróbálja néhányszor újra. Ha mégis egy \"Leállítva\" képernyőn köt ki, ez a beállítás opcionálisan automatikusan újraindítja egy késleltetés után.",
+                "enabled": "Automatikus újraindítás összeomláskor: ",
+                "minutes": "Újraindítás ennyi perc után: "
             }
         },
         "help": {

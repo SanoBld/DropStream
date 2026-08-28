@@ -8,7 +8,9 @@
         "claimed_drop": "Drop abgeholt: {drop}",
         "no_channel": "Keine teilnehmenden Kanäle online. Warten auf Kanäle...",
         "no_campaign": "Keine aktiven Kampagnen verfügbar. Warten auf neue Kampagne...",
-        "auto_action": "Alle Drops sind vorerst erledigt, konfigurierte Aktion wird ausgeführt: {action}"
+        "auto_action": "Alle Drops sind vorerst erledigt, konfigurierte Aktion wird ausgeführt: {action}",
+        "auto_restart": "Automatischer Neustart ist aktiviert: Neustart in {minutes} Minute(n), sofern Sie dieses Fenster nicht vorher schließen.",
+        "auto_restart_now": "Wird jetzt neu gestartet..."
     },
     "login": {
         "chrome": {
@@ -45,7 +47,8 @@
             "adding_campaigns": "Kampagnen dem Inventar hinzufügen... {counter}",
             "paused": "Pausiert",
             "paused_until": "Pausiert bis {time}",
-            "scheduled": "Außerhalb der geplanten Zeiten"
+            "scheduled": "Außerhalb der geplanten Zeiten",
+            "auto_restart": "Beendet - Neustart in {minutes} Min"
         },
         "tabs": {
             "main": "Hauptseite",
@@ -199,6 +202,12 @@
                 "warning_text": "Diese Optionen können dazu führen, dass der Miner nicht mehr richtig funktioniert.\nWenn Probleme auftreten, stellen Sie sicher, dass alle diese Optionen deaktiviert sind.",
                 "enable_badges_emotes": "Teilweise Unterstützung für Badges und Emotes aktivieren: ",
                 "available_drops_check": "Zusätzliche Prüfung verfügbarer Drops aktivieren: "
+            },
+            "reliability": {
+                "name": "Zuverlässigkeit",
+                "info": "Die App versucht es bereits von selbst ein paar Mal erneut, bevor sie aufgibt. Landet sie trotzdem auf einem \"Beendet\"-Bildschirm, startet diese Option sie optional nach einer Verzögerung automatisch neu.",
+                "enabled": "Automatischer Neustart bei Absturz: ",
+                "minutes": "Neustart nach (Minuten): "
             }
         },
         "help": {

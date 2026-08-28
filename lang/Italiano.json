@@ -8,7 +8,9 @@
         "claimed_drop": "Contenuti riscattati: {drop}",
         "no_channel": "Nessun canale disponibile da guardare. In attesa di un canale ONLINE...",
         "no_campaign": "Nessuna campagna attiva per ottenere i premi. In attesa di una campagna attiva...",
-        "auto_action": "Tutti i drop sono completati per ora, esecuzione dell'azione configurata: {action}"
+        "auto_action": "Tutti i drop sono completati per ora, esecuzione dell'azione configurata: {action}",
+        "auto_restart": "Il riavvio automatico è attivo: riavvio tra {minutes} minuto/i, a meno che tu non chiuda prima questa finestra.",
+        "auto_restart_now": "Riavvio in corso..."
     },
     "login": {
         "unexpected_content": "Tipo di contenuto inaspettato restituito, di solito a causa di un reindirizzamento. Hai bisogno di fare il login per accedere a internet?",
@@ -45,7 +47,8 @@
             "adding_campaigns": "Aggiunta delle campagne all'inventario... {counter}",
             "paused": "In pausa",
             "paused_until": "In pausa fino alle {time}",
-            "scheduled": "Fuori dagli orari pianificati"
+            "scheduled": "Fuori dagli orari pianificati",
+            "auto_restart": "Terminato - riavvio tra {minutes} min"
         },
         "tabs": {
             "main": "Principale",
@@ -199,6 +202,12 @@
                 "warning_text": "Queste opzioni possono causare un malfunzionamento del miner.\nSe riscontri problemi, assicurati che tutte queste opzioni siano disattivate.",
                 "enable_badges_emotes": "Attiva supporto parziale per badge ed emote: ",
                 "available_drops_check": "Attiva controllo extra dei drop disponibili: "
+            },
+            "reliability": {
+                "name": "Affidabilità",
+                "info": "L'app riprova già automaticamente alcune volte prima di arrendersi. Se comunque finisce su una schermata \"Terminato\", questa opzione la riavvia automaticamente dopo un ritardo.",
+                "enabled": "Riavvio automatico in caso di crash: ",
+                "minutes": "Riavvia dopo (minuti): "
             }
         },
         "help": {

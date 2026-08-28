@@ -8,7 +8,9 @@
         "claimed_drop": "Hentet belønning: {drop}",
         "no_channel": "Ingen tilgængelige kanaler at se. Venter på en ONLINE kanal...",
         "no_campaign": "Der er ingen aktive kampagner at hente. Venter på en aktiv kampagne...",
-        "auto_action": "Alle drops er klaret for nu, kører konfigureret handling: {action}"
+        "auto_action": "Alle drops er klaret for nu, kører konfigureret handling: {action}",
+        "auto_restart": "Automatisk genstart er aktiveret: genstarter om {minutes} minut(ter), medmindre du lukker dette vindue først.",
+        "auto_restart_now": "Genstarter nu..."
     },
     "login": {
         "unexpected_content": "Uventet indholdstype returneres, normalt på grund af at blive omdirigeret. Skal du logge ind for internetadgang?",
@@ -45,7 +47,8 @@
             "adding_campaigns": "Tilføjer kampagner til beholdning... {counter}",
             "paused": "Sat på pause",
             "paused_until": "Sat på pause indtil {time}",
-            "scheduled": "Uden for planlagte timer"
+            "scheduled": "Uden for planlagte timer",
+            "auto_restart": "Afsluttet - genstarter om {minutes} min"
         },
         "tabs": {
             "main": "Main",
@@ -199,6 +202,12 @@
                 "warning_text": "Disse indstillinger kan få minearbejderen til at fungere forkert.\nHvis du oplever problemer, skal du sørge for, at alle disse indstillinger er deaktiveret.",
                 "enable_badges_emotes": "Aktivér delvis support til badges og emotes: ",
                 "available_drops_check": "Aktivér ekstra kontrol af tilgængelige drops: "
+            },
+            "reliability": {
+                "name": "Pålidelighed",
+                "info": "Appen prøver allerede automatisk igen et par gange, før den giver op. Hvis den alligevel ender på en \"Afsluttet\"-skærm, genstarter denne indstilling den valgfrit automatisk efter en forsinkelse.",
+                "enabled": "Automatisk genstart ved nedbrud: ",
+                "minutes": "Genstart efter (minutter): "
             }
         },
         "help": {

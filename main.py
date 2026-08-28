@@ -209,6 +209,28 @@ if __name__ == "__main__":
             client.gui.status.update(_("gui", "status", "terminated"))
             # notify the user about the closure
             client.gui.grab_attention(sound=True)
+            if settings.auto_restart_enabled:
+                # give the user a chance to look at the error and cancel by closing the
+                # window manually; if they don't, relaunch a fresh instance once the timer
+                # elapses. os.execv replaces the current process outright (same PID isn't
+                # kept, but there's no orphaned/duplicate process to worry about either).
+                minutes = max(1, settings.auto_restart_minutes)
+                client.print(_("status", "auto_restart").format(minutes=minutes))
+                client.gui.status.update(_("gui", "status", "auto_restart").format(minutes=minutes))
+                sleep_task = asyncio.ensure_future(asyncio.sleep(minutes * 60))
+                close_task = asyncio.ensure_future(client.gui.wait_until_closed())
+                done, pending = await asyncio.wait(
+                    {sleep_task, close_task}, return_when=asyncio.FIRST_COMPLETED
+                )
+                for pending_task in pending:
+                    pending_task.cancel()
+                if sleep_task in done and not client.gui.close_requested:
+                    client.print(_("status", "auto_restart_now"))
+                    client.save(force=True)
+                    client.gui.stop()
+                    client.gui.close_window()
+                    os.execv(sys.executable, [sys.executable] + sys.argv[1:])
+                    # os.execv never returns on success; if we get here, it failed
         await client.gui.wait_until_closed()
         # save the application state
         # NOTE: we have to do it after wait_until_closed,

@@ -8,7 +8,9 @@
         "claimed_drop": "Drop verkregen: {drop}",
         "no_channel": "Geen deelnemende kanalen online. Wachten op streamers...",
         "no_campaign": "Geen actieve campagnes beschikbaar. Wachten op nieuwe campagne...",
-        "auto_action": "Alle drops zijn voor nu voltooid, actie wordt uitgevoerd: {action}"
+        "auto_action": "Alle drops zijn voor nu voltooid, actie wordt uitgevoerd: {action}",
+        "auto_restart": "Automatisch herstarten is ingeschakeld: herstart over {minutes} minuut/minuten, tenzij je dit venster eerst sluit.",
+        "auto_restart_now": "Nu herstarten..."
     },
     "login": {
         "chrome": {
@@ -45,7 +47,8 @@
             "adding_campaigns": "De campagnelijst toevoegen aan de inventaris... {counter}",
             "paused": "Gepauzeerd",
             "paused_until": "Gepauzeerd tot {time}",
-            "scheduled": "Buiten geplande uren"
+            "scheduled": "Buiten geplande uren",
+            "auto_restart": "Beëindigd - herstart over {minutes} min"
         },
         "tabs": {
             "main": "Algemeen",
@@ -200,6 +203,12 @@
                 "warning_text": "Deze opties kunnen ervoor zorgen dat de miner niet goed werkt.\nAls je problemen ondervindt, zorg dan dat al deze opties zijn uitgeschakeld.",
                 "enable_badges_emotes": "Gedeeltelijke ondersteuning voor badges en emotes inschakelen: ",
                 "available_drops_check": "Extra controle van beschikbare drops inschakelen: "
+            },
+            "reliability": {
+                "name": "Betrouwbaarheid",
+                "info": "De app probeert het al zelf een paar keer opnieuw voordat hij het opgeeft. Als hij toch op een \"Beëindigd\"-scherm belandt, herstart deze optie hem optioneel automatisch na een vertraging.",
+                "enabled": "Automatisch herstarten bij crash: ",
+                "minutes": "Herstarten na (minuten): "
             }
         },
         "help": {

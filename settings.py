@@ -37,6 +37,10 @@ class SettingsFile(TypedDict):
     web_server_token: str  # secret path segment, part of the share link; empty = not generated yet
     web_server_allow_control: bool  # False = visitors can only view; True = they can also act
     web_server_password: str  # optional extra check gating control actions; empty = no password
+    # if a critical task dies even after its built-in retries, optionally relaunch the app
+    # automatically after a delay, instead of leaving it sitting on a "Terminated" screen
+    auto_restart_enabled: bool
+    auto_restart_minutes: int
 
 
 default_settings: SettingsFile = {
@@ -62,6 +66,8 @@ default_settings: SettingsFile = {
     "web_server_token": "",
     "web_server_allow_control": False,
     "web_server_password": "",
+    "auto_restart_enabled": False,
+    "auto_restart_minutes": 5,
 }
 
 
@@ -97,6 +103,8 @@ class Settings:
     web_server_token: str
     web_server_allow_control: bool
     web_server_password: str
+    auto_restart_enabled: bool
+    auto_restart_minutes: int
 
     PASSTHROUGH = ("_settings", "_args", "_altered")
 

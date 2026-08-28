@@ -61,7 +61,13 @@ Every few seconds, the application simulates watching a stream by requesting its
 The **Remote** tab (its own tab, not buried in Settings) lets you turn on a small local web
 server built into the app and generates a private link (a random token embedded in the URL,
 e.g. `http://192.168.1.42:21000/8f3a.../`). Opening that link in a browser, on any device on
-the same network, shows a live view of the current drop/campaign progress and weekly stats.
+the same network, mirrors most of what the desktop app itself shows: the current drop and
+campaign, with the actual reward images pulled straight from Twitch (not proxied through the
+app); a ranked "drops per game" leaderboard with box art, matching the desktop Dashboard tab;
+and a browsable list of drop campaigns, each with its box art and a thumbnail strip of every
+reward (checked off once claimed) - the same information as the desktop Inventory tab, just
+read-only. The page auto-detects your browser's language and offers a language switcher
+covering the same languages as the desktop app; your choice is remembered on that device.
 
 From that same tab you choose the **access mode**:
 
@@ -89,8 +95,10 @@ A few things worth knowing:
   hitting it: requests are rate-limited per visitor (a generous cap well above what the page's
   own 4-second polling needs), the tracked-IP table is bounded so random internet scanning
   can't grow memory over time, POST bodies are capped to a few KB, and access logging is
-  disabled. Under normal use (a handful of people checking in occasionally) none of this is
-  noticeable; it exists specifically so exposing the port doesn't become a liability.
+  disabled. Reward and box art images are never downloaded, cached, or resized by the app -
+  the page just links directly to Twitch's own CDN, so serving them costs the app nothing.
+  Under normal use (a handful of people checking in occasionally) none of this is noticeable;
+  it exists specifically so exposing the port doesn't become a liability.
 - This dashboard is view/control only: it can't be used to log into your Twitch account or
   claim drops through it directly, it just reflects and steers what the desktop app is already
   doing.

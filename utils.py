@@ -125,32 +125,57 @@ def deduplicate(iterable: abc.Iterable[_T]) -> list[_T]:
 
 
 def task_wrapper(
-    afunc: abc.Callable[_P, abc.Coroutine[Any, Any, _T]] | None = None, *, critical: bool = False
+    afunc: abc.Callable[_P, abc.Coroutine[Any, Any, _T]] | None = None,
+    *,
+    critical: bool = False,
+    max_retries: int = 3,
+    retry_delay: float = 10.0,
 ):
+    """
+    Wraps a long-running task's coroutine function.
+
+    On an unexpected exception, the task is logged and, for critical tasks, retried up to
+    `max_retries` times (waiting `retry_delay` seconds between attempts) before the app is
+    actually torn down. Most exceptions here are transient (a dropped connection, a single
+    bad response from Twitch), and simply re-entering the task's loop recovers on its own -
+    so a critical task dying once shouldn't immediately tell the user to restart the app.
+    Only once the retries are exhausted do we treat it as an actual fatal error.
+    """
     def decorator(
         afunc: abc.Callable[_P, abc.Coroutine[Any, Any, _T]]
     ) -> abc.Callable[_P, abc.Coroutine[Any, Any, _T]]:
         @wraps(afunc)
         async def wrapper(*args: _P.args, **kwargs: _P.kwargs):
-            try:
-                await afunc(*args, **kwargs)
-            except (ExitRequest, ReloadRequest):
-                pass
-            except Exception:
-                logger.exception(f"Exception in {afunc.__name__} task")
-                if critical:
-                    # critical task's death should trigger a termination.
-                    # there isn't an easy and sure way to obtain the Twitch instance here,
-                    # but we can improvise finding it
-                    from twitch import Twitch  # cyclic import
-                    probe = args and args[0] or None  # extract from 'self' arg
-                    if isinstance(probe, Twitch):
-                        probe.close()
-                    elif probe is not None:
-                        probe = getattr(probe, "_twitch", None)  # extract from '_twitch' attr
+            attempt = 0
+            while True:
+                try:
+                    return await afunc(*args, **kwargs)
+                except (ExitRequest, ReloadRequest):
+                    return
+                except Exception:
+                    logger.exception(f"Exception in {afunc.__name__} task")
+                    if critical and attempt < max_retries:
+                        attempt += 1
+                        logger.warning(
+                            f"{afunc.__name__} will be retried "
+                            f"({attempt}/{max_retries}) in {retry_delay:.0f}s..."
+                        )
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    if critical:
+                        # retries exhausted (or this task isn't retryable) - this is now
+                        # treated as an actual fatal error, so the app has to close down.
+                        # there isn't an easy and sure way to obtain the Twitch instance here,
+                        # but we can improvise finding it
+                        from twitch import Twitch  # cyclic import
+                        probe = args and args[0] or None  # extract from 'self' arg
                         if isinstance(probe, Twitch):
                             probe.close()
-                raise  # raise up to the wrapping task
+                        elif probe is not None:
+                            probe = getattr(probe, "_twitch", None)  # extract from '_twitch'
+                            if isinstance(probe, Twitch):
+                                probe.close()
+                    raise  # raise up to the wrapping task
         return wrapper
     if afunc is None:
         return decorator
