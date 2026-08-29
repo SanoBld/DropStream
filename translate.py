@@ -243,6 +243,7 @@ class GUIRemote(TypedDict):
     password_label: str
     password_placeholder: str
     public_label: str
+    show_viewers_label: str
     new_link: str
     link: str
     link_disabled: str
@@ -606,6 +607,7 @@ default_translation: Translation = {
             "password_label": "Control password:",
             "password_placeholder": "Optional, leave empty for none",
             "public_label": "Also show a public link: ",
+            "show_viewers_label": "Show viewer count on page: ",
             "new_link": "Generate a new link",
             "link": "Share link:",
             "link_disabled": "Enable the dashboard to generate a link.",

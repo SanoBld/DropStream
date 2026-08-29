@@ -326,6 +326,8 @@ class WebDashboard:
         return {
             "app": {"name": "DropStream", "version": self._version()},
             "control_enabled": settings.web_server_allow_control,
+            "show_viewers": settings.web_server_show_viewers,
+            "viewer_count": self._viewer_count() if settings.web_server_show_viewers else None,
             "password_required": bool(
                 settings.web_server_allow_control and settings.web_server_password
             ),
@@ -689,7 +691,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <div class="wrap">
   <div class="top-row">
     <div>
-      <h1><span class="logo"><img id="app-logo" src="favicon.ico" alt=""></span> DropStream <span class="badge" id="mode-badge">-</span></h1>
+      <h1><span class="logo"><img id="app-logo" src="favicon.ico" alt=""></span> DropStream <span class="badge" id="mode-badge">-</span><span class="badge" id="viewer-badge" style="display:none"></span></h1>
       <div class="sub" data-i18n="subtitle"></div>
     </div>
     <div class="top-controls">
@@ -2392,6 +2394,13 @@ async function refresh() {
 
     const badge = document.getElementById("mode-badge");
     badge.textContent = s.control_enabled ? t("mode_control") : t("mode_view");
+    const viewerBadge = document.getElementById("viewer-badge");
+    if (s.show_viewers && s.viewer_count != null) {
+      viewerBadge.style.display = "inline-block";
+      viewerBadge.textContent = "\ud83d\udc41 " + s.viewer_count;
+    } else {
+      viewerBadge.style.display = "none";
+    }
     const needsPassword = s.password_required && !password;
     document.getElementById("password-card").style.display = needsPassword ? "block" : "none";
     const controlsReady = s.control_enabled && !needsPassword;

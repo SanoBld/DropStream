@@ -3000,6 +3000,7 @@ class RemoteAccessTab:
         control_var = tk.IntVar(master, int(self._settings.web_server_allow_control))
         port_var = tk.StringVar(master, str(self._settings.web_server_port))
         public_var = tk.IntVar(master, int(self._settings.web_server_public))
+        show_viewers_var = tk.IntVar(master, int(self._settings.web_server_show_viewers))
         link_var = tk.StringVar(master, "")
         public_link_var = tk.StringVar(master, "")
         self._vars: dict[str, tk.Variable] = {
@@ -3007,6 +3008,7 @@ class RemoteAccessTab:
             "control": control_var,
             "port": port_var,
             "public": public_var,
+            "show_viewers": show_viewers_var,
             "link": link_var,
             "public_link": public_link_var,
         }
@@ -3073,6 +3075,14 @@ class RemoteAccessTab:
         )
         ttk.Checkbutton(
             center, variable=public_var, command=self.update_server
+        ).grid(column=1, row=irow, sticky="w")
+
+        # Also show the live viewer count on the dashboard page itself, not just here
+        ttk.Label(center, text=_("gui", "remote", "show_viewers_label")).grid(
+            column=0, row=(irow := irow + 1), sticky="e"
+        )
+        ttk.Checkbutton(
+            center, variable=show_viewers_var, command=self.update_server
         ).grid(column=1, row=irow, sticky="w")
 
         # Local share link
@@ -3191,6 +3201,7 @@ class RemoteAccessTab:
         self._settings.web_server_allow_control = bool(self._vars["control"].get())
         self._settings.web_server_password = self._password_entry.get()
         self._settings.web_server_public = bool(self._vars["public"].get())
+        self._settings.web_server_show_viewers = bool(self._vars["show_viewers"].get())
         try:
             port = int(self._vars["port"].get())
             if not (1 <= port <= 65535):
