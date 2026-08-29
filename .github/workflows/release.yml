@@ -35,11 +35,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           if [ -n "${{ github.event.inputs.run_id }}" ]; then
-            echo "id=${{ github.event.inputs.run_id }}" >> "${GITHUB_OUTPUT}"
+            RUN_ID="${{ github.event.inputs.run_id }}"
           else
-            RUN_ID=$(gh run list --workflow=ci.yml --branch=master --status=success --limit=1 --json databaseId --jq '.[0].databaseId' --repo "${GITHUB_REPOSITORY}")
-            echo "id=${RUN_ID}" >> "${GITHUB_OUTPUT}"
+            RUN_ID=$(gh run list --workflow=ci.yml --branch="${{ github.event.repository.default_branch }}" --status=success --limit=1 --json databaseId --jq '.[0].databaseId' --repo "${GITHUB_REPOSITORY}")
           fi
+          if [ -z "$RUN_ID" ]; then
+            echo "::error::Could not find a successful Build run on branch '${{ github.event.repository.default_branch }}' (and no run_id was given)."
+            exit 1
+          fi
+          echo "id=${RUN_ID}" >> "${GITHUB_OUTPUT}"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
