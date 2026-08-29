@@ -157,3 +157,12 @@ class ImageCache:
         # drops the least-recently-used entries once the cache grows past its cap
         while len(mapping) > max_size:
             mapping.popitem(last=False)
+
+    def trim(self, *, keep: int = 0) -> None:
+        # drop almost everything from RAM (decoded images + resized PhotoImages);
+        # the on-disk cache is untouched, so images just get reloaded/redecoded
+        # next time they're needed instead of staying loaded for nothing
+        while len(self._images) > keep:
+            self._images.popitem(last=False)
+        while len(self._photos) > keep:
+            self._photos.popitem(last=False)

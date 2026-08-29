@@ -1180,12 +1180,20 @@ class Twitch:
     async def _memory_maintenance_loop(self) -> None:
         # runs a lightweight garbage-collection pass every 10 minutes, on top of the bounded
         # image cache (see cache.py), to help keep memory usage from creeping up on long,
-        # multi-hour/24h+ mining sessions
+        # multi-hour/24h+ mining sessions. Every 6h, also does a deeper trim of the image
+        # cache itself (keeping just what's on-screen), not just a gc pass.
         import gc
         MEMORY_CHECK_INTERVAL = 10 * 60  # seconds
+        DEEP_TRIM_EVERY = 6 * 60 * 60  # seconds
+        elapsed = 0
         while True:
             await asyncio.sleep(MEMORY_CHECK_INTERVAL)
+            elapsed += MEMORY_CHECK_INTERVAL
             try:
+                if elapsed >= DEEP_TRIM_EVERY:
+                    elapsed = 0
+                    if self.gui._minimized:
+                        self.gui._cache.trim(keep=40)
                 gc.collect()
             except Exception:
                 logger.exception("Periodic memory cleanup failed")
@@ -1631,6 +1639,7 @@ class Twitch:
         self._drops.clear()
         self.gui.inv.clear()
         self.inventory.clear()
+        self._campaigns.clear()
         self._mnt_triggers.clear()
         switch_triggers: set[datetime] = set()
         next_hour = datetime.now(timezone.utc) + timedelta(hours=1)

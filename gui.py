@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import gc
 import sys
 import shlex
 import ctypes
@@ -1239,12 +1240,18 @@ class TrayIcon:
         else:
             self.icon.visible = True
         self._manager._root.withdraw()
+        self._manager._minimized = True
+        # not visible anymore: drop nearly all cached images from RAM,
+        # they'll just get reloaded from disk/redecoded once restored
+        self._manager._cache.trim()
+        gc.collect()
 
     def restore(self):
         if self.icon is not None:
             # self.stop()
             self.icon.visible = False
         self._manager._root.deiconify()
+        self._manager._minimized = False
 
     def notify(
         self, message: str, title: str | None = None, duration: float = 10
@@ -3276,6 +3283,7 @@ class GUIManager:
     def __init__(self, twitch: Twitch):
         self._twitch: Twitch = twitch
         self._poll_task: asyncio.Task[None] | None = None
+        self._minimized: bool = False
         self._close_requested = asyncio.Event()
         self._root = root = Tk(className=WINDOW_TITLE)
         # withdraw immediately to prevent the window from flashing
@@ -3511,6 +3519,7 @@ class GUIManager:
 
         FAST_INTERVAL = 0.05   # matches the previous fixed behavior while there's activity
         IDLE_INTERVAL = 0.35   # ~3x fewer wakeups/sec once the UI has been quiet for a bit
+        MINIMIZED_INTERVAL = 1.0  # window is hidden in the tray, no need to poll fast at all
         IDLE_AFTER = 20        # consecutive empty ticks before backing off (~1s of quiet)
         idle_streak = 0
 
@@ -3527,7 +3536,10 @@ class GUIManager:
                 idle_streak = 0
             else:
                 idle_streak += 1
-            interval = IDLE_INTERVAL if idle_streak >= IDLE_AFTER else FAST_INTERVAL
+            if not self._minimized:
+                interval = IDLE_INTERVAL if idle_streak >= IDLE_AFTER else FAST_INTERVAL
+            else:
+                interval = MINIMIZED_INTERVAL
             await asyncio.sleep(interval)
 
         self._poll_task = None
