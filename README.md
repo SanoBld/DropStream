@@ -60,22 +60,33 @@ Every few seconds, the application simulates watching a stream by requesting its
 
 The **Remote** tab (its own tab, not buried in Settings) lets you turn on a small local web
 server built into the app and generates a private link (a random token embedded in the URL,
-e.g. `http://192.168.1.42:21000/8f3a.../`). Opening that link in a browser, on any device on
-the same network, mirrors most of what the desktop app itself shows: the current drop and
-campaign, with the actual reward images pulled straight from Twitch (not proxied through the
-app); a ranked "drops per game" leaderboard with box art, matching the desktop Dashboard tab;
-and a browsable list of drop campaigns, each with its box art and a thumbnail strip of every
-reward (checked off once claimed) - the same information as the desktop Inventory tab, just
-read-only. The page auto-detects your browser's language and offers a language switcher
-covering the same languages as the desktop app; your choice is remembered on that device.
+e.g. `http://192.168.1.42:21000/8f3a.../`), plus an "Open" button to launch it straight in
+your default browser. Opening that link, on any device on the same network, gives you a
+tabbed page (Dashboard / Campaigns / Control) that mirrors most of the desktop app: the
+current drop and campaign with remaining time and the actual reward images pulled straight
+from Twitch (not proxied through the app); a ranked "drops per game" leaderboard with box
+art; a browsable list of drop campaigns with thumbnails for every reward (checked off once
+claimed); and, in Control mode, live editing of the priority and exclude lists plus a Reload
+button. A traffic-light status dot (green mining / amber paused / red idle) and a single
+pause-or-resume toggle mirror the app's state at a glance, the browser tab's title updates
+with the current drop's progress, and the page offers its own light/dark/auto theme switch
+alongside the language switcher, independent of the desktop app's theme.
 
 From that same tab you choose the **access mode**:
 
 - **View only** (default): visitors can watch progress, nothing else.
-- **View and control**: visitors can also pause/resume mining and change the priority mode.
-  In this mode you can optionally set a **control password**; without one, anyone with the
-  link can control the app, with one, they additionally need the password for any control
-  action (viewing still only requires the link).
+- **View and control**: visitors can also pause/resume mining, change the priority mode, and
+  edit the priority/exclude lists. In this mode you can optionally set a **control password**;
+  without one, anyone with the link can control the app, with one, they additionally need the
+  password for any control action (viewing still only requires the link).
+
+There's also an optional **public link**: alongside the local network link, the app can look
+up your machine's public IP and build a second link from it, for sharing beyond your own
+Wi-Fi. This only builds the URL - it doesn't open a port or configure anything on its own;
+your router still needs to forward the configured port to this machine for a public link to
+actually be reachable from outside. Looking up the public IP needs a moment of internet
+access and can fail silently (e.g. no connection); if it does, the field just says so instead
+of showing a broken link.
 
 A few things worth knowing:
 
@@ -83,10 +94,10 @@ A few things worth knowing:
   treat it like a password: anyone who has it can see your activity. Use the "Generate a new
   link" button any time you want to revoke a previously shared one. If you also enabled
   control, set a control password unless you fully trust everyone you're sharing the link with.
-- By default this is reachable only from your local network (same Wi-Fi/router). To reach it
-  from outside your home network, you'd need to either forward the configured port on your
+- By default this is reachable only from your local network (same Wi-Fi/router). Reaching it
+  from outside that network needs either the public link above with port forwarding on your
   router (this exposes the link to the whole internet, including scanners; only do this if you
-  understand the risk) or use a private tunnel/VPN (Tailscale, WireGuard, etc.) to your network
+  understand the risk) or a private tunnel/VPN (Tailscale, WireGuard, etc.) to your network
   instead.
 - The port (`21000` by default) can be changed if it conflicts with something else already
   running on your machine.
@@ -102,6 +113,17 @@ A few things worth knowing:
 - This dashboard is view/control only: it can't be used to log into your Twitch account or
   claim drops through it directly, it just reflects and steers what the desktop app is already
   doing.
+
+### Small Window / Compact Layout:
+
+The main window can now be resized noticeably smaller than before. Instead of clipping a
+tab's content once it no longer fits, each tab scrolls vertically - a scrollbar appears
+automatically (only when needed) and the mouse wheel scrolls the content while hovering it.
+The tab bar itself also supports the mouse wheel (while hovering the row of tab labels) and
+Ctrl+PageUp / Ctrl+PageDown from anywhere, to switch between tabs without needing to click a
+label that might not fit.
+
+
 
 ### Notes:
 
