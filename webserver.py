@@ -2397,7 +2397,7 @@ async function refresh() {
     const viewerBadge = document.getElementById("viewer-badge");
     if (s.show_viewers && s.viewer_count != null) {
       viewerBadge.style.display = "inline-block";
-      viewerBadge.textContent = "\ud83d\udc41 " + s.viewer_count;
+      viewerBadge.textContent = "\\ud83d\\udc41 " + s.viewer_count;
     } else {
       viewerBadge.style.display = "none";
     }
