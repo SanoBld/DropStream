@@ -447,94 +447,6 @@ class WebDashboard:
         if not self._password_ok(request):
             return web.json_response({"error": "wrong password"}, status=401)
         self._twitch.change_state(State.INVENTORY_FETCH)
-<<<<<<< HEAD
-=======
-        return web.json_response(self._state_dict())
-
-    async def _handle_priority_add(self, request: web.Request) -> web.Response:
-        if not self._password_ok(request):
-            return web.json_response({"error": "wrong password"}, status=401)
-        try:
-            body = await request.json()
-            game_name = str(body["game"]).strip()
-        except (json.JSONDecodeError, KeyError):
-            return web.json_response({"error": "invalid game"}, status=400)
-        if not game_name:
-            return web.json_response({"error": "invalid game"}, status=400)
-        settings = self._twitch.settings
-        if game_name not in settings.priority:
-            settings.priority.append(game_name)
-            settings.alter()
-        return web.json_response(self._state_dict())
-
-    async def _handle_priority_remove(self, request: web.Request) -> web.Response:
-        if not self._password_ok(request):
-            return web.json_response({"error": "wrong password"}, status=401)
-        try:
-            body = await request.json()
-            game_name = str(body["game"])
-        except (json.JSONDecodeError, KeyError):
-            return web.json_response({"error": "invalid game"}, status=400)
-        settings = self._twitch.settings
-        if game_name in settings.priority:
-            settings.priority.remove(game_name)
-            settings.alter()
-        return web.json_response(self._state_dict())
-
-    async def _handle_priority_move(self, request: web.Request) -> web.Response:
-        if not self._password_ok(request):
-            return web.json_response({"error": "wrong password"}, status=401)
-        try:
-            body = await request.json()
-            game_name = str(body["game"])
-            direction = int(body["direction"])  # -1 = up (earlier), +1 = down (later)
-        except (json.JSONDecodeError, KeyError, ValueError):
-            return web.json_response({"error": "invalid request"}, status=400)
-        settings = self._twitch.settings
-        priority = settings.priority
-        if game_name in priority and direction in (-1, 1):
-            idx = priority.index(game_name)
-            new_idx = idx + direction
-            if 0 <= new_idx < len(priority):
-                priority[idx], priority[new_idx] = priority[new_idx], priority[idx]
-                settings.alter()
-        return web.json_response(self._state_dict())
-
-    async def _handle_exclude_add(self, request: web.Request) -> web.Response:
-        if not self._password_ok(request):
-            return web.json_response({"error": "wrong password"}, status=401)
-        try:
-            body = await request.json()
-            game_name = str(body["game"]).strip()
-        except (json.JSONDecodeError, KeyError):
-            return web.json_response({"error": "invalid game"}, status=400)
-        if not game_name:
-            return web.json_response({"error": "invalid game"}, status=400)
-        settings = self._twitch.settings
-        if game_name not in settings.exclude:
-            settings.exclude.add(game_name)
-            settings.alter()
-        return web.json_response(self._state_dict())
-
-    async def _handle_exclude_remove(self, request: web.Request) -> web.Response:
-        if not self._password_ok(request):
-            return web.json_response({"error": "wrong password"}, status=401)
-        try:
-            body = await request.json()
-            game_name = str(body["game"])
-        except (json.JSONDecodeError, KeyError):
-            return web.json_response({"error": "invalid game"}, status=400)
-        settings = self._twitch.settings
-        if game_name in settings.exclude:
-            settings.exclude.discard(game_name)
-            settings.alter()
-        return web.json_response(self._state_dict())
-
-    async def _handle_reload(self, request: web.Request) -> web.Response:
-        if not self._password_ok(request):
-            return web.json_response({"error": "wrong password"}, status=401)
-        self._twitch.change_state(State.INVENTORY_FETCH)
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
         return web.json_response(self._state_dict())
 
 
@@ -572,10 +484,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   }
   .wrap { max-width: 860px; margin: 0 auto; }
   .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
   h1 { font-size: 20px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
   .logo { display: inline-flex; color: var(--red); transition: color .3s; }
   .logo.mining { color: var(--green); }
@@ -583,14 +491,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .logo.idle { color: var(--red); }
   .sub { color: var(--dim); font-size: 13px; margin-bottom: 14px; }
   .top-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-<<<<<<< HEAD
-=======
-=======
-  h1 { font-size: 20px; margin: 0 0 4px; }
-  .sub { color: var(--dim); font-size: 13px; margin-bottom: 14px; }
-  .top-controls { display: flex; gap: 8px; align-items: center; }
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
   .badge {
     display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px;
     background: var(--input-bg); color: var(--dim); margin-left: 8px; vertical-align: middle;
@@ -601,18 +501,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   }
   .theme-switch { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
   .theme-switch button {
-<<<<<<< HEAD
     background: var(--input-bg); color: var(--dim); border: none; padding: 6px 10px;
     font-size: 12px; line-height: 1.4; white-space: nowrap; cursor: pointer; border-radius: 0;
-=======
-<<<<<<< HEAD
-    background: var(--input-bg); color: var(--dim); border: none; padding: 6px 10px;
-    font-size: 12px; line-height: 1.4; white-space: nowrap; cursor: pointer; border-radius: 0;
-=======
-    background: var(--input-bg); color: var(--dim); border: none; padding: 6px 9px;
-    font-size: 12px; cursor: pointer; border-radius: 0;
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
   }
   .theme-switch button.active { background: var(--accent); color: #fff; }
   .tab-bar { display: flex; gap: 4px; margin: 16px 0; border-bottom: 1px solid var(--border); }
@@ -701,18 +591,9 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .add-row { display: flex; gap: 8px; margin-top: 10px; }
   .add-row input { flex: 1; }
   .notice { background: var(--card2); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--dim); }
-<<<<<<< HEAD
   .campaign-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
   .campaign-toolbar input[type=text] { flex: 1; }
   .campaign-toolbar select { width: auto; flex: 0 0 auto; }
-=======
-<<<<<<< HEAD
-  .campaign-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
-  .campaign-toolbar input[type=text] { flex: 1; }
-  .campaign-toolbar select { width: auto; flex: 0 0 auto; }
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
 </style>
 </head>
 <body>
@@ -798,10 +679,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 
   <div class="tab-panel" id="tab-campaigns">
     <div class="card">
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
       <div class="campaign-toolbar">
         <input type="text" id="campaign-search">
         <select id="campaign-sort">
@@ -810,11 +687,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           <option value="progress" data-i18n="sort_progress"></option>
         </select>
       </div>
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
       <div class="label" data-i18n="campaigns_title"></div>
       <div class="campaign-list" id="campaign-list"></div>
       <div class="muted" id="no-campaigns" data-i18n="no_campaigns" style="display:none"></div>
@@ -883,19 +755,10 @@ const I18N = {
     "priority_list": "Priority list",
     "drops_per_game_title": "Drops per game",
     "campaigns_title": "Drop campaigns",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Search campaigns or games...",
     "sort_default": "Default",
     "sort_recent": "Most recent",
     "sort_progress": "Progress",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Claimed",
     "no_campaigns": "No campaigns to show yet.",
     "connection_lost": "Connection lost - retrying...",
@@ -952,19 +815,10 @@ const I18N = {
     "priority_list": "Liste de priorité",
     "drops_per_game_title": "Drops par jeu",
     "campaigns_title": "Campagnes de drops",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Rechercher une campagne ou un jeu...",
     "sort_default": "Par défaut",
     "sort_recent": "Plus récent",
     "sort_progress": "Progression",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Récupéré",
     "no_campaigns": "Aucune campagne à afficher pour le moment.",
     "connection_lost": "Connexion perdue, nouvelle tentative...",
@@ -1021,19 +875,10 @@ const I18N = {
     "priority_list": "Prioritätsliste",
     "drops_per_game_title": "Drops pro Spiel",
     "campaigns_title": "Drop-Kampagnen",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Kampagnen oder Spiele suchen...",
     "sort_default": "Standard",
     "sort_recent": "Neueste",
     "sort_progress": "Fortschritt",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Erhalten",
     "no_campaigns": "Noch keine Kampagnen vorhanden.",
     "connection_lost": "Verbindung verloren, erneuter Versuch...",
@@ -1090,19 +935,10 @@ const I18N = {
     "priority_list": "Lista de prioridad",
     "drops_per_game_title": "Drops por juego",
     "campaigns_title": "Campañas de drops",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Buscar campañas o juegos...",
     "sort_default": "Predeterminado",
     "sort_recent": "Más reciente",
     "sort_progress": "Progreso",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Obtenido",
     "no_campaigns": "Aún no hay campañas que mostrar.",
     "connection_lost": "Conexión perdida, reintentando...",
@@ -1159,19 +995,10 @@ const I18N = {
     "priority_list": "Lista priorità",
     "drops_per_game_title": "Drop per gioco",
     "campaigns_title": "Campagne drop",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Cerca campagne o giochi...",
     "sort_default": "Predefinito",
     "sort_recent": "Più recente",
     "sort_progress": "Progresso",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Ottenuto",
     "no_campaigns": "Nessuna campagna da mostrare per ora.",
     "connection_lost": "Connessione persa, nuovo tentativo...",
@@ -1228,19 +1055,10 @@ const I18N = {
     "priority_list": "Lista de prioridade",
     "drops_per_game_title": "Drops por jogo",
     "campaigns_title": "Campanhas de drops",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Pesquisar campanhas ou jogos...",
     "sort_default": "Padrão",
     "sort_recent": "Mais recente",
     "sort_progress": "Progresso",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Obtido",
     "no_campaigns": "Ainda não há campanhas para mostrar.",
     "connection_lost": "Ligação perdida, a tentar novamente...",
@@ -1297,19 +1115,10 @@ const I18N = {
     "priority_list": "Prioriteitslijst",
     "drops_per_game_title": "Drops per spel",
     "campaigns_title": "Drop-campagnes",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Campagnes of games zoeken...",
     "sort_default": "Standaard",
     "sort_recent": "Meest recent",
     "sort_progress": "Voortgang",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Verkregen",
     "no_campaigns": "Nog geen campagnes om te tonen.",
     "connection_lost": "Verbinding verbroken, opnieuw proberen...",
@@ -1366,19 +1175,10 @@ const I18N = {
     "priority_list": "Prioritetsliste",
     "drops_per_game_title": "Drops pr. spil",
     "campaigns_title": "Drop-kampagner",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Søg kampagner eller spil...",
     "sort_default": "Standard",
     "sort_recent": "Nyeste",
     "sort_progress": "Fremskridt",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Opnået",
     "no_campaigns": "Ingen kampagner at vise endnu.",
     "connection_lost": "Forbindelse mistet, prøver igen...",
@@ -1435,19 +1235,10 @@ const I18N = {
     "priority_list": "Prioritetsliste",
     "drops_per_game_title": "Drops per spill",
     "campaigns_title": "Drop-kampanjer",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Søk kampanjer eller spill...",
     "sort_default": "Standard",
     "sort_recent": "Nyeste",
     "sort_progress": "Fremdrift",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Oppnådd",
     "no_campaigns": "Ingen kampanjer å vise ennå.",
     "connection_lost": "Mistet forbindelse, prøver igjen...",
@@ -1504,19 +1295,10 @@ const I18N = {
     "priority_list": "Lista priorytetowa",
     "drops_per_game_title": "Dropy wg gry",
     "campaigns_title": "Kampanie dropów",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Szukaj kampanii lub gier...",
     "sort_default": "Domyślne",
     "sort_recent": "Najnowsze",
     "sort_progress": "Postęp",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Zdobyto",
     "no_campaigns": "Brak kampanii do wyświetlenia.",
     "connection_lost": "Utracono połączenie, ponawianie...",
@@ -1573,19 +1355,10 @@ const I18N = {
     "priority_list": "Seznam priorit",
     "drops_per_game_title": "Dropy podle hry",
     "campaigns_title": "Kampaně dropů",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Hledat kampaně nebo hry...",
     "sort_default": "Výchozí",
     "sort_recent": "Nejnovější",
     "sort_progress": "Postup",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Získáno",
     "no_campaigns": "Zatím žádné kampaně k zobrazení.",
     "connection_lost": "Spojení ztraceno, zkouším znovu...",
@@ -1642,19 +1415,10 @@ const I18N = {
     "priority_list": "Listă de prioritate",
     "drops_per_game_title": "Drop-uri pe joc",
     "campaigns_title": "Campanii de drop-uri",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Caută campanii sau jocuri...",
     "sort_default": "Implicit",
     "sort_recent": "Cele mai recente",
     "sort_progress": "Progres",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Obținut",
     "no_campaigns": "Nicio campanie de afișat momentan.",
     "connection_lost": "Conexiune pierdută, se reîncearcă...",
@@ -1711,19 +1475,10 @@ const I18N = {
     "priority_list": "Prioritási lista",
     "drops_per_game_title": "Dropok játékonként",
     "campaigns_title": "Drop kampányok",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Kampányok vagy játékok keresése...",
     "sort_default": "Alapértelmezett",
     "sort_recent": "Legújabb",
     "sort_progress": "Előrehaladás",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Megszerezve",
     "no_campaigns": "Még nincs megjeleníthető kampány.",
     "connection_lost": "Kapcsolat megszakadt, újrapróbálkozás...",
@@ -1780,19 +1535,10 @@ const I18N = {
     "priority_list": "Öncelik listesi",
     "drops_per_game_title": "Oyuna göre droplar",
     "campaigns_title": "Drop kampanyaları",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Kampanya veya oyun ara...",
     "sort_default": "Varsayılan",
     "sort_recent": "En yeni",
     "sort_progress": "İlerleme",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Kazanıldı",
     "no_campaigns": "Henüz gösterilecek kampanya yok.",
     "connection_lost": "Bağlantı kesildi, yeniden deneniyor...",
@@ -1849,19 +1595,10 @@ const I18N = {
     "priority_list": "Список приоритета",
     "drops_per_game_title": "Дропы по играм",
     "campaigns_title": "Кампании дропов",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Поиск кампаний или игр...",
     "sort_default": "По умолчанию",
     "sort_recent": "Недавние",
     "sort_progress": "Прогресс",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Получено",
     "no_campaigns": "Пока нет кампаний для отображения.",
     "connection_lost": "Соединение потеряно, повтор попытки...",
@@ -1918,19 +1655,10 @@ const I18N = {
     "priority_list": "Список пріоритету",
     "drops_per_game_title": "Дропи за іграми",
     "campaigns_title": "Кампанії дропів",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Пошук кампаній або ігор...",
     "sort_default": "За замовчуванням",
     "sort_recent": "Найновіші",
     "sort_progress": "Прогрес",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Отримано",
     "no_campaigns": "Поки немає кампаній для показу.",
     "connection_lost": "З'єднання втрачено, повторна спроба...",
@@ -1987,19 +1715,10 @@ const I18N = {
     "priority_list": "قائمة الأولوية",
     "drops_per_game_title": "الدروبات حسب اللعبة",
     "campaigns_title": "حملات الدروب",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "البحث عن الحملات أو الألعاب...",
     "sort_default": "افتراضي",
     "sort_recent": "الأحدث",
     "sort_progress": "التقدم",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "تم الاستلام",
     "no_campaigns": "لا توجد حملات لعرضها بعد.",
     "connection_lost": "انقطع الاتصال، جارٍ إعادة المحاولة...",
@@ -2056,19 +1775,10 @@ const I18N = {
     "priority_list": "優先リスト",
     "drops_per_game_title": "ゲーム別ドロップ",
     "campaigns_title": "ドロップキャンペーン",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "キャンペーンやゲームを検索...",
     "sort_default": "デフォルト",
     "sort_recent": "最新",
     "sort_progress": "進捗",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "獲得済み",
     "no_campaigns": "表示するキャンペーンはまだありません。",
     "connection_lost": "接続が切断されました。再試行中...",
@@ -2125,19 +1835,10 @@ const I18N = {
     "priority_list": "优先列表",
     "drops_per_game_title": "各游戏掉落数",
     "campaigns_title": "掉落活动",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "搜索活动或游戏...",
     "sort_default": "默认",
     "sort_recent": "最新",
     "sort_progress": "进度",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "已获得",
     "no_campaigns": "暂无活动可显示。",
     "connection_lost": "连接已断开，正在重试...",
@@ -2194,19 +1895,10 @@ const I18N = {
     "priority_list": "優先清單",
     "drops_per_game_title": "各遊戲掉落數",
     "campaigns_title": "掉落活動",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "搜尋活動或遊戲...",
     "sort_default": "預設",
     "sort_recent": "最新",
     "sort_progress": "進度",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "已獲得",
     "no_campaigns": "目前沒有活動可顯示。",
     "connection_lost": "連線已中斷，正在重試...",
@@ -2263,19 +1955,10 @@ const I18N = {
     "priority_list": "Daftar prioritas",
     "drops_per_game_title": "Drop per game",
     "campaigns_title": "Kampanye drop",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "campaign_search_placeholder": "Cari kampanye atau game...",
     "sort_default": "Default",
     "sort_recent": "Terbaru",
     "sort_progress": "Progres",
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     "claimed": "Diperoleh",
     "no_campaigns": "Belum ada kampanye untuk ditampilkan.",
     "connection_lost": "Koneksi terputus, mencoba lagi...",
@@ -2344,14 +2027,7 @@ function applyStaticTranslations() {
   document.getElementById("password-input").placeholder = t("password_title");
   document.getElementById("priority-input").placeholder = t("priority_placeholder");
   document.getElementById("exclude-input").placeholder = t("exclude_placeholder");
-<<<<<<< HEAD
   document.getElementById("campaign-search").placeholder = t("campaign_search_placeholder");
-=======
-<<<<<<< HEAD
-  document.getElementById("campaign-search").placeholder = t("campaign_search_placeholder");
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
   const modeSelect = document.getElementById("priority-mode");
   const modeLabels = t("modes");
   [0, 3, 1, 4, 2, 5].forEach((value, i) => {
@@ -2626,14 +2302,7 @@ async function refresh() {
     const dot = document.getElementById("status-dot");
     const text = document.getElementById("status-text");
     dot.className = "dot " + s.status;
-<<<<<<< HEAD
     document.getElementById("app-logo").className = "logo " + s.status;
-=======
-<<<<<<< HEAD
-    document.getElementById("app-logo").className = "logo " + s.status;
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
     text.textContent = s.status === "paused" ? t("paused") : (s.status === "mining" ? t("mining") : t("idle"));
     lastPaused = s.paused;
     const toggleBtn = document.getElementById("toggle-btn");
@@ -2741,16 +2410,8 @@ document.getElementById("reload-btn").addEventListener("click", async () => {
   await post("/api/reload");
   refresh();
 });
-<<<<<<< HEAD
 document.getElementById("campaign-search").addEventListener("input", applyCampaignFilters);
 document.getElementById("campaign-sort").addEventListener("change", applyCampaignFilters);
-=======
-<<<<<<< HEAD
-document.getElementById("campaign-search").addEventListener("input", applyCampaignFilters);
-document.getElementById("campaign-sort").addEventListener("change", applyCampaignFilters);
-=======
->>>>>>> 28fdf0b625446954268076fd1a960453abd895d4
->>>>>>> 0b21ea9d26669bbad23fa5ae309654e13ca22797
 
 applyStaticTranslations();
 refresh();
