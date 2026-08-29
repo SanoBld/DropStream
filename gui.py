@@ -1786,11 +1786,13 @@ class InventoryOverview:
         self._canvas.configure(xscrollcommand=xscroll.set, yscrollcommand=yscroll.set)
         self._canvas.bind("<Configure>", self._canvas_update)
         self._main_frame = ttk.Frame(self._canvas)
+        self._main_frame.columnconfigure(0, weight=1)
         self._canvas.bind(
             "<Enter>", lambda e: self._canvas.bind_all("<MouseWheel>", self._on_mousewheel)
         )
         self._canvas.bind("<Leave>", lambda e: self._canvas.unbind_all("<MouseWheel>"))
         self._canvas.create_window(0, 0, anchor="nw", window=self._main_frame)
+        self._main_frame_window = self._canvas.find_all()[-1]
         self._campaigns: dict[DropsCampaign, CampaignDisplay] = {}
         self._drops: dict[str, ttk.Label] = {}
 
@@ -1851,6 +1853,10 @@ class InventoryOverview:
         self._canvas_update()
 
     def _canvas_update(self, event: tk.Event[tk.Canvas] | None = None):
+        # stretch the inner frame to the canvas's width, so campaign cards use the full
+        # available width instead of staying at their minimal natural size
+        if event is not None and event.width > 1:
+            self._canvas.itemconfigure(self._main_frame_window, width=event.width)
         self._canvas.update_idletasks()
         self._canvas.configure(scrollregion=self._canvas.bbox("all"))
 
@@ -1962,13 +1968,15 @@ class InventoryOverview:
         ttk.Separator(
             campaign_frame, orient="vertical", takefocus=False
         ).grid(column=2, row=0, rowspan=5, sticky="ns")
-        # Drops display
+        # Drops display: cards wrap onto new rows instead of just growing sideways forever,
+        # so the campaign fits the available width instead of forcing a horizontal scrollbar
         drops_row = ttk.Frame(campaign_frame)
         drops_row.grid(column=3, row=0, rowspan=5, sticky="nsew", padx=4)
-        drops_row.rowconfigure(0, weight=1)
+        drop_frames: list[ttk.Frame] = []
         for i, drop in enumerate(campaign.drops):
             drop_frame = ttk.Frame(drops_row, relief="ridge", borderwidth=1, padding=5)
-            drop_frame.grid(column=i, row=0, padx=4)
+            drop_frame.grid(column=i, row=0, padx=4, pady=4)
+            drop_frames.append(drop_frame)
             benefits_frame = ttk.Frame(drop_frame)
             benefits_frame.grid(column=0, row=0)
             benefit_images: list[PhotoImage] = await asyncio.gather(
@@ -1984,6 +1992,21 @@ class InventoryOverview:
             self._drops[drop.id] = label = ttk.Label(drop_frame, justify=tk.CENTER)
             self.update_progress(drop, label)
             label.grid(column=0, row=1)
+
+        def rewrap(event: tk.Event[tk.Misc] | None = None) -> None:
+            if not drop_frames:
+                return
+            drop_frames[0].update_idletasks()
+            card_width = drop_frames[0].winfo_reqwidth() + 8
+            available = drops_row.winfo_width()
+            cols = max(1, available // card_width) if available > 1 else len(drop_frames)
+            for idx, frame in enumerate(drop_frames):
+                r, c = divmod(idx, cols)
+                frame.grid_configure(row=r, column=c)
+            self._canvas_update()
+
+        drops_row.bind("<Configure>", rewrap)
+        drops_row.after_idle(rewrap)
         if self._manager.tabs.current_tab() == 2:  # Inventory is the 3rd tab
             self._update_visibility(campaign)
             self._canvas_update()
