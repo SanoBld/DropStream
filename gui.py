@@ -3120,8 +3120,9 @@ class RemoteAccessTab:
         self._poll_viewers()
 
     def _poll_viewers(self) -> None:
-        if self._settings.web_server_enabled and self._twitch.web_server.running:
-            count = self._twitch.web_server._viewer_count()
+        web_server = getattr(self._twitch, "web_server", None)
+        if web_server is not None and self._settings.web_server_enabled and web_server.running:
+            count = web_server._viewer_count()
             if count == 0:
                 text = _("gui", "remote", "viewers_none")
             elif count == 1:
