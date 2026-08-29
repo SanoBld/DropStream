@@ -1241,10 +1241,15 @@ class TrayIcon:
             self.icon.visible = True
         self._manager._root.withdraw()
         self._manager._minimized = True
-        # not visible anymore: drop nearly all cached images from RAM,
-        # they'll just get reloaded from disk/redecoded once restored
-        self._manager._cache.trim()
-        gc.collect()
+        if self._manager._twitch.settings.low_power_tray_mode:
+            # not visible anymore: drop the whole Inventory tab (widgets + images) and
+            # nearly all cached images from RAM, they'll get rebuilt/redecoded once
+            # restored. This is opt-in since it makes things noticeably slower right
+            # after restoring, or when opening Inventory, while it reloads.
+            self._manager.inv.clear()
+            self._manager._cache.trim()
+            self._manager._inventory_dirty = True
+            gc.collect()
 
     def restore(self):
         if self.icon is not None:
@@ -1320,7 +1325,10 @@ class Notebook:
         new_index = (current + direction) % len(tabs)
         self._nb.select(new_index)
 
-    def add_tab(self, widget: ttk.Widget, *, name: str, icon_key: str | None = None, **kwargs):
+    def add_tab(
+        self, widget: ttk.Widget, *, name: str, icon_key: str | None = None,
+        fill_height: bool = False, **kwargs,
+    ):
         kwargs.pop("text", None)
         if "sticky" not in kwargs:
             kwargs["sticky"] = "nsew"
@@ -1346,6 +1354,11 @@ class Notebook:
 
         def on_canvas_resize(event: tk.Event[tk.Misc]) -> None:
             canvas.itemconfigure(window_id, width=event.width)
+            if fill_height:
+                # this tab manages its own internal scrolling (e.g. Inventory), so stretch
+                # it to the full page height instead of leaving it at its natural (small)
+                # size anchored at the top - that's what left half the tab empty before
+                canvas.itemconfigure(window_id, height=event.height)
             sync_scrollregion()
 
         widget.bind("<Configure>", sync_scrollregion)
@@ -1834,6 +1847,9 @@ class InventoryOverview:
 
     def _on_tab_switched(self, event: tk.Event[ttk.Notebook]) -> None:
         if self._manager.tabs.current_tab() == 2:  # Inventory is the 3rd tab
+            # if a low-power tray minimize cleared this tab, rebuild it before showing
+            # anything, instead of showing a blank/half-broken tab
+            self._manager.ensure_inventory_reloaded()
             # refresh only if we're switching to the tab
             self.refresh()
 
@@ -2173,6 +2189,7 @@ class SettingsPanel:
             "auto_action": StringVar(master, self.POWER_ACTIONS[self._settings.auto_action]),
             "auto_restart_enabled": IntVar(master, int(self._settings.auto_restart_enabled)),
             "auto_restart_minutes": StringVar(master, str(self._settings.auto_restart_minutes)),
+            "low_power_tray_mode": IntVar(master, int(self._settings.low_power_tray_mode)),
         }
         self._game_names: set[str] = set()
         master.rowconfigure(0, weight=1)
@@ -2233,6 +2250,21 @@ class SettingsPanel:
                     bool(self._vars["tray_notifications"].get()),
                 ),
             ).grid(column=1, row=irow, sticky="w")
+        ttk.Label(
+            checkboxes_frame, text=_("gui", "settings", "general", "low_power_tray_mode")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Checkbutton(
+            checkboxes_frame,
+            variable=self._vars["low_power_tray_mode"],
+            command=lambda: setattr(
+                self._settings,
+                "low_power_tray_mode",
+                bool(self._vars["low_power_tray_mode"].get()),
+            ),
+        ).grid(column=1, row=irow, sticky="w")
+        InfoTooltip(
+            checkboxes_frame, text=_("gui", "settings", "general", "low_power_tray_mode_info")
+        ).grid(column=2, row=irow, sticky="w", padx=(4, 0))
         ttk.Label(
             checkboxes_frame, text=_("gui", "settings", "general", "theme")
         ).grid(column=0, row=(irow := irow + 1), sticky="e")
@@ -3340,6 +3372,20 @@ class GUIManager:
         root_frame.grid(column=0, row=0, sticky="nsew")
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
+        # Loading overlay: covers the whole window, used when restoring from a low-power
+        # tray minimize (rebuilding the Inventory tab/images takes a moment) so the user
+        # sees real progress instead of a frozen-looking window
+        self._loading_overlay = ttk.Frame(root)
+        self._loading_label = ttk.Label(
+            self._loading_overlay, text="", font=("TkDefaultFont", 11), anchor="center"
+        )
+        self._loading_label.pack(expand=True, pady=(0, 8))
+        self._loading_bar = ttk.Progressbar(
+            self._loading_overlay, mode="indeterminate", length=220
+        )
+        self._loading_bar.pack(pady=(0, 0))
+        self._inventory_dirty = False
+        self._inventory_reload_task: asyncio.Task[None] | None = None
         # Notebook
         self.tabs = Notebook(self, root_frame)
         # Tray icon - place after notebook so it draws on top of the tabs space
@@ -3361,7 +3407,9 @@ class GUIManager:
         # Inventory tab
         inv_frame = ttk.Frame(root_frame, padding=8)
         self.inv = InventoryOverview(self, inv_frame)
-        self.tabs.add_tab(inv_frame, name=_("gui", "tabs", "inventory"), icon_key="inventory")
+        self.tabs.add_tab(
+            inv_frame, name=_("gui", "tabs", "inventory"), icon_key="inventory", fill_height=True
+        )
         # Settings tab
         settings_frame = ttk.Frame(root_frame, padding=8)
         self.settings = SettingsPanel(self, settings_frame)
@@ -3538,11 +3586,51 @@ class GUIManager:
                 idle_streak += 1
             if not self._minimized:
                 interval = IDLE_INTERVAL if idle_streak >= IDLE_AFTER else FAST_INTERVAL
-            else:
+            elif self._twitch.settings.low_power_tray_mode:
                 interval = MINIMIZED_INTERVAL
+            else:
+                interval = IDLE_INTERVAL if idle_streak >= IDLE_AFTER else FAST_INTERVAL
             await asyncio.sleep(interval)
 
         self._poll_task = None
+
+    def show_loading(self, message: str) -> None:
+        self._loading_label.configure(text=message)
+        self._loading_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self._loading_overlay.lift()
+        self._loading_bar.start(12)
+
+    def hide_loading(self) -> None:
+        self._loading_bar.stop()
+        self._loading_overlay.place_forget()
+
+    async def reload_inventory_after_low_power(self) -> None:
+        # rebuilds the Inventory tab (and re-fetches/re-decodes the images that were
+        # dropped from RAM) after a low-power tray minimize. Real, awaited work behind a
+        # loading screen - not a fake delay - since this can take a moment.
+        if not self._inventory_dirty:
+            return
+        self.show_loading(_("gui", "inventory", "reloading"))
+        try:
+            self.inv.clear()
+            tasks = [
+                asyncio.create_task(self.inv.add_campaign(campaign))
+                for campaign in self._twitch.inventory
+            ]
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+        finally:
+            self._inventory_dirty = False
+            self._inventory_reload_task = None
+            self.hide_loading()
+
+    def ensure_inventory_reloaded(self) -> None:
+        # call before showing the Inventory tab, or right after restoring from the tray:
+        # kicks off the rebuild (if needed) and makes sure it only runs once at a time
+        if self._inventory_dirty and self._inventory_reload_task is None:
+            self._inventory_reload_task = asyncio.create_task(
+                self.reload_inventory_after_low_power()
+            )
 
     def close(self, *args) -> int:
         """

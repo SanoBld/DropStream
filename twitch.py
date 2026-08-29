@@ -1192,7 +1192,7 @@ class Twitch:
             try:
                 if elapsed >= DEEP_TRIM_EVERY:
                     elapsed = 0
-                    if self.gui._minimized:
+                    if self.gui._minimized and self.settings.low_power_tray_mode:
                         self.gui._cache.trim(keep=40)
                 gc.collect()
             except Exception:

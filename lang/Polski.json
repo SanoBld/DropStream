@@ -138,7 +138,8 @@
             "all_channels": "Wszystkie kanały",
             "and_more": "i {amount} więcej...",
             "percent_progress": "{percent} z {minutes} min.",
-            "minutes_progress": "{minutes} min."
+            "minutes_progress": "{minutes} min.",
+            "reloading": "Ponowne ładowanie ekwipunku (tryb oszczędzania energii)..."
         },
         "settings": {
             "general": {
@@ -151,7 +152,9 @@
                 "proxy": "Proxy (wymaga restartu):",
                 "theme": "Motyw: ",
                 "use_system_accent": "Użyj koloru akcentu systemu: ",
-                "priority_mode_info": "Gry z listy priorytetów są zawsze próbowane jako pierwsze, w ustalonej przez Ciebie kolejności. \"Kończy się najwcześniej\"/\"Najpierw niska dostępność\" określają tylko kolejność dla reszty, gdy nic z listy priorytetów nie jest już dostępne."
+                "priority_mode_info": "Gry z listy priorytetów są zawsze próbowane jako pierwsze, w ustalonej przez Ciebie kolejności. \"Kończy się najwcześniej\"/\"Najpierw niska dostępność\" określają tylko kolejność dla reszty, gdy nic z listy priorytetów nie jest już dostępne.",
+                "low_power_tray_mode": "Tryb oszczędzania energii po zminimalizowaniu: ",
+                "low_power_tray_mode_info": "Po zminimalizowaniu aplikacji do zasobnika systemowego agresywnie zwalnia pamięć RAM (czyści zapisane w pamięci podręcznej obrazy, odbudowuje kartę Ekwipunek od zera) i spowalnia sprawdzanie w tle, aby oszczędzać CPU/baterię. Może to sprawić, że aplikacja będzie chwilę wolniejsza zaraz po otwarciu karty Ekwipunek, podczas ponownego ładowania - w tym czasie wyświetlany jest ekran ładowania."
             },
             "advanced": {
                 "name": "Zaawansowane",

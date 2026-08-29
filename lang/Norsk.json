@@ -138,7 +138,8 @@
             "all_channels": "Alle",
             "and_more": "og {amount} flere...",
             "percent_progress": "{percent} av {minutes} minutter",
-            "minutes_progress": "{minutes} minutter"
+            "minutes_progress": "{minutes} minutter",
+            "reloading": "Laster inn beholdning på nytt (strømsparemodus)..."
         },
         "settings": {
             "general": {
@@ -151,7 +152,9 @@
                 "proxy": "Proxy (krever omstart):",
                 "theme": "Tema: ",
                 "use_system_accent": "Bruk systemets aksentfarge: ",
-                "priority_mode_info": "Spill på prioritetslisten forsøkes alltid først, i rekkefølgen du har angitt. \"Avsluttes snarest\"/\"Lav tilgjengelighet først\" bestemmer bare rekkefølgen for alt annet, når ingenting fra prioritetslisten lenger er tilgjengelig."
+                "priority_mode_info": "Spill på prioritetslisten forsøkes alltid først, i rekkefølgen du har angitt. \"Avsluttes snarest\"/\"Lav tilgjengelighet først\" bestemmer bare rekkefølgen for alt annet, når ingenting fra prioritetslisten lenger er tilgjengelig.",
+                "low_power_tray_mode": "Strømsparemodus ved minimering: ",
+                "low_power_tray_mode_info": "Når appen minimeres til systemstatusfeltet, frigjøres RAM aggressivt (bufrede bilder tømmes, Beholdning-fanen bygges opp igjen fra bunnen), og bakgrunnssjekker senkes for å spare CPU/batteri. Dette kan gjøre appen litt tregere rett etter at du åpner Beholdning-fanen, mens den lastes på nytt - en lasteskjerm vises i mellomtiden."
             },
             "advanced": {
                 "name": "Avansert",

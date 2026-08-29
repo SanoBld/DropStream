@@ -139,7 +139,8 @@
             "all_channels": "Alle",
             "and_more": "en {amount} Andere...",
             "percent_progress": "{percent} van {minutes} Minuten",
-            "minutes_progress": "{minutes} Minuten"
+            "minutes_progress": "{minutes} Minuten",
+            "reloading": "Inventaris wordt opnieuw geladen (energiebesparende modus)..."
         },
         "settings": {
             "general": {
@@ -153,7 +154,9 @@
                 "use_system_accent": "Systeem-accentkleur gebruiken: ",
                 "priority_mode": "Prioriteitsmodus: ",
                 "priority_mode_info": "Games op de prioriteitslijst worden altijd eerst geprobeerd, in de door jou ingestelde volgorde. \"Eindigt het snelst\"/\"Lage beschikbaarheid eerst\" bepalen alleen de volgorde voor de rest, zodra er niets meer beschikbaar is van de prioriteitslijst.",
-                "tray_notifications": "Systeemvakmeldingen: "
+                "tray_notifications": "Systeemvakmeldingen: ",
+                "low_power_tray_mode": "Energiebesparende modus bij minimaliseren: ",
+                "low_power_tray_mode_info": "Wanneer de app naar het systeemvak wordt geminimaliseerd, wordt het RAM-geheugen agressief vrijgemaakt (gecachte afbeeldingen worden gewist, het tabblad Inventaris wordt helemaal opnieuw opgebouwd) en worden achtergrondcontroles vertraagd om CPU/batterij te sparen. Hierdoor kan de app iets trager reageren vlak nadat je het tabblad Inventaris opent, terwijl het opnieuw laadt - er wordt dan een laadscherm getoond."
             },
             "game_name": "Spel",
             "priority": "Prioriteit",

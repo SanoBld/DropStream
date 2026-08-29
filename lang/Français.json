@@ -8,7 +8,9 @@
         "claimed_drop": "Drop récupéré : {drop}",
         "no_channel": "Aucune chaîne disponible à regarder. En attente d'une chaîne EN LIGNE...",
         "no_campaign": "Aucune campagne active pour laquelle miner des drops. En attente d'une campagne active...",
-        "auto_action": "Tous les drops récupérés pour le moment, action lancée : {action}"
+        "auto_action": "Tous les drops récupérés pour le moment, action lancée : {action}",
+        "auto_restart": "Le redémarrage automatique est activé : relance dans {minutes} minute(s), sauf si vous fermez cette fenêtre avant.",
+        "auto_restart_now": "Relance en cours..."
     },
     "login": {
         "chrome": {
@@ -45,14 +47,16 @@
             "adding_campaigns": "Ajout de la liste des campagnes à l'inventaire... {counter}",
             "paused": "En pause",
             "scheduled": "Hors des horaires programmés",
-            "paused_until": "En pause jusqu'à {time}"
+            "paused_until": "En pause jusqu'à {time}",
+            "auto_restart": "Arrêtée - redémarrage dans {minutes} min"
         },
         "tabs": {
             "main": "Détails",
             "inventory": "Inventaire",
             "settings": "Paramètres",
             "help": "Aide",
-            "dashboard": "Tableau de bord"
+            "dashboard": "Tableau de bord",
+            "remote": "Distant"
         },
         "tray": {
             "notification_title": "Drop miné",
@@ -134,7 +138,8 @@
             "all_channels": "Toutes",
             "and_more": "et {amount} de plus...",
             "percent_progress": "{percent} de {minutes} minutes",
-            "minutes_progress": "{minutes} minutes"
+            "minutes_progress": "{minutes} minutes",
+            "reloading": "Rechargement de l'inventaire (mode basse consommation)..."
         },
         "settings": {
             "general": {
@@ -146,7 +151,9 @@
                 "proxy": "Proxy (nécessite un redémarrage) :",
                 "theme": "Thème : ",
                 "use_system_accent": "Utiliser la couleur d'accentuation du système : ",
-                "priority_mode_info": "Les jeux de la liste de priorité sont toujours essayés en premier, dans l'ordre défini. « Se termine le plus tôt »/« Faible disponibilité en premier » ne déterminent que l'ordre pour tout le reste, une fois qu'il n'y a plus rien à farmer dans la liste de priorité."
+                "priority_mode_info": "Les jeux de la liste de priorité sont toujours essayés en premier, dans l'ordre défini. « Se termine le plus tôt »/« Faible disponibilité en premier » ne déterminent que l'ordre pour tout le reste, une fois qu'il n'y a plus rien à farmer dans la liste de priorité.",
+                "low_power_tray_mode": "Mode basse consommation en réduit : ",
+                "low_power_tray_mode_info": "Quand l'app est réduite dans la barre des tâches, libère agressivement la RAM (vide les images en cache, reconstruit l'onglet Inventaire depuis zéro) et ralentit les vérifications en arrière-plan pour économiser CPU/batterie. Cela peut rendre l'app un peu plus lente juste après avoir ouvert l'onglet Inventaire, le temps qu'il se recharge - un écran de chargement s'affiche pendant ce temps."
             },
             "priority_modes": {
                 "priority_only": "Liste de priorité uniquement",
@@ -196,6 +203,12 @@
                 "warning_text": "Ces options peuvent perturber le fonctionnement du mineur.\nSi vous rencontrez des problèmes, assurez-vous qu'elles sont toutes désactivées.",
                 "enable_badges_emotes": "Activer le support partiel des badges et émotes : ",
                 "available_drops_check": "Activer la vérification supplémentaire des drops disponibles : "
+            },
+            "reliability": {
+                "name": "Fiabilité",
+                "info": "L'application retente déjà plusieurs fois automatiquement avant d'abandonner. Si elle finit malgré tout sur un écran « Arrêtée », cette option la relance automatiquement après un délai.",
+                "enabled": "Redémarrage automatique après un plantage : ",
+                "minutes": "Redémarrer après (minutes) : "
             }
         },
         "help": {
@@ -205,9 +218,9 @@
                 "campaigns": "Afficher toutes les campagnes et gérer les comptes associés"
             },
             "how_it_works": "Comment ça fonctionne",
-            "how_it_works_text": "Toutes les quelques secondes, l'application fait semblant de regarder un flux particulier en récupérant les métadonnées du flux - ce qui suffit pour faire avancer les drops. Notez que cela contourne complètement le besoin de télécharger la vidéo et le son du flux réel. Pour maintenir à jour le statut (EN LIGNE ou HORS LIGNE) des chaînes, une connexion websocket est établie pour recevoir des événements sur les flux qui montent ou descendent, ou des mises à jour concernant le nombre actuel de spectateurs.",
+            "how_it_works_text": "Toutes les quelques secondes, l'application simule le visionnage d'un flux en récupérant ses métadonnées, ce qui suffit à faire progresser les drops. Cette méthode évite tout téléchargement réel de vidéo ou de son. Une connexion websocket permanente permet de maintenir à jour le statut de chaque chaîne (EN LIGNE ou HORS LIGNE), ainsi que le nombre de spectateurs en direct.",
             "getting_started": "Premiers pas",
-            "getting_started_text": "1. Connectez-vous à l'application.\n2. Assurez-vous que votre compte Twitch est lié à toutes les campagnes qui vous intéressent.\n3. Si vous souhaitez miner tout ce qui est possible, modifiez le mode de priorité en autre chose que \"Liste de priorité uniquement\" et appuyez sur \"Recharger\".\n4. Si vous souhaitez miner certains jeux en priorité, utilisez la liste \"Priorité\" pour définir un ordre de préférence des jeux de votre choix. Les jeux en haut de la liste seront minés en premier, avant ceux qui se trouvent plus bas dans la liste.\n5. Gardez le mode de priorité sur \"Liste de priorité uniquement\" pour éviter de miner des jeux qui ne sont pas dans la liste de priorité. Ou pas - c'est à vous de décider.\n6. Utilisez la liste \"Exclure\" pour indiquer à l'application les jeux qui ne doivent jamais être minés.\n7. Toute modification du contenu des listes ou du mode de priorité nécessite d'appuyer sur \"Recharger\" pour que les changements prennent effet.",
+            "getting_started_text": "1. Connectez-vous à l'application.\n2. Assurez-vous que votre compte Twitch est lié à toutes les campagnes qui vous intéressent.\n3. Pour miner tout ce qui est disponible, réglez le mode de priorité sur une valeur autre que « Liste de priorité uniquement », puis appuyez sur « Recharger ».\n4. Pour miner certains jeux en priorité, utilisez la liste « Priorité » afin de définir votre ordre de préférence. Les jeux situés en haut de la liste sont minés avant ceux du bas.\n5. Conservez le mode de priorité sur « Liste de priorité uniquement » pour éviter de miner des jeux absents de cette liste. Cette étape reste facultative.\n6. Utilisez la liste « Exclure » pour indiquer les jeux qui ne doivent jamais être minés.\n7. Toute modification du contenu des listes ou du mode de priorité nécessite d'appuyer sur « Recharger » pour être prise en compte.",
             "invalidate": {
                 "button": "Invalider le jeton d'authentification",
                 "text": "Utilisez ceci si vous devez vous reconnecter, par exemple pour changer de compte. Cela invalide le jeton d'authentification actuel et vous déconnecte."
@@ -229,6 +242,25 @@
             "resume_at_info": "Exemple : tapez 14:30 puis cliquez sur « Mettre en pause jusqu'à » pour mettre en pause maintenant et reprendre automatiquement à 14h30 (aujourd'hui, ou demain si l'heure est déjà passée).",
             "drop_remaining": "Temps restant pour ce drop : ",
             "campaign_remaining": "Temps restant pour la campagne : "
+        },
+        "remote": {
+            "info": "Permet de consulter l'état en direct et, si vous le choisissez, de contrôler cette instance (pause/reprise, mode de priorité) depuis un navigateur, sur un autre appareil, grâce au lien ci-dessous. Toute personne disposant du lien peut consulter ; toute personne disposant du lien et du mot de passe (si défini) peut aussi contrôler l'application. Ne le partagez donc qu'avec des personnes de confiance.",
+            "enabled": "Activer le tableau de bord web : ",
+            "port": "Port : ",
+            "mode_label": "Mode d'accès :",
+            "mode_view": "Consultation uniquement",
+            "mode_control": "Consultation et contrôle",
+            "password_label": "Mot de passe de contrôle :",
+            "password_placeholder": "Facultatif, laissez vide pour aucun",
+            "new_link": "Générer un nouveau lien",
+            "link": "Lien de partage :",
+            "link_disabled": "Activez le tableau de bord pour générer un lien.",
+            "copy_link": "Copier",
+            "public_label": "Afficher aussi un lien public : ",
+            "open_link": "Ouvrir",
+            "public_link": "Lien de partage public :",
+            "public_link_resolving": "Recherche de votre IP publique...",
+            "public_link_unavailable": "Impossible de déterminer une IP publique pour le moment."
         }
     }
 }

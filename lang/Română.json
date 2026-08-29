@@ -134,7 +134,8 @@
             "all_channels": "Toate",
             "and_more": "și încă {amount}...",
             "percent_progress": "{percent} din {minutes} minute",
-            "minutes_progress": "{minutes} minute"
+            "minutes_progress": "{minutes} minute",
+            "reloading": "Se reîncarcă inventarul (mod de consum redus)..."
         },
         "settings": {
             "general": {
@@ -148,7 +149,9 @@
                 "theme": "Temă: ",
                 "use_system_accent": "Folosește culoarea de accent a sistemului: ",
                 "priority_mode": "Mod prioritate: ",
-                "priority_mode_info": "Jocurile din lista de priorități sunt încercate mereu primele, în ordinea stabilită. \"Se termină cel mai curând\"/\"Disponibilitate scăzută prima\" determină doar ordinea pentru rest, odată ce nimic din lista de priorități nu mai este disponibil."
+                "priority_mode_info": "Jocurile din lista de priorități sunt încercate mereu primele, în ordinea stabilită. \"Se termină cel mai curând\"/\"Disponibilitate scăzută prima\" determină doar ordinea pentru rest, odată ce nimic din lista de priorități nu mai este disponibil.",
+                "low_power_tray_mode": "Mod de consum redus la minimizare: ",
+                "low_power_tray_mode_info": "Când aplicația este minimizată în bara de sistem, eliberează agresiv memoria RAM (șterge imaginile din cache, reconstruiește fila Inventar de la zero) și încetinește verificările din fundal pentru a economisi CPU/baterie. Acest lucru poate face aplicația puțin mai lentă imediat după deschiderea filei Inventar, în timp ce se reîncarcă - un ecran de încărcare este afișat în acest timp."
             },
             "game_name": "Nume joc",
             "priority": "Prioritate",

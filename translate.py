@@ -185,6 +185,7 @@ class GUIInventory(TypedDict):
     and_more: str
     percent_progress: str
     minutes_progress: str
+    reloading: str
 
 
 class GUISettingsGeneral(TypedDict):
@@ -192,6 +193,8 @@ class GUISettingsGeneral(TypedDict):
     autostart: str
     tray: str
     tray_notifications: str
+    low_power_tray_mode: str
+    low_power_tray_mode_info: str
     theme: str
     use_system_accent: str
     priority_mode: str
@@ -510,6 +513,7 @@ default_translation: Translation = {
             "and_more": "and {amount} more...",
             "percent_progress": "{percent} of {minutes} minutes",
             "minutes_progress": "{minutes} minutes",
+            "reloading": "Reloading inventory (low power mode)...",
         },
         "settings": {
             "general": {
@@ -517,6 +521,14 @@ default_translation: Translation = {
                 "autostart": "Autostart: ",
                 "tray": "Autostart into tray: ",
                 "tray_notifications": "Tray notifications: ",
+                "low_power_tray_mode": "Low power mode when minimized: ",
+                "low_power_tray_mode_info": (
+                    "When minimized to the tray, aggressively frees up RAM (clears cached "
+                    "images, rebuilds the Inventory tab from scratch) and slows down "
+                    "background polling to save CPU/battery. This can make the app briefly "
+                    "slower to respond right after you restore it or open the Inventory tab, "
+                    "while it reloads - a loading screen is shown during that time."
+                ),
                 "theme": "Theme: ",
                 "use_system_accent": "Use system accent color: ",
                 "priority_mode": "Priority mode: ",

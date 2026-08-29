@@ -134,7 +134,8 @@
             "all_channels": "Všechny kanály",
             "and_more": "Je tu {amount} ...",
             "percent_progress": "{minutes} minut {percent}",
-            "minutes_progress": "{minutes} minut"
+            "minutes_progress": "{minutes} minut",
+            "reloading": "Znovu se načítá inventář (úsporný režim)..."
         },
         "settings": {
             "general": {
@@ -148,7 +149,9 @@
                 "use_system_accent": "Použít systémovou barvu zvýraznění: ",
                 "priority_mode": "Režim priority: ",
                 "priority_mode_info": "Hry ze seznamu priorit se vždy zkoušejí jako první, v nastaveném pořadí. \"Končí nejdříve\"/\"Nízká dostupnost jako první\" určují pořadí pouze pro zbytek, jakmile ze seznamu priorit už nic není dostupné.",
-                "tray_notifications": "Oznámení v hlavním panelu: "
+                "tray_notifications": "Oznámení v hlavním panelu: ",
+                "low_power_tray_mode": "Úsporný režim při minimalizaci: ",
+                "low_power_tray_mode_info": "Po minimalizaci aplikace do systémové lišty agresivně uvolní RAM (vymaže uložené obrázky v mezipaměti, znovu sestaví kartu Inventář od nuly) a zpomalí kontroly na pozadí, aby ušetřil CPU/baterii. Aplikace tak může být krátce po otevření karty Inventář trochu pomalejší, dokud se znovu nenačte - během této doby se zobrazí načítací obrazovka."
             },
             "game_name": "Název Hry",
             "priority": "Priorita",

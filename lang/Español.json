@@ -8,7 +8,9 @@
         "claimed_drop": "Drop reclamado: {drop}",
         "no_channel": "No se ha encontrado un canal en vivo para mirar. \nEsperando un canal en vivo...",
         "no_campaign": "No se ha encontrado una campaña activa. \nEsperando una nueva campaña...",
-        "auto_action": "Todos los drops están listos por ahora, ejecutando la acción configurada: {action}"
+        "auto_action": "Todos los drops están listos por ahora, ejecutando la acción configurada: {action}",
+        "auto_restart": "El reinicio automático está activado: se reiniciará en {minutes} minuto(s) a menos que cierre esta ventana antes.",
+        "auto_restart_now": "Reiniciando ahora..."
     },
     "login": {
         "unexpected_content": "Se produjo un error inesperado, \ngeneralmente debido a una redirección.\n¿Necesitas un VPN o iniciar sesión para acceder a internet?",
@@ -45,14 +47,16 @@
             "adding_campaigns": "Agregando lista de campañas al inventario... {counter}",
             "paused": "Pausado",
             "paused_until": "Pausado hasta {time}",
-            "scheduled": "Fuera del horario programado"
+            "scheduled": "Fuera del horario programado",
+            "auto_restart": "Terminado - reiniciando en {minutes} min"
         },
         "tabs": {
             "main": "General",
             "inventory": "Inventario",
             "settings": "Configuración",
             "help": "Ayuda",
-            "dashboard": "Panel"
+            "dashboard": "Panel",
+            "remote": "Remoto"
         },
         "tray": {
             "notification_title": "Drop minado",
@@ -134,7 +138,8 @@
             "all_channels": "Todos",
             "and_more": "y {amount} más...",
             "percent_progress": "{percent} de {minutes} minutos",
-            "minutes_progress": "{minutes} minutos"
+            "minutes_progress": "{minutes} minutos",
+            "reloading": "Recargando inventario (modo de bajo consumo)..."
         },
         "settings": {
             "general": {
@@ -147,7 +152,9 @@
                 "proxy": "Proxy (requiere reinicio):",
                 "theme": "Tema: ",
                 "use_system_accent": "Usar color de acento del sistema: ",
-                "priority_mode_info": "Los juegos de la lista de prioridad siempre se intentan primero, en el orden que hayas definido. \"Finaliza antes\"/\"Baja disponibilidad primero\" solo determinan el orden para todo lo demás, una vez que no queda nada disponible en la lista de prioridad."
+                "priority_mode_info": "Los juegos de la lista de prioridad siempre se intentan primero, en el orden que hayas definido. \"Finaliza antes\"/\"Baja disponibilidad primero\" solo determinan el orden para todo lo demás, una vez que no queda nada disponible en la lista de prioridad.",
+                "low_power_tray_mode": "Modo de bajo consumo al minimizar: ",
+                "low_power_tray_mode_info": "Al minimizar la app a la bandeja, libera agresivamente la RAM (borra las imágenes en caché, reconstruye la pestaña de Inventario desde cero) y ralentiza las comprobaciones en segundo plano para ahorrar CPU/batería. Esto puede hacer que la app responda un poco más lento justo después de abrir la pestaña Inventario, mientras se recarga - se muestra una pantalla de carga durante ese tiempo."
             },
             "advanced": {
                 "name": "Avanzado",
@@ -197,6 +204,12 @@
                 "modern_auto": "Colores de Twitch (Auto)",
                 "modern_light": "Colores de Twitch, claro",
                 "modern_dark": "Colores de Twitch, oscuro"
+            },
+            "reliability": {
+                "name": "Fiabilidad",
+                "info": "La aplicación ya reintenta varias veces por su cuenta antes de rendirse. Si aun así termina en una pantalla de \"Terminado\", esta opción la reinicia automáticamente tras un retraso.",
+                "enabled": "Reinicio automático tras un fallo: ",
+                "minutes": "Reiniciar después de (minutos): "
             }
         },
         "help": {
@@ -230,6 +243,25 @@
             "total_drops": "Drops totales reclamados: {count}",
             "hours_saved": "Horas de visionado ahorradas: {hours}",
             "no_data": "Aún no hay datos"
+        },
+        "remote": {
+            "info": "Permite ver el estado en tiempo real y, si lo desea, controlar esta instancia (pausar/reanudar, modo de prioridad) desde un navegador en otro dispositivo, mediante el enlace de abajo. Cualquiera con el enlace puede ver; cualquiera con el enlace y la contraseña (si se establece una) también puede controlar, así que compártalo solo con quienes confíe.",
+            "enabled": "Activar panel web: ",
+            "port": "Puerto: ",
+            "mode_label": "Modo de acceso: ",
+            "mode_view": "Solo ver",
+            "mode_control": "Ver y controlar",
+            "password_label": "Contraseña de control: ",
+            "password_placeholder": "Opcional, deje vacío para ninguna",
+            "new_link": "Generar un nuevo enlace",
+            "link": "Enlace para compartir:",
+            "link_disabled": "Active el panel para generar un enlace.",
+            "copy_link": "Copiar",
+            "public_label": "Mostrar también un enlace público: ",
+            "open_link": "Abrir",
+            "public_link": "Enlace público para compartir:",
+            "public_link_resolving": "Buscando su IP pública...",
+            "public_link_unavailable": "No se pudo determinar una IP pública en este momento."
         }
     }
 }

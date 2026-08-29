@@ -138,7 +138,8 @@
             "all_channels": "Tutti",
             "and_more": "e altri {amount}...",
             "percent_progress": "{percent} di {minutes} minuti",
-            "minutes_progress": "{minutes} minuti"
+            "minutes_progress": "{minutes} minuti",
+            "reloading": "Ricaricamento inventario (modalità a basso consumo)..."
         },
         "settings": {
             "general": {
@@ -152,7 +153,9 @@
                 "theme": "Tema: ",
                 "use_system_accent": "Usa il colore di accento del sistema: ",
                 "priority_mode": "Modalità priorità: ",
-                "priority_mode_info": "I giochi nella lista priorità vengono sempre provati per primi, nell'ordine impostato. \"In scadenza prima\"/\"Bassa disponibilità prima\" determinano solo l'ordine per il resto, una volta che nulla dalla lista priorità è più disponibile."
+                "priority_mode_info": "I giochi nella lista priorità vengono sempre provati per primi, nell'ordine impostato. \"In scadenza prima\"/\"Bassa disponibilità prima\" determinano solo l'ordine per il resto, una volta che nulla dalla lista priorità è più disponibile.",
+                "low_power_tray_mode": "Modalità a basso consumo da ridotto: ",
+                "low_power_tray_mode_info": "Quando l'app è ridotta a icona, libera aggressivamente la RAM (svuota le immagini in cache, ricostruisce la scheda Inventario da zero) e rallenta i controlli in background per risparmiare CPU/batteria. Questo può rendere l'app leggermente più lenta subito dopo l'apertura della scheda Inventario, mentre si ricarica - durante questo tempo viene mostrata una schermata di caricamento."
             },
             "game_name": "Nome del gioco",
             "priority": "Priorità",
