@@ -258,7 +258,10 @@
             "open_link": "Megnyitás",
             "public_link": "Nyilvános megosztási hivatkozás:",
             "public_link_resolving": "Nyilvános IP cím keresése...",
-            "public_link_unavailable": "Jelenleg nem sikerült megállapítani a nyilvános IP-t."
+            "public_link_unavailable": "Jelenleg nem sikerült megállapítani a nyilvános IP-t.",
+            "viewers_none": "Jelenleg senki sem nézi a webes irányítópultot.",
+            "viewers_one": "Jelenleg 1 fő nézi a webes irányítópultot.",
+            "viewers_many": "Jelenleg {count} fő nézi a webes irányítópultot."
         }
     }
 }

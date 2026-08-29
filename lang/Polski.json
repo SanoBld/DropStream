@@ -262,7 +262,10 @@
             "open_link": "Otwórz",
             "public_link": "Publiczny link do udostępnienia:",
             "public_link_resolving": "Wyszukiwanie publicznego adresu IP...",
-            "public_link_unavailable": "Nie można teraz ustalić publicznego adresu IP."
+            "public_link_unavailable": "Nie można teraz ustalić publicznego adresu IP.",
+            "viewers_none": "Nikt obecnie nie przegląda panelu internetowego.",
+            "viewers_one": "1 osoba obecnie przegląda panel internetowy.",
+            "viewers_many": "{count} osób obecnie przegląda panel internetowy."
         }
     }
 }

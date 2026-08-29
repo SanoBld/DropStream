@@ -258,7 +258,10 @@
             "open_link": "Åpne",
             "public_link": "Offentlig delingslenke:",
             "public_link_resolving": "Slår opp din offentlige IP...",
-            "public_link_unavailable": "Kunne ikke fastslå en offentlig IP akkurat nå."
+            "public_link_unavailable": "Kunne ikke fastslå en offentlig IP akkurat nå.",
+            "viewers_none": "Ingen ser for øyeblikket på webdashbordet.",
+            "viewers_one": "1 person ser for øyeblikket på webdashbordet.",
+            "viewers_many": "{count} personer ser for øyeblikket på webdashbordet."
         }
     }
 }

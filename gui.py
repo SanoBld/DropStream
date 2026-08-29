@@ -3115,7 +3115,7 @@ class RemoteAccessTab:
         # is looking at the dashboard). Only meaningful while the server is running.
         self._viewer_label = ttk.Label(center, text="")
         self._viewer_label.grid(
-            column=0, row=(irow := irow + 1), columnspan=2, pady=(10, 0)
+            column=0, row=self._public_row_row + 2, columnspan=2, pady=(10, 0)
         )
         self._poll_viewers()
 

@@ -259,7 +259,10 @@
             "open_link": "Öffnen",
             "public_link": "Öffentlicher Freigabelink:",
             "public_link_resolving": "Öffentliche IP wird ermittelt...",
-            "public_link_unavailable": "Öffentliche IP konnte gerade nicht ermittelt werden."
+            "public_link_unavailable": "Öffentliche IP konnte gerade nicht ermittelt werden.",
+            "viewers_none": "Niemand betrachtet gerade das Web-Dashboard.",
+            "viewers_one": "1 Person betrachtet gerade das Web-Dashboard.",
+            "viewers_many": "{count} Personen betrachten gerade das Web-Dashboard."
         }
     }
 }

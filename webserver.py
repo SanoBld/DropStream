@@ -2410,8 +2410,8 @@ async function refresh() {
 
     // tab icon, header icon, and accent color all follow the live status, cache-busted
     // so the browser actually refetches the icon instead of reusing the page-load one
-    document.getElementById("favicon").href = "favicon.ico?s=" + s.status;
-    document.getElementById("app-logo").src = "favicon.ico?s=" + s.status;
+    document.getElementById("favicon").href = base + "/favicon.ico?s=" + s.status;
+    document.getElementById("app-logo").src = base + "/favicon.ico?s=" + s.status;
     const statusColor = { mining: "#2ecc71", paused: "#e0a800", idle: "#e05252" }[s.status] || "#9147ff";
     document.getElementById("theme-color-meta").content = statusColor;
 

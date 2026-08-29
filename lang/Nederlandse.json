@@ -260,7 +260,10 @@
             "open_link": "Openen",
             "public_link": "Openbare deellink:",
             "public_link_resolving": "Je openbare IP wordt opgezocht...",
-            "public_link_unavailable": "Kon momenteel geen openbaar IP-adres vaststellen."
+            "public_link_unavailable": "Kon momenteel geen openbaar IP-adres vaststellen.",
+            "viewers_none": "Niemand bekijkt momenteel het webdashboard.",
+            "viewers_one": "1 persoon bekijkt momenteel het webdashboard.",
+            "viewers_many": "{count} personen bekijken momenteel het webdashboard."
         }
     }
 }

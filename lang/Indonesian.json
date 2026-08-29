@@ -259,7 +259,10 @@
             "open_link": "Buka",
             "public_link": "Tautan berbagi publik:",
             "public_link_resolving": "Mencari IP publik Anda...",
-            "public_link_unavailable": "Tidak dapat menentukan IP publik saat ini."
+            "public_link_unavailable": "Tidak dapat menentukan IP publik saat ini.",
+            "viewers_none": "Tidak ada yang sedang melihat dasbor web.",
+            "viewers_one": "1 orang sedang melihat dasbor web.",
+            "viewers_many": "{count} orang sedang melihat dasbor web."
         }
     }
 }

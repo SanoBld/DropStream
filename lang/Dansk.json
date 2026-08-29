@@ -259,7 +259,10 @@
             "open_link": "Åbn",
             "public_link": "Offentligt delingslink:",
             "public_link_resolving": "Slår din offentlige IP op...",
-            "public_link_unavailable": "Kunne ikke finde en offentlig IP lige nu."
+            "public_link_unavailable": "Kunne ikke finde en offentlig IP lige nu.",
+            "viewers_none": "Ingen ser i øjeblikket webpanelet.",
+            "viewers_one": "1 person ser i øjeblikket webpanelet.",
+            "viewers_many": "{count} personer ser i øjeblikket webpanelet."
         }
     }
 }

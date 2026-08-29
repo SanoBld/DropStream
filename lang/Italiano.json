@@ -259,7 +259,10 @@
             "open_link": "Apri",
             "public_link": "Link di condivisione pubblico:",
             "public_link_resolving": "Ricerca del tuo IP pubblico...",
-            "public_link_unavailable": "Impossibile determinare un IP pubblico in questo momento."
+            "public_link_unavailable": "Impossibile determinare un IP pubblico in questo momento.",
+            "viewers_none": "Nessuno sta attualmente visualizzando la dashboard web.",
+            "viewers_one": "1 persona sta attualmente visualizzando la dashboard web.",
+            "viewers_many": "{count} persone stanno attualmente visualizzando la dashboard web."
         }
     }
 }
