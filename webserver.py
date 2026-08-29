@@ -716,11 +716,11 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="dashboard" data-i18n="tab_dashboard"></button>
     <button class="tab-btn" data-tab="campaigns" data-i18n="tab_campaigns"></button>
-    <button class="tab-btn" data-tab="control" data-i18n="tab_control"></button>
+    <button class="tab-btn" data-tab="control" id="control-tab-btn" data-i18n="tab_control"></button>
   </div>
 
   <div class="tab-panel active" id="tab-dashboard">
-    <div class="card">
+    <div class="card" id="pause-card">
       <div class="row">
         <div><span class="dot" id="status-dot"></span><span class="value" id="status-text">...</span></div>
         <button class="action" id="toggle-btn"></button>
@@ -2407,6 +2407,15 @@ async function refresh() {
     setControlsEnabled(controlsReady);
     document.getElementById("control-locked").style.display = s.control_enabled ? "none" : "block";
     document.getElementById("control-body").style.display = s.control_enabled ? "block" : "none";
+    const controlTabBtn = document.getElementById("control-tab-btn");
+    controlTabBtn.style.display = s.control_enabled ? "" : "none";
+    document.getElementById("pause-card").style.display = s.control_enabled ? "block" : "none";
+    if (!s.control_enabled && controlTabBtn.classList.contains("active")) {
+      controlTabBtn.classList.remove("active");
+      document.getElementById("tab-control").classList.remove("active");
+      document.querySelector('.tab-btn[data-tab="dashboard"]').classList.add("active");
+      document.getElementById("tab-dashboard").classList.add("active");
+    }
 
     const dot = document.getElementById("status-dot");
     const text = document.getElementById("status-text");
