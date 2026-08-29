@@ -257,7 +257,12 @@
             "new_link": "Wygeneruj nowy link",
             "link": "Link do udostępnienia:",
             "link_disabled": "Włącz panel, aby wygenerować link.",
-            "copy_link": "Kopiuj link"
+            "copy_link": "Kopiuj",
+            "public_label": "Pokaż też publiczny link: ",
+            "open_link": "Otwórz",
+            "public_link": "Publiczny link do udostępnienia:",
+            "public_link_resolving": "Wyszukiwanie publicznego adresu IP...",
+            "public_link_unavailable": "Nie można teraz ustalić publicznego adresu IP."
         }
     }
 }

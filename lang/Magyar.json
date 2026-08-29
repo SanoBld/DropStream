@@ -253,7 +253,12 @@
             "new_link": "Új hivatkozás generálása",
             "link": "Megosztási hivatkozás:",
             "link_disabled": "Engedélyezd az irányítópultot a hivatkozás létrehozásához.",
-            "copy_link": "Hivatkozás másolása"
+            "copy_link": "Másolás",
+            "public_label": "Nyilvános hivatkozás megjelenítése is: ",
+            "open_link": "Megnyitás",
+            "public_link": "Nyilvános megosztási hivatkozás:",
+            "public_link_resolving": "Nyilvános IP cím keresése...",
+            "public_link_unavailable": "Jelenleg nem sikerült megállapítani a nyilvános IP-t."
         }
     }
 }

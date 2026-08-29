@@ -254,7 +254,12 @@
             "new_link": "Generer et nyt link",
             "link": "Delingslink:",
             "link_disabled": "Aktiver dashboardet for at generere et link.",
-            "copy_link": "Kopier link"
+            "copy_link": "Kopiér",
+            "public_label": "Vis også et offentligt link: ",
+            "open_link": "Åbn",
+            "public_link": "Offentligt delingslink:",
+            "public_link_resolving": "Slår din offentlige IP op...",
+            "public_link_unavailable": "Kunne ikke finde en offentlig IP lige nu."
         }
     }
 }

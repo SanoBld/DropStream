@@ -255,7 +255,12 @@
             "new_link": "Nieuwe link genereren",
             "link": "Deellink:",
             "link_disabled": "Schakel het dashboard in om een link te genereren.",
-            "copy_link": "Link kopiëren"
+            "copy_link": "Kopiëren",
+            "public_label": "Ook een openbare link tonen: ",
+            "open_link": "Openen",
+            "public_link": "Openbare deellink:",
+            "public_link_resolving": "Je openbare IP wordt opgezocht...",
+            "public_link_unavailable": "Kon momenteel geen openbaar IP-adres vaststellen."
         }
     }
 }

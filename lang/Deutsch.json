@@ -254,7 +254,12 @@
             "new_link": "Neuen Link erzeugen",
             "link": "Freigabelink:",
             "link_disabled": "Aktivieren Sie das Dashboard, um einen Link zu erzeugen.",
-            "copy_link": "Link kopieren"
+            "copy_link": "Kopieren",
+            "public_label": "Auch einen öffentlichen Link anzeigen: ",
+            "open_link": "Öffnen",
+            "public_link": "Öffentlicher Freigabelink:",
+            "public_link_resolving": "Öffentliche IP wird ermittelt...",
+            "public_link_unavailable": "Öffentliche IP konnte gerade nicht ermittelt werden."
         }
     }
 }
