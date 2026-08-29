@@ -1286,6 +1286,11 @@ class Notebook:
         # tab widget -> icon key, so icons can be recolored/reapplied when the theme changes
         self._icon_keys: dict[ttk.Widget, str] = {}
         self._icons: dict[str, PhotoImage] = {}
+        # per-tab wrapper canvases (see add_tab): plain tk.Canvas has no ttk theme awareness,
+        # so its background must be set manually and kept in sync on theme changes, otherwise
+        # it shows through as a plain white/gray rectangle whenever a tab's content is shorter
+        # than the window (e.g. after resizing taller, or with filters hiding rows).
+        self._page_canvases: list[tk.Canvas] = []
         # let the user cycle through tabs with the mouse wheel (while hovering the tab bar)
         # or Ctrl+PageUp/PageDown from anywhere, so tabs stay reachable even when the window
         # is too narrow to show every tab's label at once
@@ -1320,6 +1325,7 @@ class Notebook:
         page.rowconfigure(0, weight=1)
         canvas = tk.Canvas(page, highlightthickness=0, borderwidth=0)
         canvas.grid(column=0, row=0, sticky="nsew")
+        self._page_canvases.append(canvas)
         vbar = ttk.Scrollbar(page, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=vbar.set)
         window_id = canvas.create_window((0, 0), window=widget, anchor="nw")
@@ -1371,8 +1377,11 @@ class Notebook:
         if icon_key is not None:
             self._icon_keys[page] = icon_key
 
+    def configure_theme(self, *, bg: str) -> None:
+        for canvas in self._page_canvases:
+            canvas.configure(bg=bg)
+
     def set_icons(self, icons: dict[str, PhotoImage]) -> None:
-        # icons must be kept referenced (self._icons) or Tk will garbage-collect them
         # NOTE: these are PIL.ImageTk.PhotoImage instances (imported as PhotoImage above),
         # not tkinter.PhotoImage - both work as Tk widget images, but aren't the same type
         self._icons = icons
@@ -3426,10 +3435,14 @@ class GUIManager:
     async def _poll(self):
         """
         This runs the Tkinter event loop via asyncio instead of calling mainloop.
-        0.05s gives similar performance and CPU usage.
-        Not ideal, but the simplest way to avoid threads, thread safety,
-        loop.call_soon_threadsafe, futures and all of that.
-        
+
+        Uses an adaptive sleep instead of a fixed 0.05s tick: a fixed 20Hz wakeup runs
+        forever even while the window is idle or minimized, which burns CPU (and, on a
+        laptop, battery) for no visible benefit. Instead we poll fast only right after
+        real Tk activity (so animations/typing stay smooth), and back off up to a much
+        coarser interval once nothing has happened for a while - falling straight back
+        to fast polling the moment a new event shows up.
+
         Uses TKINTER_DONT_WAIT to prevent Tcl/Tk from hanging inside native
         system calls (e.g. X11/Wayland input contexts) during heavy UI redraws.
         """
@@ -3438,15 +3451,26 @@ class GUIManager:
         # if no events are ready in the queue.
         DONT_WAIT = 1 << 1
 
+        FAST_INTERVAL = 0.05   # matches the previous fixed behavior while there's activity
+        IDLE_INTERVAL = 0.35   # ~3x fewer wakeups/sec once the UI has been quiet for a bit
+        IDLE_AFTER = 20        # consecutive empty ticks before backing off (~1s of quiet)
+        idle_streak = 0
+
         while True:
             try:
                 # Drain pending Tk events non-blockingly
+                had_events = False
                 while do_one_event(DONT_WAIT):
-                    pass
+                    had_events = True
             except tk.TclError:
                 # Root window was destroyed
                 break
-            await asyncio.sleep(0.05)
+            if had_events:
+                idle_streak = 0
+            else:
+                idle_streak += 1
+            interval = IDLE_INTERVAL if idle_streak >= IDLE_AFTER else FAST_INTERVAL
+            await asyncio.sleep(interval)
 
         self._poll_task = None
 
@@ -3639,6 +3663,11 @@ class GUIManager:
 
         # Base containers and labels
         s.configure("TFrame", background=bg, foreground=fg)
+        # Root window background: any window area not covered by a themed ttk widget
+        # (e.g. leftover space below a tab's content when the window is resized taller
+        # than that tab needs) falls back to the raw Tk window background, which is a
+        # plain white/gray by default on Windows regardless of the ttk theme in use.
+        self._root.configure(bg=bg)
         s.configure("TLabel", background=bg, foreground=fg)
         s.configure("TLabelframe", background=bg, foreground=fg)
         s.configure("TLabelframe.Label", background=bg, foreground=fg)
@@ -3826,6 +3855,8 @@ class GUIManager:
         )
         # Inventory canvas
         self.inv.configure_theme(bg=bg)
+        # Notebook tab wrapper canvases (scroll-on-overflow background, see Notebook.add_tab)
+        self.tabs.configure_theme(bg=bg)
 
         # Tk option database for selection/popup list readability (affects Tk-backed widgets)
         # Global selection colors and listbox defaults (covers Combobox dropdown)

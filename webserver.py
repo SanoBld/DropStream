@@ -5,12 +5,15 @@ import time
 import socket
 import secrets
 import logging
+from pathlib import Path
+from datetime import datetime, timedelta
 from collections import OrderedDict
 from typing import TYPE_CHECKING, Any
 
 from aiohttp import web
 
 from constants import PriorityMode, State
+from utils import resource_path
 
 if TYPE_CHECKING:
     from twitch import Twitch
@@ -120,6 +123,11 @@ class WebDashboard:
         self._runner: web.AppRunner | None = None
         self._site: web.TCPSite | None = None
         self._limiter = _RateLimiter()
+        # ip -> last-seen monotonic timestamp, used to estimate how many distinct visitors
+        # currently have the dashboard open (an entry expires after VIEWER_TTL of silence,
+        # i.e. after ~2 missed polls), without keeping any persistent connection open
+        self._viewers: OrderedDict[str, float] = OrderedDict()
+        self._icon_cache: dict[str, bytes] = {}
 
     @property
     def running(self) -> bool:
@@ -139,12 +147,14 @@ class WebDashboard:
         routes = [
             web.get(f"/{token}", self._handle_index),
             web.get(f"/{token}/", self._handle_index),
+            web.get(f"/{token}/favicon.ico", self._handle_favicon),
             web.get(f"/{token}/api/state", self._handle_state),
             web.get(f"/{token}/api/campaigns", self._handle_campaigns),
         ]
         if settings.web_server_allow_control:
             routes += [
                 web.post(f"/{token}/api/pause", self._handle_pause),
+                web.post(f"/{token}/api/pause_for", self._handle_pause_for),
                 web.post(f"/{token}/api/resume", self._handle_resume),
                 web.post(f"/{token}/api/priority_mode", self._handle_priority_mode),
                 web.post(f"/{token}/api/priority/add", self._handle_priority_add),
@@ -182,7 +192,39 @@ class WebDashboard:
         ip = request.remote or "unknown"
         if not self._limiter.allow(ip):
             return web.json_response({"error": "rate limited"}, status=429)
-        return await handler(request)
+        response = await handler(request)
+        # defense-in-depth headers: this page is never meant to be embedded elsewhere,
+        # never contains third-party scripts, and its API responses aren't meant to be
+        # sniffed as anything other than what they declare themselves to be
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; img-src 'self' https: data:; "
+            "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+        )
+        return response
+
+    # -- viewer tracking --
+
+    VIEWER_TTL = 9.0  # seconds; a bit over 2x the 4s poll interval used by the page
+
+    def _touch_viewer(self, request: web.Request) -> None:
+        ip = request.remote or "unknown"
+        now = time.monotonic()
+        self._viewers[ip] = now
+        self._viewers.move_to_end(ip)
+        # sweep from the oldest entry; the dict is ordered by last-touch time, so we can
+        # stop as soon as we hit one that's still fresh instead of scanning everything
+        while self._viewers:
+            oldest_ip, last_seen = next(iter(self._viewers.items()))
+            if now - last_seen > self.VIEWER_TTL:
+                del self._viewers[oldest_ip]
+            else:
+                break
+
+    def _viewer_count(self) -> int:
+        return len(self._viewers)
 
     # -- auth helper --
 
@@ -292,6 +334,7 @@ class WebDashboard:
             "resume_at": (
                 twitch._resume_at.isoformat() if twitch._resume_at is not None else None
             ),
+            "viewers": self._viewer_count(),
             "watching_channel": watching_channel,
             "current_drop": current_drop,
             "priority_mode": {
@@ -319,7 +362,37 @@ class WebDashboard:
     async def _handle_index(self, request: web.Request) -> web.Response:
         return web.Response(text=DASHBOARD_HTML, content_type="text/html")
 
+    # icon shown in the browser tab; reuses the same status-coded .ico files as the
+    # desktop tray icon, so the tab tells you what's happening at a glance too
+    _FAVICON_BY_STATUS = {
+        "mining": "active.ico",
+        "paused": "maint.ico",
+        "idle": "idle.ico",
+    }
+
+    async def _handle_favicon(self, request: web.Request) -> web.Response:
+        twitch = self._twitch
+        if twitch.paused:
+            status = "paused"
+        elif twitch.watching_channel.get_with_default(None) is not None:
+            status = "mining"
+        else:
+            status = "idle"
+        filename = self._FAVICON_BY_STATUS.get(status, "idle.ico")
+        data = self._icon_cache.get(filename)
+        if data is None:
+            try:
+                data = Path(resource_path(f"icons/{filename}")).read_bytes()
+            except OSError:
+                data = b""
+            self._icon_cache[filename] = data
+        return web.Response(
+            body=data, content_type="image/x-icon",
+            headers={"Cache-Control": "no-cache"},  # tab icon must follow live status
+        )
+
     async def _handle_state(self, request: web.Request) -> web.Response:
+        self._touch_viewer(request)
         return web.json_response(self._state_dict())
 
     async def _handle_campaigns(self, request: web.Request) -> web.Response:
@@ -335,6 +408,21 @@ class WebDashboard:
         if not self._password_ok(request):
             return web.json_response({"error": "wrong password"}, status=401)
         self._twitch.resume()
+        return web.json_response(self._state_dict())
+
+    async def _handle_pause_for(self, request: web.Request) -> web.Response:
+        if not self._password_ok(request):
+            return web.json_response({"error": "wrong password"}, status=401)
+        try:
+            body = await request.json()
+            minutes = float(body["minutes"])
+        except (json.JSONDecodeError, KeyError, ValueError):
+            return web.json_response({"error": "invalid duration"}, status=400)
+        if not (0 < minutes <= 24 * 60):
+            return web.json_response({"error": "duration out of range"}, status=400)
+        self._twitch.pause_until(datetime.now() + timedelta(minutes=minutes))
+        if self._twitch.gui is not None:
+            self._twitch.gui.settings.sync_from_settings()
         return web.json_response(self._state_dict())
 
     async def _handle_priority_mode(self, request: web.Request) -> web.Response:
@@ -460,6 +548,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" id="favicon" href="favicon.ico" type="image/x-icon">
+<meta name="theme-color" id="theme-color-meta" content="#9147ff">
 <title>DropStream</title>
 <style>
   :root {
@@ -636,6 +726,18 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div><span class="dot" id="status-dot"></span><span class="value" id="status-text">...</span></div>
         <button class="action" id="toggle-btn"></button>
       </div>
+      <div class="row" style="margin-top:8px">
+        <select id="pause-timer-select">
+          <option value="15">Pause 15 min</option>
+          <option value="30">Pause 30 min</option>
+          <option value="60">Pause 1 h</option>
+          <option value="180">Pause 3 h</option>
+          <option value="480">Pause 8 h</option>
+        </select>
+        <button class="action secondary" id="pause-timer-btn">Set timer</button>
+      </div>
+      <div class="muted" id="resume-at-info" style="margin-top:6px"></div>
+      <div class="muted" id="viewer-count" style="margin-top:6px"></div>
     </div>
 
     <div class="card" id="drop-card" style="display:none">
@@ -2311,6 +2413,18 @@ async function refresh() {
     toggleBtn.textContent = s.paused ? t("resume") : t("pause");
     toggleBtn.className = "action" + (s.paused ? "" : " secondary");
 
+    // tab icon + accent color follow the live status, cache-busted so the browser
+    // actually refetches it instead of reusing whatever it fetched on page load
+    document.getElementById("favicon").href = "favicon.ico?s=" + s.status;
+    const statusColor = { mining: "#2ecc71", paused: "#e0a800", idle: "#e05252" }[s.status] || "#9147ff";
+    document.getElementById("theme-color-meta").content = statusColor;
+
+    document.getElementById("resume-at-info").textContent = s.resume_at
+      ? "Resumes automatically at " + new Date(s.resume_at).toLocaleTimeString()
+      : "";
+    document.getElementById("viewer-count").textContent =
+      s.viewers === 1 ? "1 person viewing this dashboard" : s.viewers + " people viewing this dashboard";
+
     const dropCard = document.getElementById("drop-card");
     if (s.current_drop) {
       dropCard.style.display = "block";
@@ -2386,6 +2500,11 @@ document.getElementById("toggle-btn").addEventListener("click", async () => {
   await post(lastPaused ? "/api/resume" : "/api/pause");
   refresh();
 });
+document.getElementById("pause-timer-btn").addEventListener("click", async () => {
+  const minutes = parseFloat(document.getElementById("pause-timer-select").value);
+  await post("/api/pause_for", { minutes });
+  refresh();
+});
 modeSelect.addEventListener("change", async () => {
   applyingMode = true;
   await post("/api/priority_mode", { mode: parseInt(modeSelect.value, 10) });
@@ -2418,8 +2537,25 @@ document.getElementById("campaign-sort").addEventListener("change", applyCampaig
 applyStaticTranslations();
 refresh();
 refreshCampaigns();
-setInterval(refresh, 4000);
-setInterval(refreshCampaigns, 15000);
+
+// Battery/CPU optimization: a background tab has no reason to poll the API every few
+// seconds, so intervals are cleared while hidden and a single catch-up refresh runs the
+// moment the tab becomes visible again, instead of keeping timers ticking uselessly.
+let refreshTimer = setInterval(refresh, 4000);
+let campaignsTimer = setInterval(refreshCampaigns, 15000);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    clearInterval(refreshTimer);
+    clearInterval(campaignsTimer);
+    refreshTimer = null;
+    campaignsTimer = null;
+  } else if (!refreshTimer) {
+    refresh();
+    refreshCampaigns();
+    refreshTimer = setInterval(refresh, 4000);
+    campaignsTimer = setInterval(refreshCampaigns, 15000);
+  }
+});
 </script>
 </body>
 </html>
