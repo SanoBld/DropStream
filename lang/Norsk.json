@@ -253,7 +253,12 @@
             "new_link": "Generer en ny lenke",
             "link": "Delingslenke:",
             "link_disabled": "Aktiver dashbordet for å generere en lenke.",
-            "copy_link": "Kopier lenke"
+            "copy_link": "Kopier",
+            "public_label": "Vis også en offentlig lenke: ",
+            "open_link": "Åpne",
+            "public_link": "Offentlig delingslenke:",
+            "public_link_resolving": "Slår opp din offentlige IP...",
+            "public_link_unavailable": "Kunne ikke fastslå en offentlig IP akkurat nå."
         }
     }
 }

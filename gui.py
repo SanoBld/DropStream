@@ -8,6 +8,7 @@ import ctypes
 import asyncio
 import logging
 import plistlib
+import webbrowser
 import tkinter as tk
 from pathlib import Path
 from collections import abc
@@ -19,7 +20,15 @@ import tkinter.font as tkfont
 from functools import partial, cached_property
 from datetime import datetime, timedelta, timezone
 from tkinter import Tk, ttk, StringVar, DoubleVar, IntVar, messagebox
-from typing import Any, Union, Tuple, TypedDict, NoReturn, Generic, TYPE_CHECKING
+from typing import Any, Union, Tuple, TypedDict, Generic, TYPE_CHECKING, Literal, cast
+
+# Local aliases for tkinter's private (underscore-prefixed) stub-only type aliases.
+# tkinter exposes these only for its own internal typing use, so referencing them
+# directly as `_ScreenUnits` etc. triggers static-analysis attribute warnings.
+# Defining them locally keeps the same typing behavior without touching tkinter internals.
+_ScreenUnits = Union[str, float]
+_Relief = Literal["raised", "sunken", "flat", "ridge", "solid", "groove"]
+_Anchor = Literal["nw", "n", "ne", "w", "center", "e", "sw", "s", "se"]
 
 import pystray
 from yarl import URL
@@ -175,13 +184,13 @@ class PlaceholderEntry(ttk.Entry):
             return ''
         return super().get()
 
-    def insert(self, index: str | int, content: str) -> None:
+    def insert(self, index: str | int, string: str) -> None:
         # when inserting into the entry externally, disable the placeholder flag
-        if not content:
+        if not string:
             # if an empty string was passed in
             return
         self._remove_placeholder()
-        super().insert(index, content)
+        super().insert(index, string)
 
     def delete(self, first: str | int, last: str | int | None = None) -> None:
         super().delete(first, last)
@@ -250,20 +259,24 @@ class PaddedListbox(tk.Listbox):
         # update padding
         if "padding" in options:
             padding: TK_PADDING = options.pop("padding")
-            padx1: tk._ScreenUnits
-            padx2: tk._ScreenUnits
-            pady1: tk._ScreenUnits
-            pady2: tk._ScreenUnits
+            padx1: _ScreenUnits
+            padx2: _ScreenUnits
+            pady1: _ScreenUnits
+            pady2: _ScreenUnits
             if not isinstance(padding, tuple) or len(padding) == 1:
                 if isinstance(padding, tuple):
                     padding = padding[0]
-                padx1 = padx2 = pady1 = pady2 = padding
+                # pyright can't verify tuple length via len() at runtime, so the
+                # remaining Union members (2/3/4-tuples) are still considered possible
+                padx1 = padx2 = pady1 = pady2 = cast(int, padding)
             elif len(padding) == 2:
-                padx1 = padx2 = padding[0]
-                pady1 = pady2 = padding[1]
+                # each padding[i] is an int here, but pyright can't narrow the element
+                # type across the TK_PADDING Union-of-tuples, so it's cast explicitly
+                padx1 = padx2 = cast(int, padding[0])
+                pady1 = pady2 = cast(int, padding[1])
             elif len(padding) == 3:
-                padx1, padx2 = padding[0], padding[1]
-                pady1 = pady2 = padding[2]
+                padx1, padx2 = cast(int, padding[0]), cast(int, padding[1])
+                pady1 = pady2 = cast(int, padding[2])
             else:
                 padx1, padx2, pady1, pady2 = padding
             super().grid(column=0, row=0, padx=(padx1, padx2), pady=(pady1, pady2), sticky="nsew")
@@ -407,7 +420,7 @@ class SelectMenu(tk.Menubutton, Generic[_T]):
         options: dict[str, _T],
         command: abc.Callable[[_T], Any] | None = None,
         default: str | None = None,
-        relief: tk._Relief = "solid",
+        relief: _Relief = "solid",
         background: str = "white",
         **kwargs: Any,
     ):
@@ -952,7 +965,7 @@ class ChannelList:
         cid: str,
         name: str,
         *,
-        anchor: tk._Anchor = "center",
+        anchor: _Anchor = "center",
         width: int | None = None,
         width_template: str | list[str] | None = None,
     ):
@@ -961,7 +974,7 @@ class ChannelList:
         if cid != "#0":
             # we need to save the column settings and headings before modifying the columns...
             columns: tuple[str, ...] = table.cget("columns") or ()
-            column_settings: dict[str, tuple[str, tk._Anchor, int, int]] = {}
+            column_settings: dict[str, tuple[str, _Anchor, int, int]] = {}
             for s_cid in columns:
                 s_column = table.column(s_cid)
                 assert s_column is not None
@@ -1018,14 +1031,16 @@ class ChannelList:
 
     def shrink(self):
         # causes the columns to shrink back after long values have been removed from it
-        columns = self._table.cget("columns")
+        columns: tuple[str, ...] = self._table.cget("columns") or ()
         iids = self._table.get_children()
         for column in columns:
             if column in self._const_width:
                 continue
             if iids:
                 # table has at least one item
-                width = max(self._measure(self._table.set(i, column)) for i in iids)
+                # explicit column name makes Treeview.set return a single str value
+                # instead of the dict[str, Any] overload used when column is omitted
+                width = max(self._measure(self._table.set(i, str(column))) for i in iids)
                 self._table.column(column, width=width)
             else:
                 # no items - use minwidth
@@ -1201,11 +1216,12 @@ class TrayIcon:
             pystray.Menu.SEPARATOR,
             pystray.MenuItem(_("gui", "tray", "quit"), bridge(self.quit)),
         )
-        self.icon = pystray.Icon(
+        icon = pystray.Icon(
             "twitch_miner", self._icon_images[self._icon_state], self.get_title(drop), menu
         )
+        self.icon = icon
         # self.icon.run_detached()
-        loop.run_in_executor(None, self.icon.run)
+        loop.run_in_executor(None, icon.run)
 
     def stop(self):
         if self.icon is not None:
@@ -1269,18 +1285,96 @@ class Notebook:
         self._nb.bind("<<NotebookTabChanged>>", lambda event: manager._root.focus_set())
         # tab widget -> icon key, so icons can be recolored/reapplied when the theme changes
         self._icon_keys: dict[ttk.Widget, str] = {}
-        self._icons: dict[str, tk.PhotoImage] = {}
+        self._icons: dict[str, PhotoImage] = {}
+        # let the user cycle through tabs with the mouse wheel (while hovering the tab bar)
+        # or Ctrl+PageUp/PageDown from anywhere, so tabs stay reachable even when the window
+        # is too narrow to show every tab's label at once
+        self._nb.bind("<MouseWheel>", self._on_mousewheel)  # Windows / macOS
+        self._nb.bind("<Button-4>", lambda event: self._cycle_tab(-1))  # Linux scroll up
+        self._nb.bind("<Button-5>", lambda event: self._cycle_tab(1))  # Linux scroll down
+        manager._root.bind_all("<Control-Prior>", lambda event: self._cycle_tab(-1))
+        manager._root.bind_all("<Control-Next>", lambda event: self._cycle_tab(1))
+
+    def _on_mousewheel(self, event: tk.Event[ttk.Notebook]) -> None:
+        # event.delta is positive when scrolling up, negative when scrolling down (Windows
+        # gives multiples of 120, macOS gives smaller values - the sign is what matters here)
+        self._cycle_tab(-1 if event.delta > 0 else 1)
+
+    def _cycle_tab(self, direction: int) -> None:
+        tabs = self._nb.tabs()
+        if not tabs:
+            return
+        current = self._nb.index("current")
+        new_index = (current + direction) % len(tabs)
+        self._nb.select(new_index)
 
     def add_tab(self, widget: ttk.Widget, *, name: str, icon_key: str | None = None, **kwargs):
         kwargs.pop("text", None)
         if "sticky" not in kwargs:
             kwargs["sticky"] = "nsew"
-        self._nb.add(widget, text=name, **kwargs)
-        if icon_key is not None:
-            self._icon_keys[widget] = icon_key
+        # Wrap the (already fully built) tab content in a scrollable page: if the window
+        # ends up too small to show everything, the content scrolls vertically instead of
+        # being clipped. The scrollbar only appears once the content actually doesn't fit.
+        page = ttk.Frame(self._nb)
+        page.columnconfigure(0, weight=1)
+        page.rowconfigure(0, weight=1)
+        canvas = tk.Canvas(page, highlightthickness=0, borderwidth=0)
+        canvas.grid(column=0, row=0, sticky="nsew")
+        vbar = ttk.Scrollbar(page, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=vbar.set)
+        window_id = canvas.create_window((0, 0), window=widget, anchor="nw")
 
-    def set_icons(self, icons: dict[str, tk.PhotoImage]) -> None:
+        def sync_scrollregion(event: tk.Event[tk.Misc] | None = None) -> None:
+            canvas.configure(scrollregion=canvas.bbox("all"))
+            if widget.winfo_reqheight() > canvas.winfo_height():
+                vbar.grid(column=1, row=0, sticky="ns")
+            else:
+                vbar.grid_remove()
+
+        def on_canvas_resize(event: tk.Event[tk.Misc]) -> None:
+            canvas.itemconfigure(window_id, width=event.width)
+            sync_scrollregion()
+
+        widget.bind("<Configure>", sync_scrollregion)
+        canvas.bind("<Configure>", on_canvas_resize)
+
+        def on_wheel(event: tk.Event[tk.Misc]) -> None:
+            canvas.yview_scroll(-1 if event.delta > 0 else 1, "units")
+
+        def on_wheel_up(event: tk.Event[tk.Misc]) -> None:
+            canvas.yview_scroll(-1, "units")
+
+        def on_wheel_down(event: tk.Event[tk.Misc]) -> None:
+            canvas.yview_scroll(1, "units")
+
+        def bind_wheel(event: tk.Event[tk.Misc]) -> None:
+            # only scroll-on-wheel while the cursor is actually over this tab's content,
+            # so wheeling elsewhere in the window (e.g. a listbox) isn't hijacked
+            canvas.bind_all("<MouseWheel>", on_wheel)
+            canvas.bind_all("<Button-4>", on_wheel_up)
+            canvas.bind_all("<Button-5>", on_wheel_down)
+
+        def unbind_wheel(event: tk.Event[tk.Misc]) -> None:
+            canvas.unbind_all("<MouseWheel>")
+            canvas.unbind_all("<Button-4>")
+            canvas.unbind_all("<Button-5>")
+
+        canvas.bind("<Enter>", bind_wheel)
+        canvas.bind("<Leave>", unbind_wheel)
+
+        # give the canvas a sensible initial size so the window's default/natural size is
+        # unaffected by this wrapper - it can still be shrunk smaller by the user afterward
+        widget.update_idletasks()
+        canvas.configure(width=widget.winfo_reqwidth(), height=widget.winfo_reqheight())
+
+        self._nb.add(page, text=name, **kwargs)
+        if icon_key is not None:
+            self._icon_keys[page] = icon_key
+
+    def set_icons(self, icons: dict[str, PhotoImage]) -> None:
         # icons must be kept referenced (self._icons) or Tk will garbage-collect them
+        # NOTE: these are PIL.ImageTk.PhotoImage instances (imported as PhotoImage above),
+        # not tkinter.PhotoImage - both work as Tk widget images, but aren't the same type
         self._icons = icons
         for widget, key in self._icon_keys.items():
             icon = icons.get(key)
@@ -1964,6 +2058,8 @@ class _SettingsVars(TypedDict):
     schedule_start: StringVar
     schedule_end: StringVar
     auto_action: StringVar
+    auto_restart_enabled: IntVar
+    auto_restart_minutes: StringVar
 
 
 class SettingsPanel:
@@ -2606,6 +2702,22 @@ class SettingsPanel:
                 self._settings.priority_mode = value
                 break
 
+    def sync_from_settings(self) -> None:
+        """
+        Refreshes the priority list, exclude list, and priority mode combobox to match
+        the current `self._settings` values. Call this after settings.priority,
+        settings.exclude, or settings.priority_mode were changed from outside the GUI
+        (e.g. via the web dashboard), so the desktop panel doesn't show stale data.
+        """
+        self._priority_list.delete(0, "end")
+        self._priority_list.insert("end", *self._settings.priority)
+        self._exclude_list.delete(0, "end")
+        self._exclude_list.insert("end", *sorted(self._settings.exclude))
+        priority_mode = self._settings.priority_mode
+        if priority_mode in self.PRIORITY_MODES:
+            self._vars["priority_mode"].set(self.PRIORITY_MODES[priority_mode])
+        self.update_priority_choices()
+
     def refresh_profiles(self) -> None:
         self._profiles_list.delete(0, "end")
         for name in profiles_module.list_profiles():
@@ -2878,13 +2990,18 @@ class RemoteAccessTab:
         master_var = tk.IntVar(master, int(self._settings.web_server_enabled))
         control_var = tk.IntVar(master, int(self._settings.web_server_allow_control))
         port_var = tk.StringVar(master, str(self._settings.web_server_port))
+        public_var = tk.IntVar(master, int(self._settings.web_server_public))
         link_var = tk.StringVar(master, "")
+        public_link_var = tk.StringVar(master, "")
         self._vars: dict[str, tk.Variable] = {
             "enabled": master_var,
             "control": control_var,
             "port": port_var,
+            "public": public_var,
             "link": link_var,
+            "public_link": public_link_var,
         }
+        self._public_ip: str | None = None
 
         irow = 0
         ttk.Label(
@@ -2939,39 +3056,108 @@ class RemoteAccessTab:
         self._password_entry.grid(column=1, row=irow, sticky="w")
         self._password_entry.bind("<FocusOut>", lambda e: self.update_server())
 
-        # Share link
+        # Public link (opt-in): shows a second link built from the machine's public IP,
+        # for sharing beyond the local network. Still requires the user's router to forward
+        # the configured port - this only builds the URL, it doesn't open anything by itself.
+        ttk.Label(center, text=_("gui", "remote", "public_label")).grid(
+            column=0, row=(irow := irow + 1), sticky="e"
+        )
+        ttk.Checkbutton(
+            center, variable=public_var, command=self.update_server
+        ).grid(column=1, row=irow, sticky="w")
+
+        # Local share link
         ttk.Button(
             center, text=_("gui", "remote", "new_link"), command=self.regenerate_token
         ).grid(column=0, row=(irow := irow + 1), columnspan=2, pady=(10, 0))
         ttk.Label(center, text=_("gui", "remote", "link")).grid(
             column=0, row=(irow := irow + 1), columnspan=2, sticky="w", pady=(8, 0)
         )
-        link_entry = ttk.Entry(center, textvariable=link_var, width=48, state="readonly")
-        link_entry.grid(column=0, row=(irow := irow + 1), columnspan=2, sticky="ew")
+        link_row = ttk.Frame(center)
+        link_row.grid(column=0, row=(irow := irow + 1), columnspan=2, sticky="ew")
+        link_row.columnconfigure(0, weight=1)
+        link_entry = ttk.Entry(link_row, textvariable=link_var, state="readonly")
+        link_entry.grid(column=0, row=0, sticky="ew")
         ttk.Button(
-            center, text=_("gui", "remote", "copy_link"), command=self.copy_link
-        ).grid(column=0, row=(irow := irow + 1), columnspan=2, pady=(4, 0))
+            link_row, text=_("gui", "remote", "copy_link"), command=self.copy_link, width=3
+        ).grid(column=1, row=0, padx=(4, 0))
+        ttk.Button(
+            link_row, text=_("gui", "remote", "open_link"), command=self.open_link, width=3
+        ).grid(column=2, row=0, padx=(4, 0))
+
+        # Public share link, only shown once resolved
+        self._public_label = ttk.Label(center, text=_("gui", "remote", "public_link"))
+        self._public_row = ttk.Frame(center)
+        self._public_row.columnconfigure(0, weight=1)
+        public_entry = ttk.Entry(self._public_row, textvariable=public_link_var, state="readonly")
+        public_entry.grid(column=0, row=0, sticky="ew")
+        ttk.Button(
+            self._public_row, text=_("gui", "remote", "copy_link"),
+            command=self.copy_public_link, width=3,
+        ).grid(column=1, row=0, padx=(4, 0))
+        self._public_row_row = irow + 1
 
         self._update_link_display()
         self._update_password_state()
+        self._update_public_row()
 
     def _update_password_state(self) -> None:
         state = "normal" if self._vars["control"].get() else "disabled"
         self._password_entry.configure(state=state)
 
+    def _update_public_row(self) -> None:
+        if self._vars["public"].get() and self._settings.web_server_enabled:
+            self._public_label.grid(
+                column=0, row=self._public_row_row, columnspan=2, sticky="w", pady=(8, 0)
+            )
+            self._public_row.grid(
+                column=0, row=self._public_row_row + 1, columnspan=2, sticky="ew"
+            )
+        else:
+            self._public_label.grid_forget()
+            self._public_row.grid_forget()
+
     def _update_link_display(self) -> None:
-        from webserver import local_ip
-        token = self._settings.web_server_token
-        if not token or not self._settings.web_server_enabled:
+        from webserver import local_ip, new_token
+        if not self._settings.web_server_enabled:
             self._vars["link"].set(_("gui", "remote", "link_disabled"))
+            self._vars["public_link"].set("")
             return
+        if not self._settings.web_server_token:
+            # previously the token was only ever generated inside the async server-start
+            # coroutine, which runs *after* this method - so the very first link shown
+            # after enabling was built with an empty token and was permanently broken.
+            # Generate it here too, synchronously, so the displayed link is always correct
+            # the instant the dashboard is turned on.
+            self._settings.web_server_token = new_token()
+        token = self._settings.web_server_token
         port = self._settings.web_server_port
         self._vars["link"].set(f"http://{local_ip()}:{port}/{token}")
+        if self._vars["public"].get():
+            self._refresh_public_link()
+
+    def _refresh_public_link(self) -> None:
+        # public IP lookup needs the network, so it's resolved asynchronously on the
+        # shared asyncio loop (same one tkinter is being pumped from) and applied once done
+        from webserver import public_ip
+
+        async def _resolve():
+            ip = await public_ip()
+            self._public_ip = ip
+            token = self._settings.web_server_token
+            port = self._settings.web_server_port
+            if ip and token and self._settings.web_server_enabled:
+                self._vars["public_link"].set(f"http://{ip}:{port}/{token}")
+            else:
+                self._vars["public_link"].set(_("gui", "remote", "public_link_unavailable"))
+        asyncio.create_task(_resolve())
+        self._vars["public_link"].set(_("gui", "remote", "public_link_resolving"))
 
     def update_server(self) -> None:
         self._settings.web_server_enabled = bool(self._vars["enabled"].get())
         self._settings.web_server_allow_control = bool(self._vars["control"].get())
         self._settings.web_server_password = self._password_entry.get()
+        self._settings.web_server_public = bool(self._vars["public"].get())
         try:
             port = int(self._vars["port"].get())
             if not (1 <= port <= 65535):
@@ -2983,6 +3169,7 @@ class RemoteAccessTab:
             self._settings.web_server_port = port
         self._update_password_state()
         self._update_link_display()
+        self._update_public_row()
         self._twitch.apply_web_server_settings()
 
     def regenerate_token(self) -> None:
@@ -2999,6 +3186,19 @@ class RemoteAccessTab:
         self._manager._root.clipboard_clear()
         self._manager._root.clipboard_append(link)
 
+    def copy_public_link(self) -> None:
+        link = self._vars["public_link"].get()
+        if not link.startswith("http"):
+            return
+        self._manager._root.clipboard_clear()
+        self._manager._root.clipboard_append(link)
+
+    def open_link(self) -> None:
+        link = self._vars["link"].get()
+        if not link.startswith("http"):
+            return
+        webbrowser.open_new_tab(link)
+
 
 ##########################################
 # GUI DEFINITION END / GUI MANAGER START #
@@ -3008,7 +3208,7 @@ class RemoteAccessTab:
 class GUIManager:
     def __init__(self, twitch: Twitch):
         self._twitch: Twitch = twitch
-        self._poll_task: asyncio.Task[NoReturn] | None = None
+        self._poll_task: asyncio.Task[None] | None = None
         self._close_requested = asyncio.Event()
         self._root = root = Tk(className=WINDOW_TITLE)
         # withdraw immediately to prevent the window from flashing
@@ -3039,7 +3239,10 @@ class GUIManager:
         if theme != "classic" and sys.platform != "darwin":
             # remove Notebook.focus from the Notebook.Tab layout tree to avoid an ugly dotted line
             # on tab selection. We fold the Notebook.focus children into Notebook.padding children.
-            original = style.layout("TNotebook.Tab")
+            # ttk's style.layout() returns a deeply nested, dynamically-shaped structure
+            # (not the fixed _Layout TypedDict shape) - cast to Any here since the
+            # "children" key access below is correct at runtime but too dynamic to type.
+            original: Any = style.layout("TNotebook.Tab")
             sublayout = original[0][1]["children"][0][1]
             sublayout["children"] = sublayout["children"][0][1]["children"]
             style.layout("TNotebook.Tab", original)
@@ -3098,7 +3301,14 @@ class GUIManager:
         self.tabs.add_tab(help_frame, name=_("gui", "tabs", "help"), icon_key="help")
         # clamp minimum window size (update geometry first)
         root.update_idletasks()
-        root.minsize(width=root.winfo_reqwidth(), height=root.winfo_reqheight())
+        # previously this pinned minsize to the full natural size of the widest tab, which
+        # meant the window couldn't be shrunk below that at all. Tab content isn't reflowed
+        # below its natural size, so it can get visually clipped once you shrink past it -
+        # but the tab bar itself (with mouse-wheel/Ctrl+PageUp/PageDown cycling, see Notebook
+        # above) stays fully usable, which is what actually matters at small sizes.
+        min_w = min(420, root.winfo_reqwidth())
+        min_h = min(320, root.winfo_reqheight())
+        root.minsize(width=min_w, height=min_h)
         # register logging handler
         self._handler = _TKOutputHandler(self)
         self._handler.setFormatter(OUTPUT_FORMATTER)
@@ -3672,8 +3882,10 @@ if __name__ == "__main__":
     class HashNamespace(SimpleNamespace):
         __hash__ = object.__hash__  # type: ignore
 
-    def create_game(id: int, name: str):
-        return StrNamespace(name=name, id=id, _str__=lambda s: s.name)
+    def create_game(id: int, name: str) -> Game:
+        # StrNamespace duck-types Game for debug purposes; cast so callers below
+        # (set_games, etc.) match the real Game type without runtime changes
+        return cast("Game", StrNamespace(name=name, id=id, _str__=lambda s: s.name))
 
     iid = 0
 
@@ -3692,11 +3904,13 @@ if __name__ == "__main__":
         else:
             pending = False
         if game is not None:
-            game_obj: StrNamespace | None = create_game(0, game)
+            game_obj: Game | None = create_game(0, game)
         else:
             game_obj = None
         global iid
-        return SimpleNamespace(
+        # SimpleNamespace duck-types Channel for debug purposes; cast so callers below
+        # (display, set_watching, etc.) match the real Channel type without runtime changes
+        return cast("Channel", SimpleNamespace(
             name=name,
             iid=(iid := iid + 1),
             online=bool(status),
@@ -3705,7 +3919,7 @@ if __name__ == "__main__":
             drops_enabled=drops,
             viewers=viewers,
             acl_based=acl_based,
-        )
+        ))
 
     def create_drop(
         campaign_name: str,
@@ -3852,7 +4066,7 @@ if __name__ == "__main__":
             "Wardrobe Cleaning", "Cleaning Masters", ["Fancy Pants"], 2, 7, 0, 240
         )
         campaign = drop.campaign
-        await gui.inv.add_campaign(campaign)
+        await gui.inv.add_campaign(cast("DropsCampaign", campaign))
 
         gui.print("Single-line test message")
         await asyncio.sleep(1)
@@ -3868,7 +4082,7 @@ if __name__ == "__main__":
         gui.tray.notify(claim_text, "Mined Drop")
 
         # Drop progress
-        gui.display_drop(drop, countdown=False)
+        gui.display_drop(cast("TimedDrop", drop), countdown=False)
         await asyncio.sleep(3)
 
         gui.progress.start_timer()
@@ -3878,16 +4092,16 @@ if __name__ == "__main__":
         await asyncio.sleep(5)
 
         campaign.can_earn = lambda: True
-        gui.inv.update_drop(drop)
-        gui.display_drop(drop)
+        gui.inv.update_drop(cast("TimedDrop", drop))
+        gui.display_drop(cast("TimedDrop", drop))
         await asyncio.sleep(10)
 
         drop.current_minutes = 239
         drop.remaining_minutes = 1
         drop.progress = 239/240
         campaign.remaining_minutes -= 1
-        gui.inv.update_drop(drop)
-        gui.display_drop(drop)
+        gui.inv.update_drop(cast("TimedDrop", drop))
+        gui.display_drop(cast("TimedDrop", drop))
         await asyncio.sleep(63)
 
         drop.current_minutes = 240
@@ -3897,8 +4111,8 @@ if __name__ == "__main__":
         campaign.progress = 3/7
         campaign.claimed_drops = 3
         campaign.remaining_drops = 4
-        gui.inv.update_drop(drop)
-        gui.display_drop(drop)
+        gui.inv.update_drop(cast("TimedDrop", drop))
+        gui.display_drop(cast("TimedDrop", drop))
 
     def main_exit(task: asyncio.Task[None]) -> None:
         if task.exception() is not None:

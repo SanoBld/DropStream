@@ -254,7 +254,12 @@
             "new_link": "Buat tautan baru",
             "link": "Tautan berbagi:",
             "link_disabled": "Aktifkan dasbor untuk membuat tautan.",
-            "copy_link": "Salin tautan"
+            "copy_link": "Salin",
+            "public_label": "Tampilkan juga tautan publik: ",
+            "open_link": "Buka",
+            "public_link": "Tautan berbagi publik:",
+            "public_link_resolving": "Mencari IP publik Anda...",
+            "public_link_unavailable": "Tidak dapat menentukan IP publik saat ini."
         }
     }
 }

@@ -254,7 +254,12 @@
             "new_link": "Genera un nuovo link",
             "link": "Link di condivisione:",
             "link_disabled": "Attiva il pannello per generare un link.",
-            "copy_link": "Copia link"
+            "copy_link": "Copia",
+            "public_label": "Mostra anche un link pubblico: ",
+            "open_link": "Apri",
+            "public_link": "Link di condivisione pubblico:",
+            "public_link_resolving": "Ricerca del tuo IP pubblico...",
+            "public_link_unavailable": "Impossibile determinare un IP pubblico in questo momento."
         }
     }
 }

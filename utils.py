@@ -19,7 +19,7 @@ from contextlib import suppress
 from functools import cached_property
 from datetime import datetime, timezone
 from collections import abc, OrderedDict
-from typing import Any, Literal, Callable, Generic, Mapping, TypeVar, ParamSpec, cast
+from typing import Any, Literal, Callable, Generic, Mapping, TypeVar, ParamSpec, cast, overload
 
 from yarl import URL
 from PIL.ImageTk import PhotoImage
@@ -124,6 +124,27 @@ def deduplicate(iterable: abc.Iterable[_T]) -> list[_T]:
     return list(OrderedDict.fromkeys(iterable).keys())
 
 
+# Overloads so the type checker can tell apart the two call forms:
+# `task_wrapper(afunc)` (used directly, e.g. `task_wrapper(self._invalidate_token)()`)
+# and `task_wrapper(critical=True)` (used as a decorator factory, e.g. `@task_wrapper(critical=True)`).
+@overload
+def task_wrapper(
+    afunc: abc.Callable[_P, abc.Coroutine[Any, Any, _T]],
+    *,
+    critical: bool = False,
+    max_retries: int = 3,
+    retry_delay: float = 10.0,
+) -> abc.Callable[_P, abc.Coroutine[Any, Any, _T]]: ...
+@overload
+def task_wrapper(
+    afunc: None = None,
+    *,
+    critical: bool = False,
+    max_retries: int = 3,
+    retry_delay: float = 10.0,
+) -> abc.Callable[
+    [abc.Callable[_P, abc.Coroutine[Any, Any, _T]]], abc.Callable[_P, abc.Coroutine[Any, Any, _T]]
+]: ...
 def task_wrapper(
     afunc: abc.Callable[_P, abc.Coroutine[Any, Any, _T]] | None = None,
     *,
