@@ -1,0 +1,264 @@
+{
+    "english_name": "Turkish",
+    "status": {
+        "terminated": "\nUygulama Sonlandırıldı.\nUygulamadan çıkmak için pencereyi kapatın.",
+        "watching": "İzleniyor: {channel}",
+        "goes_online": "{channel} ÇEVRİMİÇİ oldu, geçiş yapılıyor...",
+        "goes_offline": "{channel} ÇEVRİMDIŞI oldu, geçiş yapılıyor...",
+        "claimed_drop": "Alınan drop: {drop}",
+        "no_channel": "İzlenecek uygun kanal yok. ÇEVRİMİÇİ bir kanal bekleniyor...",
+        "no_campaign": "Drop kazılacak aktif kampanya yok. Aktif bir kampanya bekleniyor...",
+        "auto_action": "Şimdilik tüm droplar alındı, yapılandırılan eylem çalıştırılıyor: {action}",
+        "auto_restart": "Otomatik yeniden başlatma etkin: bu pencereyi önce kapatmazsanız {minutes} dakika içinde yeniden başlatılacak.",
+        "auto_restart_now": "Şimdi yeniden başlatılıyor..."
+    },
+    "login": {
+        "unexpected_content": "Beklenmeyen içerik türü döndürüldü, genellikle bir yönlendirmeden kaynaklanır. İnternet erişimi için giriş yapmanız gerekiyor mu?",
+        "chrome": {
+            "startup": "Chrome açılıyor...",
+            "login_to_complete": "Giriş düğmesine tekrar basarak giriş işlemini manuel olarak tamamlayın.",
+            "no_token": "Yetkilendirme anahtarı (token) bulunamadı.",
+            "closed_window": "Giriş işlemi tamamlanamadan Chrome penceresi kapatıldı."
+        },
+        "error_code": "Giriş hata kodu: {error_code}",
+        "incorrect_login_pass": "Hatalı kullanıcı adı veya şifre.",
+        "incorrect_email_code": "Hatalı e-posta kodu.",
+        "incorrect_twofa_code": "Hatalı 2FA kodu.",
+        "email_code_required": "E-posta kodu gerekli. E-postanızı kontrol edin.",
+        "twofa_code_required": "2FA kodu gerekli."
+    },
+    "error": {
+        "captcha": "Giriş denemeniz CAPTCHA tarafından reddedildi.\nLütfen 12+ saat sonra tekrar deneyin.",
+        "site_down": "Twitch çöktü, {seconds} saniye içinde tekrar deneniyor...",
+        "no_connection": "Twitch'e bağlanılamıyor, {seconds} saniye içinde tekrar deneniyor... ({url})"
+    },
+    "gui": {
+        "output": "Çıktı",
+        "status": {
+            "name": "Durum",
+            "idle": "Boşta",
+            "exiting": "Çıkılıyor...",
+            "terminated": "Sonlandırıldı",
+            "cleanup": "Kanallar temizleniyor...",
+            "gathering": "Kanallar toplanıyor...",
+            "switching": "Kanal değiştiriliyor...",
+            "fetching_inventory": "Envanter getiriliyor...",
+            "fetching_campaigns": "Kampanyalar getiriliyor...",
+            "adding_campaigns": "Kampanyalar envantere ekleniyor... {counter}",
+            "paused": "Duraklatıldı",
+            "paused_until": "{time} saatine kadar duraklatıldı",
+            "scheduled": "Planlanan saatler dışında",
+            "auto_restart": "Sonlandırıldı - {minutes} dk içinde yeniden başlatılıyor"
+        },
+        "tabs": {
+            "main": "Ana Sayfa",
+            "inventory": "Envanter",
+            "settings": "Ayarlar",
+            "help": "Yardım",
+            "dashboard": "Panel",
+            "remote": "Uzaktan"
+        },
+        "tray": {
+            "notification_title": "Kazanılan Drop",
+            "minimize": "Sistem Tepsisine Küçült",
+            "show": "Göster",
+            "quit": "Çıkış",
+            "pause": "Duraklat",
+            "resume": "Devam Et",
+            "switch_channel": "Kanal Değiştir"
+        },
+        "login": {
+            "name": "Giriş Formu",
+            "labels": "Durum:\nKullanıcı ID:",
+            "logged_in": "Giriş yapıldı",
+            "logged_out": "Çıkış yapıldı",
+            "logging_in": "Giriş yapılıyor...",
+            "required": "Giriş gerekli",
+            "request": "Devam etmek için lütfen giriş yapın.",
+            "username": "Kullanıcı Adı",
+            "password": "Şifre",
+            "twofa_code": "2FA kodu (isteğe bağlı)",
+            "button": "Giriş"
+        },
+        "websocket": {
+            "name": "Websocket Durumu",
+            "websocket": "Websocket #{id}:",
+            "initializing": "Başlatılıyor...",
+            "connected": "Bağlandı",
+            "disconnected": "Bağlantı Kesildi",
+            "connecting": "Bağlanılıyor...",
+            "disconnecting": "Bağlantı kesiliyor...",
+            "reconnecting": "Yeniden bağlanılıyor..."
+        },
+        "progress": {
+            "name": "Kampanya İlerlemesi",
+            "drop": "Drop:",
+            "game": "Oyun:",
+            "campaign": "Kampanya:",
+            "remaining": "{time} kaldı",
+            "drop_progress": "İlerleme:",
+            "campaign_progress": "İlerleme:"
+        },
+        "channels": {
+            "name": "Kanallar",
+            "switch": "Değiştir",
+            "online": "ÇEVRİMİÇİ  ✔",
+            "pending": "ÇEVRİMDIŞI ⏳",
+            "offline": "ÇEVRİMDIŞI ❌",
+            "headings": {
+                "channel": "Kanal",
+                "status": "Durum",
+                "game": "Oyun",
+                "viewers": "İzleyici"
+            }
+        },
+        "inventory": {
+            "filter": {
+                "name": "Filtre",
+                "show": "Göster:",
+                "not_linked": "Bağlı değil",
+                "upcoming": "Yaklaşan",
+                "expired": "Süresi Doldu",
+                "excluded": "Hariç Tutulan",
+                "finished": "Tamamlandı",
+                "refresh": "Yenile"
+            },
+            "status": {
+                "linked": "Bağlı ✔",
+                "not_linked": "Bağlı Değil ❌",
+                "active": "Aktif ✔",
+                "upcoming": "Yaklaşan ⏳",
+                "expired": "Süresi Doldu ❌",
+                "claimed": "Alındı ✔",
+                "ready_to_claim": "Alınmaya hazır ⏳"
+            },
+            "starts": "Başlangıç: {time}",
+            "ends": "Bitiş: {time}",
+            "allowed_channels": "İzin Verilen Kanallar:",
+            "all_channels": "Tümü",
+            "and_more": "ve {amount} tane daha...",
+            "percent_progress": "{minutes} dakikanın {percent} kadarı",
+            "minutes_progress": "{minutes} dakika"
+        },
+        "settings": {
+            "general": {
+                "name": "Genel",
+                "autostart": "Otomatik Başlatma: ",
+                "tray": "Sistem tepsisinde başlat: ",
+                "tray_notifications": "Sistem tepsisi bildirimleri: ",
+                "dark_mode": "Karanlık mod: ",
+                "priority_mode": "Öncelik modu: ",
+                "proxy": "Proxy (yeniden başlatma gerektirir):",
+                "theme": "Tema: ",
+                "use_system_accent": "Sistem vurgu rengini kullan: ",
+                "priority_mode_info": "Öncelik listesindeki oyunlar her zaman belirlediğiniz sırayla önce denenir. \"En Yakında Bitenler\"/\"Önce Düşük Erişilebilirlik\" yalnızca öncelik listesinde hiçbir şey kalmadığında geri kalanın sırasını belirler."
+            },
+            "advanced": {
+                "name": "Gelişmiş",
+                "warning": "Uyarı!",
+                "warning_text": "Bu seçenekler uygulamanın hatalı çalışmasına neden olabilir.\nEğer herhangi bir sorun yaşıyorsanız, bu seçeneklerin tümünün devre dışı olduğundan emin olun.",
+                "enable_badges_emotes": "Rozetler ve ifadeler için kısmi desteği etkinleştir: ",
+                "available_drops_check": "Ekstra kullanılabilir drop kontrolünü etkinleştir: "
+            },
+            "priority_modes": {
+                "priority_only": "Sadece öncelik listesi",
+                "ending_soonest": "En erken biten",
+                "low_availability": "Önce düşük bulunabilirlik (az bulunanlar)",
+                "priority_only_continue": "Sadece öncelik listesi, sonra geriye devam et",
+                "priority_ending_soonest": "Önce öncelik listesi, sonra en yakında bitenler",
+                "priority_low_availability": "Önce öncelik listesi, sonra düşük erişilebilirlik"
+            },
+            "game_name": "Oyun adı",
+            "priority": "Öncelik",
+            "exclude": "Hariç Tut",
+            "reload": "Yenile",
+            "reload_text": "Çoğu değişikliğin hemen etkili olması için uygulamanın yenilenmesi gerekir: ",
+            "accounts": {
+                "name": "Hesaplar",
+                "current": "Aktif profil: {name}",
+                "create": "Oluştur",
+                "launch": "Başlat (paralel)",
+                "switch": "Şuna geç",
+                "delete": "Sil",
+                "delete_confirm": "\"{name}\" profili ve tüm verileri (ayarlar, çerezler, önbellek, istatistikler) kalıcı olarak silinsin mi? Bu işlem geri alınamaz."
+            },
+            "scheduler": {
+                "name": "Zamanlayıcı",
+                "enabled": "Zamanlamayı etkinleştir: ",
+                "start": "Başlangıç (SS:DD): ",
+                "end": "Bitiş (SS:DD): ",
+                "auto_action": "Tüm droplar tamamlandığında: "
+            },
+            "power_actions": {
+                "none": "Hiçbir şey yapma",
+                "sleep": "Bilgisayarı uyku moduna al",
+                "shutdown": "Bilgisayarı kapat"
+            },
+            "themes": {
+                "auto": "Açık/Koyu (Otomatik)",
+                "light": "Açık",
+                "dark": "Koyu",
+                "modern_auto": "Twitch Renkleri (Otomatik)",
+                "modern_light": "Twitch Renkleri, Açık",
+                "modern_dark": "Twitch Renkleri, Koyu"
+            },
+            "reliability": {
+                "name": "Güvenilirlik",
+                "info": "Uygulama vazgeçmeden önce zaten kendi kendine birkaç kez yeniden dener. Yine de \"Sonlandırıldı\" ekranında kalırsa, bu seçenek isteğe bağlı olarak bir gecikmenin ardından otomatik olarak yeniden başlatır.",
+                "enabled": "Çökme durumunda otomatik yeniden başlatma: ",
+                "minutes": "Şu kadar dakika sonra yeniden başlat: "
+            }
+        },
+        "help": {
+            "links": {
+                "name": "Faydalı Bağlantılar",
+                "inventory": "Twitch envanterini gör",
+                "campaigns": "Tüm kampanyaları gör ve hesap bağlantılarını yönet"
+            },
+            "how_it_works": "Nasıl Çalışır",
+            "how_it_works_text": "Uygulama, birkaç saniyede bir bir yayının meta verilerini isteyerek onu izliyormuş gibi davranır; bu, etkin dropların ilerlemesi için yeterlidir. Bu yöntem, gerçek video veya ses indirmeyi tamamen ortadan kaldırır. Kalıcı bir websocket bağlantısı, her kanalın durumunu (ÇEVRİMİÇİ veya ÇEVRİMDIŞI) ve anlık izleyici sayısını güncel tutar.",
+            "getting_started": "Başlarken",
+            "getting_started_text": "1. Uygulamaya giriş yapın.\n2. Twitch hesabınızın, drop kazanmak istediğiniz tüm kampanyalara bağlı olduğundan emin olun.\n3. Mevcut olan her şeyi kazmak isterseniz, Öncelik Modunu \"Yalnızca öncelik listesi\" dışında bir seçeneğe getirin ve ardından \"Yeniden Yükle\"ye basın.\n4. Belirli oyunları önce kazmak isterseniz, tercih ettiğiniz sırayı belirlemek için \"Öncelik\" listesini kullanın. Listenin üst sıralarındaki oyunlar, alt sıralardakilerden önce kazılır.\n5. Öncelik listesinde olmayan oyunların kazılmasını önlemek için \"Öncelik Modu\"nu \"Yalnızca öncelik listesi\" olarak bırakın. Bu adım tamamen isteğe bağlıdır.\n6. Asla kazılmaması gereken oyunları belirtmek için \"Hariç Tut\" listesini kullanın.\n7. Listelerin içeriğinde veya Öncelik Modunda yapılan herhangi bir değişikliğin geçerli olması için \"Yeniden Yükle\"ye basmanız gerekir.",
+            "invalidate": {
+                "button": "Yetkilendirme jetonunu geçersiz kıl",
+                "text": "Örneğin hesap değiştirmek için yeniden giriş yapmanız gerekirse bunu kullanın. Bu, mevcut yetkilendirme jetonunu geçersiz kılar ve oturumunuzu kapatır."
+            }
+        },
+        "dashboard": {
+            "now_mining": "Şu An Kazılıyor",
+            "campaign": "Drop Kampanyası",
+            "status": "Durum",
+            "pause": "Duraklat",
+            "resume": "Devam Et",
+            "resume_at": "Şu saatte devam et: ",
+            "resume_at_info": "Örnek: 14:30 yazın ve madenciliği şimdi duraklatıp saat 14:30'da otomatik olarak devam ettirmek için \"Şu saate kadar duraklat\"a tıklayın (bugün, ya da o saat geçtiyse yarın).",
+            "pause_until": "Şu saate kadar duraklat",
+            "drop_remaining": "Bu drop için kalan süre: ",
+            "campaign_remaining": "Kampanya için kalan süre: ",
+            "weekly": "Son 7 gün",
+            "per_game": "Oyun Başına Drop",
+            "total_drops": "Toplam alınan drop: {count}",
+            "hours_saved": "Kazanılan izleme saati: {hours}",
+            "no_data": "Henüz veri yok"
+        },
+        "remote": {
+            "info": "Aşağıdaki bağlantıyı kullanarak canlı durumu görüntülemenizi ve isterseniz bu örneği (duraklat/devam ettir, öncelik modu) başka bir cihazdaki tarayıcıdan kontrol etmenizi sağlar. Bağlantıya sahip herkes görüntüleyebilir; bağlantıya ve parolaya (ayarlanmışsa) sahip herkes ayrıca kontrol de edebilir, bu yüzden yalnızca güvendiğiniz kişilerle paylaşın.",
+            "enabled": "Web panosunu etkinleştir: ",
+            "port": "Port: ",
+            "mode_label": "Erişim modu: ",
+            "mode_view": "Yalnızca görüntüleme",
+            "mode_control": "Görüntüleme ve kontrol",
+            "password_label": "Kontrol parolası: ",
+            "password_placeholder": "İsteğe bağlı, yoksa boş bırakın",
+            "new_link": "Yeni bağlantı oluştur",
+            "link": "Paylaşım bağlantısı:",
+            "link_disabled": "Bağlantı oluşturmak için panoyu etkinleştirin.",
+            "copy_link": "Kopyala",
+            "public_label": "Ayrıca herkese açık bir bağlantı göster: ",
+            "open_link": "Aç",
+            "public_link": "Herkese açık paylaşım bağlantısı:",
+            "public_link_resolving": "Genel IP adresiniz aranıyor...",
+            "public_link_unavailable": "Şu anda genel bir IP belirlenemedi."
+        }
+    }
+}

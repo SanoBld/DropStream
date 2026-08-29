@@ -334,7 +334,6 @@ class WebDashboard:
             "resume_at": (
                 twitch._resume_at.isoformat() if twitch._resume_at is not None else None
             ),
-            "viewers": self._viewer_count(),
             "watching_channel": watching_channel,
             "current_drop": current_drop,
             "priority_mode": {
@@ -577,10 +576,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .wrap { max-width: 860px; margin: 0 auto; }
   .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
   h1 { font-size: 20px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
-  .logo { display: inline-flex; color: var(--red); transition: color .3s; }
-  .logo.mining { color: var(--green); }
-  .logo.paused { color: var(--amber); }
-  .logo.idle { color: var(--red); }
+  .logo { display: inline-flex; }
+  .logo img { width: 22px; height: 22px; display: block; }
   .sub { color: var(--dim); font-size: 13px; margin-bottom: 14px; }
   .top-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .badge {
@@ -692,7 +689,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <div class="wrap">
   <div class="top-row">
     <div>
-      <h1><span class="logo" id="app-logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 2 3 7v10l9 5 9-5V7l-9-5Zm0 2.3 6.6 3.7-6.6 3.7-6.6-3.7L12 4.3ZM5 9.2l6 3.4v6.9l-6-3.4V9.2Zm8 10.3v-6.9l6-3.4v6.9l-6 3.4Z"/></svg></span> DropStream <span class="badge" id="mode-badge">-</span></h1>
+      <h1><span class="logo"><img id="app-logo" src="favicon.ico" alt=""></span> DropStream <span class="badge" id="mode-badge">-</span></h1>
       <div class="sub" data-i18n="subtitle"></div>
     </div>
     <div class="top-controls">
@@ -737,7 +734,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <button class="action secondary" id="pause-timer-btn">Set timer</button>
       </div>
       <div class="muted" id="resume-at-info" style="margin-top:6px"></div>
-      <div class="muted" id="viewer-count" style="margin-top:6px"></div>
     </div>
 
     <div class="card" id="drop-card" style="display:none">
@@ -2406,24 +2402,22 @@ async function refresh() {
     const dot = document.getElementById("status-dot");
     const text = document.getElementById("status-text");
     dot.className = "dot " + s.status;
-    document.getElementById("app-logo").className = "logo " + s.status;
     text.textContent = s.status === "paused" ? t("paused") : (s.status === "mining" ? t("mining") : t("idle"));
     lastPaused = s.paused;
     const toggleBtn = document.getElementById("toggle-btn");
     toggleBtn.textContent = s.paused ? t("resume") : t("pause");
     toggleBtn.className = "action" + (s.paused ? "" : " secondary");
 
-    // tab icon + accent color follow the live status, cache-busted so the browser
-    // actually refetches it instead of reusing whatever it fetched on page load
+    // tab icon, header icon, and accent color all follow the live status, cache-busted
+    // so the browser actually refetches the icon instead of reusing the page-load one
     document.getElementById("favicon").href = "favicon.ico?s=" + s.status;
+    document.getElementById("app-logo").src = "favicon.ico?s=" + s.status;
     const statusColor = { mining: "#2ecc71", paused: "#e0a800", idle: "#e05252" }[s.status] || "#9147ff";
     document.getElementById("theme-color-meta").content = statusColor;
 
     document.getElementById("resume-at-info").textContent = s.resume_at
       ? "Resumes automatically at " + new Date(s.resume_at).toLocaleTimeString()
       : "";
-    document.getElementById("viewer-count").textContent =
-      s.viewers === 1 ? "1 person viewing this dashboard" : s.viewers + " people viewing this dashboard";
 
     const dropCard = document.getElementById("drop-card");
     if (s.current_drop) {

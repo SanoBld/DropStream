@@ -3110,6 +3110,29 @@ class RemoteAccessTab:
         self._update_password_state()
         self._update_public_row()
 
+        # Live count of browsers currently viewing the web dashboard (moved here from the
+        # web page itself - it's more useful to the streamer at the source than to whoever
+        # is looking at the dashboard). Only meaningful while the server is running.
+        self._viewer_label = ttk.Label(center, text="")
+        self._viewer_label.grid(
+            column=0, row=(irow := irow + 1), columnspan=2, pady=(10, 0)
+        )
+        self._poll_viewers()
+
+    def _poll_viewers(self) -> None:
+        if self._settings.web_server_enabled and self._twitch.web_server.running:
+            count = self._twitch.web_server._viewer_count()
+            if count == 0:
+                text = _("gui", "remote", "viewers_none")
+            elif count == 1:
+                text = _("gui", "remote", "viewers_one")
+            else:
+                text = _("gui", "remote", "viewers_many").format(count=count)
+            self._viewer_label.configure(text=text)
+        else:
+            self._viewer_label.configure(text="")
+        self._manager._root.after(5000, self._poll_viewers)
+
     def _update_password_state(self) -> None:
         state = "normal" if self._vars["control"].get() else "disabled"
         self._password_entry.configure(state=state)
