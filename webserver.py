@@ -271,7 +271,9 @@ class WebDashboard:
         else:
             status = "idle"
         priority_mode = settings.priority_mode
-        priority_value = priority_mode.value if hasattr(priority_mode, "value") else priority_mode
+        priority_value = (
+            priority_mode.value if isinstance(priority_mode, PriorityMode) else int(priority_mode)
+        )
         # best-effort box art per game name, so the "drops per game" ranking can show art too
         game_images = {c.game.name: c.image_url for c in twitch.inventory}
         per_game = [
