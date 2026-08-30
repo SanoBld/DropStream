@@ -154,15 +154,18 @@ class ImageCache:
 
     @staticmethod
     def _evict_if_needed(mapping: OrderedDict, max_size: int) -> None:
-        # drops the least-recently-used entries once the cache grows past its cap
+        # drops the least-recently-used entries once the cache grows past its cap;
+        # explicitly closes PIL images so their decoded pixel buffer is freed right away
+        # instead of waiting for a gc pass to notice they're unreferenced
         while len(mapping) > max_size:
-            mapping.popitem(last=False)
+            _key, value = mapping.popitem(last=False)
+            close = getattr(value, "close", None)
+            if close is not None:
+                close()
 
     def trim(self, *, keep: int = 0) -> None:
         # drop almost everything from RAM (decoded images + resized PhotoImages);
         # the on-disk cache is untouched, so images just get reloaded/redecoded
         # next time they're needed instead of staying loaded for nothing
-        while len(self._images) > keep:
-            self._images.popitem(last=False)
-        while len(self._photos) > keep:
-            self._photos.popitem(last=False)
+        self._evict_if_needed(self._images, keep)
+        self._evict_if_needed(self._photos, keep)

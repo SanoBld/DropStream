@@ -165,6 +165,14 @@ if __name__ == "__main__":
             # this language doesn't exist - stick to English
             pass
 
+        if settings.low_power_tray_mode:
+            import gc
+            # collect generation 0/1 more often (smaller, cheaper passes) so short-lived
+            # garbage (network responses, decoded image buffers, etc.) doesn't pile up
+            # between the rarer, more expensive full collections - trades a bit of CPU
+            # for a lower RAM peak. Opt-in only, since it's not free CPU-wise.
+            gc.set_threshold(400, 5, 5)
+
         # handle logging stuff
         if settings.logging_level > logging.DEBUG:
             # redirect the root logger into a NullHandler, effectively ignoring all logging calls
