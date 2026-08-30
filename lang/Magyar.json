@@ -139,7 +139,7 @@
             "and_more": "és még {amount}...",
             "percent_progress": "{minutes} percből {percent}",
             "minutes_progress": "{minutes} perc",
-            "reloading": "Készlet újratöltése (alacsony fogyasztású mód)..."
+            "reloading": "A készleted újratöltése, ez csak egy pillanatig tart..."
         },
         "settings": {
             "general": {
@@ -153,8 +153,8 @@
                 "theme": "Téma: ",
                 "use_system_accent": "Rendszer kiemelő színének használata: ",
                 "priority_mode_info": "A prioritási lista játékai mindig előbb próbálkoznak, a beállított sorrendben. A \"Leghamarabb véget érő\"/\"Alacsony elérhetőség előbb\" csak a többi sorrendjét határozza meg, ha már semmi sincs elérhető a prioritási listáról.",
-                "low_power_tray_mode": "Alacsony fogyasztású mód kicsinyítéskor: ",
-                "low_power_tray_mode_info": "Amikor az alkalmazás a tálcára van kicsinyítve, agresszíven felszabadítja a RAM-ot (törli a gyorsítótárazott képeket, a Készlet fület nulláról építi újra), és lelassítja a háttérellenőrzéseket a CPU/akkumulátor kímélése érdekében. Emiatt az alkalmazás kissé lassabban reagálhat közvetlenül a Készlet fül megnyitása után, amíg újratöltődik - eközben egy betöltő képernyő jelenik meg."
+                "low_power_tray_mode": "RAM/akkumulátor spórolása kicsinyítéskor: ",
+                "low_power_tray_mode_info": "Amíg az alkalmazás a tálcára van kicsinyítve, törli a gyorsítótárazott képeket, és ritkábban ellenőrzi a frissítéseket, hogy kevesebb memóriát és akkumulátort használjon. A hátránya: a Készlet fül ezután megnyitva egy pillanatra kicsit lassabbnak tűnhet, mivel újra be kell töltődnie - eközben egy betöltő képernyő jelenik meg."
             },
             "advanced": {
                 "name": "Haladó",

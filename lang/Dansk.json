@@ -139,7 +139,7 @@
             "and_more": "og {amount} mere...",
             "percent_progress": "{percent} af {minutes} minutter",
             "minutes_progress": "{minutes} minutter",
-            "reloading": "Genindlæser beholdning (strømbesparende tilstand)..."
+            "reloading": "Genindlæser din beholdning, det tager kun et øjeblik..."
         },
         "settings": {
             "general": {
@@ -154,8 +154,8 @@
                 "use_system_accent": "Brug systemets accentfarve: ",
                 "priority_mode": "Prioritetstilstand: ",
                 "priority_mode_info": "Spil på prioritetslisten forsøges altid først, i den rækkefølge du har angivet. \"Slutter snarest\"/\"Lav tilgængelighed først\" bestemmer kun rækkefølgen for alt andet, når intet fra prioritetslisten er tilgængeligt.",
-                "low_power_tray_mode": "Strømbesparende tilstand ved minimering: ",
-                "low_power_tray_mode_info": "Når appen minimeres til proceslinjen, frigøres RAM aggressivt (cachelagrede billeder ryddes, fanen Beholdning genopbygges fra bunden), og baggrundstjek gøres langsommere for at spare CPU/batteri. Dette kan gøre appen lidt langsommere lige efter du åbner fanen Beholdning, mens den genindlæses - en indlæsningsskærm vises i mellemtiden."
+                "low_power_tray_mode": "Spar RAM/batteri ved minimering: ",
+                "low_power_tray_mode_info": "Når appen er minimeret til proceslinjen, rydder den sine cachelagrede billeder og tjekker sjældnere for opdateringer for at spare hukommelse og batteri. Bagsiden: at åbne fanen Beholdning bagefter kan føles lidt langsommere et øjeblik, fordi den skal genindlæses - der vises en indlæsningsskærm imens."
             },
             "game_name": "Spilnavn",
             "priority": "Prioritet",

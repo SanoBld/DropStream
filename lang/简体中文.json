@@ -135,7 +135,7 @@
             "and_more": "还有{amount}个...",
             "percent_progress": "{minutes}分钟的{percent}",
             "minutes_progress": "{minutes}分钟",
-            "reloading": "正在重新加载库存（低功耗模式）..."
+            "reloading": "正在重新加载你的库存，只需片刻..."
         },
         "settings": {
             "general": {
@@ -149,8 +149,8 @@
                 "theme": "主题：",
                 "use_system_accent": "使用系统强调色：",
                 "priority_mode_info": "优先级列表中的游戏总是按您设定的顺序优先尝试。「最快结束」/「低可用性优先」仅在优先级列表中没有可farm内容时，决定其余游戏的顺序。",
-                "low_power_tray_mode": "最小化时的低功耗模式：",
-                "low_power_tray_mode_info": "应用最小化到托盘后，会主动释放内存（清除已缓存的图片，从头重建库存标签页）并放慢后台检查以节省CPU/电池。这可能会导致刚打开库存标签页时应用响应略慢，因为正在重新加载——此时会显示加载画面。"
+                "low_power_tray_mode": "最小化时节省内存/电量：",
+                "low_power_tray_mode_info": "应用最小化到托盘期间，会清除缓存的图片并降低检查更新的频率，以节省内存和电量。代价是：之后打开库存标签页时可能会感觉稍慢一点，因为需要重新加载——这期间会显示加载画面。"
             },
             "advanced": {
                 "name": "高级设置",

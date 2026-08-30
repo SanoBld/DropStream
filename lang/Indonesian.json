@@ -139,7 +139,7 @@
             "and_more": "dan {amount} yang lainnya...",
             "percent_progress": "{percent} dari {minutes} menit",
             "minutes_progress": "{minutes} menit",
-            "reloading": "Memuat ulang inventaris (mode hemat daya)..."
+            "reloading": "Memuat ulang inventaris kamu, ini hanya butuh sebentar..."
         },
         "settings": {
             "general": {
@@ -154,8 +154,8 @@
                 "use_system_accent": "Gunakan warna aksen sistem: ",
                 "priority_mode": "Mode prioritas: ",
                 "priority_mode_info": "Game dalam daftar prioritas selalu dicoba lebih dulu, sesuai urutan yang Anda tetapkan. \"Berakhir tercepat\"/\"Ketersediaan rendah dulu\" hanya menentukan urutan untuk sisanya, setelah tidak ada lagi yang tersedia dari daftar prioritas.",
-                "low_power_tray_mode": "Mode hemat daya saat diperkecil: ",
-                "low_power_tray_mode_info": "Saat aplikasi diperkecil ke baki sistem, RAM dibebaskan secara agresif (gambar yang di-cache dihapus, tab Inventaris dibangun ulang dari awal) dan pemeriksaan latar belakang diperlambat untuk menghemat CPU/baterai. Ini dapat membuat aplikasi sedikit lebih lambat merespons tepat setelah membuka tab Inventaris, saat memuat ulang - layar pemuatan akan ditampilkan selama waktu itu."
+                "low_power_tray_mode": "Hemat RAM/baterai saat diperkecil: ",
+                "low_power_tray_mode_info": "Saat diperkecil ke baki sistem, aplikasi menghapus gambar yang di-cache dan memeriksa pembaruan lebih jarang untuk menghemat memori dan baterai. Konsekuensinya: membuka tab Inventaris setelahnya bisa terasa sedikit lebih lambat sesaat, karena perlu dimuat ulang - layar pemuatan akan ditampilkan selama itu."
             },
             "game_name": "Nama game",
             "priority": "Prioritas",

@@ -139,7 +139,7 @@
             "and_more": "y {amount} más...",
             "percent_progress": "{percent} de {minutes} minutos",
             "minutes_progress": "{minutes} minutos",
-            "reloading": "Recargando inventario (modo de bajo consumo)..."
+            "reloading": "Recargando tu inventario, solo tomará un momento..."
         },
         "settings": {
             "general": {
@@ -153,8 +153,8 @@
                 "theme": "Tema: ",
                 "use_system_accent": "Usar color de acento del sistema: ",
                 "priority_mode_info": "Los juegos de la lista de prioridad siempre se intentan primero, en el orden que hayas definido. \"Finaliza antes\"/\"Baja disponibilidad primero\" solo determinan el orden para todo lo demás, una vez que no queda nada disponible en la lista de prioridad.",
-                "low_power_tray_mode": "Modo de bajo consumo al minimizar: ",
-                "low_power_tray_mode_info": "Al minimizar la app a la bandeja, libera agresivamente la RAM (borra las imágenes en caché, reconstruye la pestaña de Inventario desde cero) y ralentiza las comprobaciones en segundo plano para ahorrar CPU/batería. Esto puede hacer que la app responda un poco más lento justo después de abrir la pestaña Inventario, mientras se recarga - se muestra una pantalla de carga durante ese tiempo."
+                "low_power_tray_mode": "Ahorrar RAM/batería al minimizar: ",
+                "low_power_tray_mode_info": "Mientras está minimizada en la bandeja, la app borra sus imágenes en caché y comprueba actualizaciones con menos frecuencia para usar menos memoria y batería. A cambio: abrir la pestaña Inventario después puede sentirse un poco más lento por un momento, ya que necesita recargarse - se muestra una pantalla de carga mientras tanto."
             },
             "advanced": {
                 "name": "Avanzado",

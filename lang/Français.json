@@ -139,7 +139,7 @@
             "and_more": "et {amount} de plus...",
             "percent_progress": "{percent} de {minutes} minutes",
             "minutes_progress": "{minutes} minutes",
-            "reloading": "Rechargement de l'inventaire (mode basse consommation)..."
+            "reloading": "Rechargement de ton inventaire, ça ne prend qu'un instant..."
         },
         "settings": {
             "general": {
@@ -152,8 +152,8 @@
                 "theme": "Thème : ",
                 "use_system_accent": "Utiliser la couleur d'accentuation du système : ",
                 "priority_mode_info": "Les jeux de la liste de priorité sont toujours essayés en premier, dans l'ordre défini. « Se termine le plus tôt »/« Faible disponibilité en premier » ne déterminent que l'ordre pour tout le reste, une fois qu'il n'y a plus rien à farmer dans la liste de priorité.",
-                "low_power_tray_mode": "Mode basse consommation en réduit : ",
-                "low_power_tray_mode_info": "Quand l'app est réduite dans la barre des tâches, libère agressivement la RAM (vide les images en cache, reconstruit l'onglet Inventaire depuis zéro) et ralentit les vérifications en arrière-plan pour économiser CPU/batterie. Cela peut rendre l'app un peu plus lente juste après avoir ouvert l'onglet Inventaire, le temps qu'il se recharge - un écran de chargement s'affiche pendant ce temps."
+                "low_power_tray_mode": "Économiser RAM/batterie une fois réduit : ",
+                "low_power_tray_mode_info": "Une fois réduite dans la barre des tâches, l'app vide ses images en cache et vérifie les mises à jour moins souvent pour économiser mémoire et batterie. En contrepartie : ouvrir l'onglet Inventaire ensuite peut sembler un peu plus lent le temps qu'il se recharge - un écran de chargement s'affiche pendant ce temps."
             },
             "priority_modes": {
                 "priority_only": "Liste de priorité uniquement",

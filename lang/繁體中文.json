@@ -135,7 +135,7 @@
             "and_more": "以及其他 {amount} 個…",
             "percent_progress": "{minutes} 分鐘的 {percent}",
             "minutes_progress": "{minutes} 分鐘",
-            "reloading": "正在重新載入庫存（低功耗模式）..."
+            "reloading": "正在重新載入你的庫存，只需片刻..."
         },
         "settings": {
             "general": {
@@ -149,8 +149,8 @@
                 "theme": "主題：",
                 "use_system_accent": "使用系統強調色：",
                 "priority_mode_info": "優先清單中的遊戲總是按您設定的順序優先嘗試。「最快結束」/「低可用性優先」僅在優先清單中沒有可farm內容時，決定其餘遊戲的順序。",
-                "low_power_tray_mode": "最小化時的低功耗模式：",
-                "low_power_tray_mode_info": "應用程式最小化到工作列後，會主動釋放記憶體（清除已快取的圖片，從頭重建庫存分頁）並放慢背景檢查以節省CPU/電池。這可能會導致剛打開庫存分頁時應用程式回應稍慢，因為正在重新載入——此時會顯示載入畫面。"
+                "low_power_tray_mode": "最小化時節省記憶體/電量：",
+                "low_power_tray_mode_info": "應用程式最小化到工作列期間，會清除快取的圖片並降低檢查更新的頻率，以節省記憶體和電量。代價是：之後打開庫存分頁時可能會感覺稍慢一點，因為需要重新載入——這期間會顯示載入畫面。"
             },
             "advanced": {
                 "name": "進階設定",

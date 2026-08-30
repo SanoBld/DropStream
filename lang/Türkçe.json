@@ -135,7 +135,7 @@
             "and_more": "ve {amount} tane daha...",
             "percent_progress": "{minutes} dakikanın {percent} kadarı",
             "minutes_progress": "{minutes} dakika",
-            "reloading": "Envanter yeniden yükleniyor (düşük güç modu)..."
+            "reloading": "Envanterin yeniden yükleniyor, bu sadece bir an sürecek..."
         },
         "settings": {
             "general": {
@@ -149,8 +149,8 @@
                 "theme": "Tema: ",
                 "use_system_accent": "Sistem vurgu rengini kullan: ",
                 "priority_mode_info": "Öncelik listesindeki oyunlar her zaman belirlediğiniz sırayla önce denenir. \"En Yakında Bitenler\"/\"Önce Düşük Erişilebilirlik\" yalnızca öncelik listesinde hiçbir şey kalmadığında geri kalanın sırasını belirler.",
-                "low_power_tray_mode": "Simge durumuna küçültüldüğünde düşük güç modu: ",
-                "low_power_tray_mode_info": "Uygulama sistem tepsisine küçültüldüğünde RAM'i agresif şekilde boşaltır (önbelleğe alınmış görselleri temizler, Envanter sekmesini sıfırdan yeniden oluşturur) ve CPU/pil tasarrufu için arka plan kontrollerini yavaşlatır. Bu, Envanter sekmesini açtıktan hemen sonra, yeniden yüklenirken uygulamanın kısa süreliğine daha yavaş yanıt vermesine neden olabilir - bu süre boyunca bir yükleme ekranı gösterilir."
+                "low_power_tray_mode": "Küçültüldüğünde RAM/pil tasarrufu yap: ",
+                "low_power_tray_mode_info": "Uygulama sistem tepsisine küçültüldüğünde, önbelleğe alınmış görselleri temizler ve bellek/pil tasarrufu için güncellemeleri daha seyrek kontrol eder. Bunun bedeli: sonrasında Envanter sekmesini açmak, yeniden yüklenmesi gerektiğinden bir an için biraz daha yavaş hissettirebilir - bu sırada bir yükleme ekranı gösterilir."
             },
             "advanced": {
                 "name": "Gelişmiş",

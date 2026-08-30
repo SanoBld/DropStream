@@ -139,7 +139,7 @@
             "and_more": "und {amount} weitere...",
             "percent_progress": "{percent} von {minutes} Minuten",
             "minutes_progress": "{minutes} Minuten",
-            "reloading": "Inventar wird neu geladen (Energiesparmodus)..."
+            "reloading": "Inventar wird neu geladen, das dauert nur einen Moment..."
         },
         "settings": {
             "general": {
@@ -154,8 +154,8 @@
                 "priority_mode": "Prioritätsmodus: ",
                 "priority_mode_info": "Spiele der Prioritätsliste werden immer zuerst in der von Ihnen festgelegten Reihenfolge versucht. \"Endet am frühesten\"/\"Geringe Verfügbarkeit zuerst\" bestimmt nur die Reihenfolge für alles andere, sobald nichts aus der Prioritätsliste verfügbar ist.",
                 "tray_notifications": "Taskleisten-Benachrichtigungen: ",
-                "low_power_tray_mode": "Energiesparmodus beim Minimieren: ",
-                "low_power_tray_mode_info": "Wenn die App in die Taskleiste minimiert wird, wird der RAM aggressiv freigegeben (zwischengespeicherte Bilder werden gelöscht, der Inventar-Tab wird von Grund auf neu aufgebaut) und die Hintergrundabfragen werden verlangsamt, um CPU/Akku zu sparen. Dadurch kann die App kurz nach dem Öffnen des Inventar-Tabs etwas langsamer reagieren, während sie neu lädt - währenddessen wird ein Ladebildschirm angezeigt."
+                "low_power_tray_mode": "RAM/Akku sparen beim Minimieren: ",
+                "low_power_tray_mode_info": "Wenn die App in die Taskleiste minimiert ist, leert sie ihre zwischengespeicherten Bilder und prüft seltener auf Updates, um Speicher und Akku zu sparen. Der Nachteil: Das Öffnen des Inventar-Tabs danach kann sich kurz etwas langsamer anfühlen, da es neu geladen werden muss - währenddessen wird ein Ladebildschirm angezeigt."
             },
             "game_name": "Spiel",
             "priority": "Priorität",

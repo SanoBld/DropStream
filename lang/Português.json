@@ -139,7 +139,7 @@
             "and_more": "e {amount} mais...",
             "percent_progress": "{percent} de {minutes} minutos",
             "minutes_progress": "{minutes} minutos",
-            "reloading": "Recarregando inventário (modo de baixo consumo)..."
+            "reloading": "Recarregando seu inventário, isso vai levar só um instante..."
         },
         "settings": {
             "general": {
@@ -154,8 +154,8 @@
                 "use_system_accent": "Usar cor de destaque do sistema: ",
                 "priority_mode": "Modo de prioridade: ",
                 "priority_mode_info": "Os jogos da lista de prioridade são sempre tentados primeiro, na ordem definida por você. \"Termina primeiro\"/\"Baixa disponibilidade primeiro\" determinam apenas a ordem para o restante, quando nada da lista de prioridade estiver mais disponível.",
-                "low_power_tray_mode": "Modo de baixo consumo ao minimizar: ",
-                "low_power_tray_mode_info": "Ao minimizar o app para a bandeja, libera agressivamente a RAM (limpa as imagens em cache, reconstrói a aba Inventário do zero) e desacelera as verificações em segundo plano para economizar CPU/bateria. Isso pode deixar o app um pouco mais lento logo após abrir a aba Inventário, enquanto ela recarrega - uma tela de carregamento é exibida durante esse tempo."
+                "low_power_tray_mode": "Economizar RAM/bateria ao minimizar: ",
+                "low_power_tray_mode_info": "Enquanto minimizado na bandeja, o app limpa as imagens em cache e verifica atualizações com menos frequência para usar menos memória e bateria. A contrapartida: abrir a aba Inventário depois pode parecer um pouco mais lento por um instante, pois precisa recarregar - uma tela de carregamento é exibida enquanto isso acontece."
             },
             "game_name": "Nome do jogo",
             "priority": "Prioridade",
