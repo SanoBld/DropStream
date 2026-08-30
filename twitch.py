@@ -1655,26 +1655,34 @@ class Twitch:
         status_update(
             _("gui", "status", "adding_campaigns").format(counter=f"(0/{len(campaigns)})")
         )
-        add_campaign_tasks: list[asyncio.Task[None]] = [
-            asyncio.create_task(self.gui.inv.add_campaign(campaign))
-            for campaign in campaigns
-        ]
-        try:
-            for i, coro in enumerate(asyncio.as_completed(add_campaign_tasks), start=1):
-                await coro
-                status_update(
-                    _("gui", "status", "adding_campaigns").format(
-                        counter=f"({i}/{len(campaigns)})"
+        if self.gui._minimized and self.settings.low_power_tray_mode:
+            # eco mode: skip building the Inventory tab (widgets + images) entirely while
+            # minimized - self.inventory above already has everything needed to rebuild it
+            # later, so there's no point paying the RAM cost for a tab nobody can see right
+            # now. It gets rebuilt (with a loading screen) the next time it's opened.
+            self.gui._inventory_dirty = True
+        else:
+            add_campaign_tasks: list[asyncio.Task[None]] = [
+                asyncio.create_task(self.gui.inv.add_campaign(campaign))
+                for campaign in campaigns
+            ]
+            try:
+                for i, coro in enumerate(asyncio.as_completed(add_campaign_tasks), start=1):
+                    await coro
+                    status_update(
+                        _("gui", "status", "adding_campaigns").format(
+                            counter=f"({i}/{len(campaigns)})"
+                        )
                     )
-                )
-                # this is needed here explicitly, because cache reads from disk don't raise this
-                if self.gui.close_requested:
-                    raise ExitRequest()
-        except Exception:
-            # asyncio.as_completed doesn't cancel tasks on errors
-            for task in add_campaign_tasks:
-                task.cancel()
-            raise
+                    # this is needed here explicitly, because cache reads from disk
+                    # don't raise this
+                    if self.gui.close_requested:
+                        raise ExitRequest()
+            except Exception:
+                # asyncio.as_completed doesn't cancel tasks on errors
+                for task in add_campaign_tasks:
+                    task.cancel()
+                raise
         self._mnt_triggers.extend(sorted(switch_triggers))
         # trim out all triggers that we're already past
         now = datetime.now(timezone.utc)
