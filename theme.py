@@ -288,12 +288,29 @@ def build_tab_icons(color: str, size: int = 18):
             d.arc(box, start=215, end=325, fill=fg, width=lw)
         return finish(img)
 
+    def draw_games(fg):
+        img, d = canvas()
+        m = S * 0.14
+        lw = max(2, int(S * 0.09))
+        d.rounded_rectangle([m, m * 1.6, S - m, S - m], radius=S * 0.08, outline=fg, width=lw)
+        d.line([(m, S * 0.42), (S - m, S * 0.42)], fill=fg, width=lw)
+        # a star on the first row to signal "priority / favorites"
+        cx, cy, r = S * 0.30, S * 0.28, S * 0.10
+        pts = []
+        for i in range(10):
+            a = math.pi / 2 + math.pi * i / 5
+            rr = r if i % 2 == 0 else r * 0.45
+            pts.append((cx + rr * math.cos(a), cy - rr * math.sin(a)))
+        d.polygon(pts, fill=fg)
+        return finish(img)
+
     builders = {
         "main": draw_home,
         "details": draw_details,
         "dashboard": draw_dashboard,
         "inventory": draw_inventory,
         "settings": draw_settings,
+        "games": draw_games,
         "help": draw_help,
         "remote": draw_remote,
     }

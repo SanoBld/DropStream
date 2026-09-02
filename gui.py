@@ -2157,7 +2157,7 @@ class SettingsPanel:
             "modern_dark": _("gui", "settings", "themes", "modern_dark"),
         }
 
-    def __init__(self, manager: GUIManager, master: ttk.Widget):
+    def __init__(self, manager: GUIManager, master: ttk.Widget, games_master: ttk.Widget):
         self._manager = manager
         self._settings: Settings = manager._twitch.settings
         priority_mode = self._settings.priority_mode
@@ -2282,19 +2282,6 @@ class SettingsPanel:
             variable=self._vars["use_system_accent"],
             command=self.update_use_system_accent,
         ).grid(column=1, row=irow, sticky="w")
-        ttk.Label(
-            checkboxes_frame, text=_("gui", "settings", "general", "priority_mode")
-        ).grid(column=0, row=(irow := irow + 1), sticky="e")
-        SelectCombobox(
-            checkboxes_frame,
-            command=self.priority_mode,
-            textvariable=self._vars["priority_mode"],
-            values=list(self.PRIORITY_MODES.values()),
-        ).grid(column=1, row=irow, sticky="w")
-        InfoTooltip(
-            checkboxes_frame, text=_("gui", "settings", "general", "priority_mode_info")
-        ).grid(column=2, row=irow, sticky="w", padx=(4, 0))
-
         # proxy frame
         proxy_frame = ttk.Frame(general_center)
         proxy_frame.grid(column=0, row=2)
@@ -2470,11 +2457,35 @@ class SettingsPanel:
             ),
         ).grid(column=1, row=irow, sticky="w")
 
+        # Games tab: priority mode + priority list + exclude list
+        games_master.rowconfigure(0, weight=1)
+        games_master.columnconfigure(0, weight=1)
+        games_center = ttk.Frame(games_master)
+        games_center.grid(column=0, row=0, sticky="nsew")
+        games_center.columnconfigure(0, weight=1)
+        games_center.columnconfigure(1, weight=1)
+        games_center.rowconfigure(1, weight=1)
+
+        priority_mode_frame = ttk.Frame(games_center)
+        priority_mode_frame.grid(column=0, row=0, columnspan=2, pady=(0, 4))
+        ttk.Label(
+            priority_mode_frame, text=_("gui", "settings", "general", "priority_mode")
+        ).grid(column=0, row=0)
+        SelectCombobox(
+            priority_mode_frame,
+            command=self.priority_mode,
+            textvariable=self._vars["priority_mode"],
+            values=list(self.PRIORITY_MODES.values()),
+        ).grid(column=1, row=0)
+        InfoTooltip(
+            priority_mode_frame, text=_("gui", "settings", "general", "priority_mode_info")
+        ).grid(column=2, row=0, sticky="w", padx=(4, 0))
+
         # Priority section
         priority_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "priority")
+            games_center, padding=(4, 0, 4, 4), text=_("gui", "settings", "priority")
         )
-        priority_frame.grid(column=1, row=0, rowspan=5, sticky="nsew")
+        priority_frame.grid(column=0, row=1, rowspan=5, sticky="nsew")
         self._priority_entry = PlaceholderCombobox(
             priority_frame, placeholder=_("gui", "settings", "game_name"), width=30
         )
@@ -2534,9 +2545,10 @@ class SettingsPanel:
 
         # Exclude section
         exclude_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
+            games_center, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
         )
-        exclude_frame.grid(column=2, row=0, rowspan=5, sticky="nsew")
+        exclude_frame.grid(column=1, row=1, rowspan=5, sticky="nsew")
+        exclude_frame.columnconfigure(0, weight=1)
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
@@ -2563,7 +2575,7 @@ class SettingsPanel:
 
         # Reload button
         reload_frame = ttk.Frame(center_frame)
-        reload_frame.grid(column=0, row=4, columnspan=3, pady=4)
+        reload_frame.grid(column=0, row=4, pady=4)
         ttk.Label(reload_frame, text=_("gui", "settings", "reload_text")).grid(column=0, row=0)
         ttk.Button(
             reload_frame,
@@ -3404,20 +3416,24 @@ class GUIManager:
         self.dashboard = DashboardTab(self, dash_frame)
         self.tabs.add_tab(dash_frame, name=_("gui", "tabs", "dashboard"), icon_key="dashboard")
         self.tabs.add_tab(main_frame, name=_("gui", "tabs", "main"), icon_key="details")
+        # Games tab: priority mode, priority list, exclude list
+        games_frame = ttk.Frame(root_frame, padding=8)
+        # Settings tab (built together with the games tab, they share state)
+        settings_frame = ttk.Frame(root_frame, padding=8)
+        self.settings = SettingsPanel(self, settings_frame, games_frame)
+        self.tabs.add_tab(games_frame, name=_("gui", "tabs", "games"), icon_key="games")
         # Inventory tab
         inv_frame = ttk.Frame(root_frame, padding=8)
         self.inv = InventoryOverview(self, inv_frame)
         self.tabs.add_tab(
             inv_frame, name=_("gui", "tabs", "inventory"), icon_key="inventory", fill_height=True
         )
-        # Settings tab
-        settings_frame = ttk.Frame(root_frame, padding=8)
-        self.settings = SettingsPanel(self, settings_frame)
-        self.tabs.add_tab(settings_frame, name=_("gui", "tabs", "settings"), icon_key="settings")
+
         # Remote access tab: optional web dashboard, view or view+control, share link
         remote_frame = ttk.Frame(root_frame, padding=8)
         self.remote = RemoteAccessTab(self, remote_frame)
         self.tabs.add_tab(remote_frame, name=_("gui", "tabs", "remote"), icon_key="remote")
+        self.tabs.add_tab(settings_frame, name=_("gui", "tabs", "settings"), icon_key="settings")
         # Help tab
         help_frame = ttk.Frame(root_frame, padding=8)
         self.help = HelpTab(self, help_frame)

@@ -71,6 +71,7 @@ class GUITabs(TypedDict):
     dashboard: str
     inventory: str
     settings: str
+    games: str
     remote: str
     help: str
 
@@ -408,6 +409,7 @@ default_translation: Translation = {
             "dashboard": "Dashboard",
             "inventory": "Inventory",
             "settings": "Settings",
+            "games": "Games",
             "remote": "Remote",
             "help": "Help",
         },
