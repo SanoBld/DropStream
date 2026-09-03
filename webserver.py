@@ -691,6 +691,16 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .link-status.linked { color: var(--green); }
   .link-status.not-linked { color: var(--red); cursor: pointer; }
   .link-status.not-linked:hover { text-decoration: underline; }
+  .campaign-title-row { display: flex; align-items: center; gap: 6px; }
+  .unlinked-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0;
+  }
+  .expand-arrow {
+    margin-left: auto; border: none; background: transparent; color: var(--dim); cursor: pointer;
+    font-size: 12px; padding: 2px 4px; transition: transform .15s ease; flex-shrink: 0;
+  }
+  .expand-arrow.open { transform: rotate(180deg); }
+  .link-status.not-linked-hint { font-size: 11px; color: var(--dim); margin-left: 6px; }
 </style>
 </head>
 <body>
@@ -794,6 +804,11 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           <option value="recent" data-i18n="sort_recent"></option>
           <option value="progress" data-i18n="sort_progress"></option>
         </select>
+        <select id="campaign-link-filter">
+          <option value="all" data-i18n="filter_all"></option>
+          <option value="linked" data-i18n="filter_linked_only"></option>
+          <option value="not_linked" data-i18n="filter_not_linked_only"></option>
+        </select>
       </div>
       <div class="label" data-i18n="campaigns_title"></div>
       <div class="campaign-list" id="campaign-list"></div>
@@ -871,6 +886,11 @@ const I18N = {
     "account_status": "Account link",
     "linked": "Linked",
     "not_linked": "Not linked - click to link",
+    "connect_account_hint": "Connect your account to earn this drop",
+    "show_details": "Show details",
+    "filter_all": "All accounts",
+    "filter_linked_only": "Linked only",
+    "filter_not_linked_only": "Not linked only",
     "allowed_channels": "Allowed channels",
     "all_channels": "All channels",
     "ends_at": "Ends",
@@ -937,6 +957,11 @@ const I18N = {
     "account_status": "Lien du compte",
     "linked": "Lié",
     "not_linked": "Non lié - cliquer pour lier",
+    "connect_account_hint": "Liez votre compte pour obtenir ce drop",
+    "show_details": "Voir les détails",
+    "filter_all": "Tous les comptes",
+    "filter_linked_only": "Liés uniquement",
+    "filter_not_linked_only": "Non liés uniquement",
     "allowed_channels": "Chaînes autorisées",
     "all_channels": "Toutes les chaînes",
     "ends_at": "Se termine",
@@ -1031,6 +1056,11 @@ const I18N = {
     "remove": "Entfernen",
     "empty_priority": "Prioritätsliste ist leer.",
     "empty_exclude": "Ausschlussliste ist leer.",
+    "connect_account_hint": "Verbinde dein Konto, um diesen Drop zu erhalten",
+    "show_details": "Details anzeigen",
+    "filter_all": "Alle Konten",
+    "filter_linked_only": "Nur verknüpfte",
+    "filter_not_linked_only": "Nur nicht verknüpfte",
     "exclude_list": "Ausschlussliste"
   },
   "es": {
@@ -1091,6 +1121,11 @@ const I18N = {
     "remove": "Quitar",
     "empty_priority": "La lista de prioridad está vacía.",
     "empty_exclude": "La lista de exclusión está vacía.",
+    "connect_account_hint": "Vincula tu cuenta para conseguir este drop",
+    "show_details": "Mostrar detalles",
+    "filter_all": "Todas las cuentas",
+    "filter_linked_only": "Solo vinculadas",
+    "filter_not_linked_only": "Solo no vinculadas",
     "exclude_list": "Lista de exclusión"
   },
   "it": {
@@ -1151,6 +1186,11 @@ const I18N = {
     "remove": "Rimuovi",
     "empty_priority": "La lista di priorità è vuota.",
     "empty_exclude": "La lista di esclusione è vuota.",
+    "connect_account_hint": "Collega il tuo account per ottenere questo drop",
+    "show_details": "Mostra dettagli",
+    "filter_all": "Tutti gli account",
+    "filter_linked_only": "Solo collegati",
+    "filter_not_linked_only": "Solo non collegati",
     "exclude_list": "Lista di esclusione"
   },
   "pt": {
@@ -1211,6 +1251,11 @@ const I18N = {
     "remove": "Remover",
     "empty_priority": "A lista de prioridade está vazia.",
     "empty_exclude": "A lista de exclusão está vazia.",
+    "connect_account_hint": "Vincule sua conta para receber este drop",
+    "show_details": "Mostrar detalhes",
+    "filter_all": "Todas as contas",
+    "filter_linked_only": "Somente vinculadas",
+    "filter_not_linked_only": "Somente não vinculadas",
     "exclude_list": "Lista de exclusão"
   },
   "nl": {
@@ -1271,6 +1316,11 @@ const I18N = {
     "remove": "Verwijderen",
     "empty_priority": "Prioriteitslijst is leeg.",
     "empty_exclude": "Uitsluitingslijst is leeg.",
+    "connect_account_hint": "Koppel je account om deze drop te ontvangen",
+    "show_details": "Details tonen",
+    "filter_all": "Alle accounts",
+    "filter_linked_only": "Alleen gekoppeld",
+    "filter_not_linked_only": "Alleen niet gekoppeld",
     "exclude_list": "Uitsluitingslijst"
   },
   "da": {
@@ -1331,6 +1381,11 @@ const I18N = {
     "remove": "Fjern",
     "empty_priority": "Prioritetslisten er tom.",
     "empty_exclude": "Udelukkelseslisten er tom.",
+    "connect_account_hint": "Tilknyt din konto for at få dette drop",
+    "show_details": "Vis detaljer",
+    "filter_all": "Alle konti",
+    "filter_linked_only": "Kun tilknyttede",
+    "filter_not_linked_only": "Kun ikke-tilknyttede",
     "exclude_list": "Udelukkelsesliste"
   },
   "no": {
@@ -1391,6 +1446,11 @@ const I18N = {
     "remove": "Fjern",
     "empty_priority": "Prioritetslisten er tom.",
     "empty_exclude": "Ekskluderingslisten er tom.",
+    "connect_account_hint": "Koble til kontoen din for å få dette droppet",
+    "show_details": "Vis detaljer",
+    "filter_all": "Alle kontoer",
+    "filter_linked_only": "Kun tilkoblede",
+    "filter_not_linked_only": "Kun ikke tilkoblede",
     "exclude_list": "Ekskluderingsliste"
   },
   "pl": {
@@ -1451,6 +1511,11 @@ const I18N = {
     "remove": "Usuń",
     "empty_priority": "Lista priorytetowa jest pusta.",
     "empty_exclude": "Lista wykluczeń jest pusta.",
+    "connect_account_hint": "Połącz konto, aby otrzymać ten drop",
+    "show_details": "Pokaż szczegóły",
+    "filter_all": "Wszystkie konta",
+    "filter_linked_only": "Tylko połączone",
+    "filter_not_linked_only": "Tylko niepołączone",
     "exclude_list": "Lista wykluczeń"
   },
   "cs": {
@@ -1511,6 +1576,11 @@ const I18N = {
     "remove": "Odebrat",
     "empty_priority": "Seznam priorit je prázdný.",
     "empty_exclude": "Seznam vyloučení je prázdný.",
+    "connect_account_hint": "Propojte svůj účet, abyste získali tento drop",
+    "show_details": "Zobrazit podrobnosti",
+    "filter_all": "Všechny účty",
+    "filter_linked_only": "Pouze propojené",
+    "filter_not_linked_only": "Pouze nepropojené",
     "exclude_list": "Seznam vyloučení"
   },
   "ro": {
@@ -1571,6 +1641,11 @@ const I18N = {
     "remove": "Elimină",
     "empty_priority": "Lista de prioritate este goală.",
     "empty_exclude": "Lista de excludere este goală.",
+    "connect_account_hint": "Conectează-ți contul pentru a primi acest drop",
+    "show_details": "Arată detalii",
+    "filter_all": "Toate conturile",
+    "filter_linked_only": "Doar conectate",
+    "filter_not_linked_only": "Doar neconectate",
     "exclude_list": "Listă de excludere"
   },
   "hu": {
@@ -1631,6 +1706,11 @@ const I18N = {
     "remove": "Eltávolítás",
     "empty_priority": "A prioritási lista üres.",
     "empty_exclude": "A kizárási lista üres.",
+    "connect_account_hint": "Kösd össze a fiókod, hogy megkapd ezt a dropot",
+    "show_details": "Részletek megjelenítése",
+    "filter_all": "Minden fiók",
+    "filter_linked_only": "Csak összekötött",
+    "filter_not_linked_only": "Csak nem összekötött",
     "exclude_list": "Kizárási lista"
   },
   "tr": {
@@ -1691,6 +1771,11 @@ const I18N = {
     "remove": "Kaldır",
     "empty_priority": "Öncelik listesi boş.",
     "empty_exclude": "Hariç tutma listesi boş.",
+    "connect_account_hint": "Bu drop'u almak için hesabını bağla",
+    "show_details": "Ayrıntıları göster",
+    "filter_all": "Tüm hesaplar",
+    "filter_linked_only": "Yalnızca bağlı",
+    "filter_not_linked_only": "Yalnızca bağlı olmayan",
     "exclude_list": "Hariç tutma listesi"
   },
   "ru": {
@@ -1751,6 +1836,11 @@ const I18N = {
     "remove": "Удалить",
     "empty_priority": "Список приоритета пуст.",
     "empty_exclude": "Список исключений пуст.",
+    "connect_account_hint": "Привяжите аккаунт, чтобы получить этот дроп",
+    "show_details": "Показать детали",
+    "filter_all": "Все аккаунты",
+    "filter_linked_only": "Только привязанные",
+    "filter_not_linked_only": "Только непривязанные",
     "exclude_list": "Список исключений"
   },
   "uk": {
@@ -1811,6 +1901,11 @@ const I18N = {
     "remove": "Видалити",
     "empty_priority": "Список пріоритету порожній.",
     "empty_exclude": "Список виключень порожній.",
+    "connect_account_hint": "Прив'яжіть акаунт, щоб отримати цей дроп",
+    "show_details": "Показати деталі",
+    "filter_all": "Всі акаунти",
+    "filter_linked_only": "Тільки прив'язані",
+    "filter_not_linked_only": "Тільки непов'язані",
     "exclude_list": "Список виключень"
   },
   "ar": {
@@ -1871,6 +1966,11 @@ const I18N = {
     "remove": "إزالة",
     "empty_priority": "قائمة الأولوية فارغة.",
     "empty_exclude": "قائمة الاستبعاد فارغة.",
+    "connect_account_hint": "اربط حسابك للحصول على هذا الدروب",
+    "show_details": "إظهار التفاصيل",
+    "filter_all": "كل الحسابات",
+    "filter_linked_only": "المرتبطة فقط",
+    "filter_not_linked_only": "غير المرتبطة فقط",
     "exclude_list": "قائمة الاستبعاد"
   },
   "ja": {
@@ -1931,6 +2031,11 @@ const I18N = {
     "remove": "削除",
     "empty_priority": "優先リストは空です。",
     "empty_exclude": "除外リストは空です。",
+    "connect_account_hint": "このドロップを獲得するにはアカウントを連携してください",
+    "show_details": "詳細を表示",
+    "filter_all": "すべてのアカウント",
+    "filter_linked_only": "連携済みのみ",
+    "filter_not_linked_only": "未連携のみ",
     "exclude_list": "除外リスト"
   },
   "zh-CN": {
@@ -1991,6 +2096,11 @@ const I18N = {
     "remove": "移除",
     "empty_priority": "优先列表为空。",
     "empty_exclude": "排除列表为空。",
+    "connect_account_hint": "关联您的账户以获取此掉落物",
+    "show_details": "显示详情",
+    "filter_all": "所有账户",
+    "filter_linked_only": "仅已关联",
+    "filter_not_linked_only": "仅未关联",
     "exclude_list": "排除列表"
   },
   "zh-TW": {
@@ -2051,6 +2161,11 @@ const I18N = {
     "remove": "移除",
     "empty_priority": "優先清單是空的。",
     "empty_exclude": "排除清單是空的。",
+    "connect_account_hint": "連結您的帳號以取得此掉落物",
+    "show_details": "顯示詳情",
+    "filter_all": "所有帳號",
+    "filter_linked_only": "僅已連結",
+    "filter_not_linked_only": "僅未連結",
     "exclude_list": "排除清單"
   },
   "id": {
@@ -2111,6 +2226,11 @@ const I18N = {
     "remove": "Hapus",
     "empty_priority": "Daftar prioritas kosong.",
     "empty_exclude": "Daftar pengecualian kosong.",
+    "connect_account_hint": "Hubungkan akunmu untuk mendapatkan drop ini",
+    "show_details": "Tampilkan detail",
+    "filter_all": "Semua akun",
+    "filter_linked_only": "Hanya yang tertaut",
+    "filter_not_linked_only": "Hanya yang belum tertaut",
     "exclude_list": "Daftar pengecualian"
   }
 };
@@ -2285,10 +2405,29 @@ function renderCampaigns(campaigns) {
     card.appendChild(img);
     const body = document.createElement("div");
     body.className = "campaign-body";
+    const titleRow = document.createElement("div");
+    titleRow.className = "campaign-title-row";
     const title = document.createElement("div");
     title.className = "campaign-title";
     title.textContent = c.name;
-    body.appendChild(title);
+    titleRow.appendChild(title);
+    if (!c.linked) {
+      const dot = document.createElement("span");
+      dot.className = "unlinked-dot";
+      dot.title = t("not_linked");
+      titleRow.appendChild(dot);
+    }
+    const expandBtn = document.createElement("button");
+    expandBtn.className = "expand-arrow";
+    expandBtn.type = "button";
+    expandBtn.textContent = "▼";
+    expandBtn.title = t("show_details");
+    expandBtn.addEventListener("click", () => {
+      const isOpen = details.classList.toggle("open");
+      expandBtn.classList.toggle("open", isOpen);
+    });
+    titleRow.appendChild(expandBtn);
+    body.appendChild(titleRow);
     const game = document.createElement("div");
     game.className = "campaign-game";
     game.textContent = c.game + " - " + c.claimed_drops + "/" + c.total_drops;
@@ -2308,7 +2447,10 @@ function renderCampaigns(campaigns) {
     body.appendChild(progressRow);
     const details = document.createElement("div");
     details.className = "campaign-details";
-    progressRow.addEventListener("click", () => details.classList.toggle("open"));
+    progressRow.addEventListener("click", () => {
+      const isOpen = details.classList.toggle("open");
+      expandBtn.classList.toggle("open", isOpen);
+    });
     const linkRow = document.createElement("div");
     linkRow.className = "row";
     const linkLabel = document.createElement("div");
@@ -2322,6 +2464,12 @@ function renderCampaigns(campaigns) {
     linkValue.className = "link-status " + (c.linked ? "linked" : "not-linked");
     linkValue.textContent = c.linked ? t("linked") : t("not_linked");
     linkRow.appendChild(linkValue);
+    if (!c.linked && c.link_url) {
+      const hint = document.createElement("span");
+      hint.className = "link-status not-linked-hint";
+      hint.textContent = t("connect_account_hint");
+      linkRow.appendChild(hint);
+    }
     details.appendChild(linkRow);
     const acRow = document.createElement("div");
     acRow.className = "row";
@@ -2438,6 +2586,12 @@ function applyCampaignFilters() {
     list = list.filter(c =>
       c.name.toLowerCase().includes(query) || c.game.toLowerCase().includes(query)
     );
+  }
+  const linkFilter = document.getElementById("campaign-link-filter").value;
+  if (linkFilter === "linked") {
+    list = list.filter(c => c.linked);
+  } else if (linkFilter === "not_linked") {
+    list = list.filter(c => !c.linked);
   }
   const sort = document.getElementById("campaign-sort").value;
   list = list.slice();
@@ -2611,6 +2765,7 @@ document.getElementById("reload-btn").addEventListener("click", async () => {
 });
 document.getElementById("campaign-search").addEventListener("input", applyCampaignFilters);
 document.getElementById("campaign-sort").addEventListener("change", applyCampaignFilters);
+document.getElementById("campaign-link-filter").addEventListener("change", applyCampaignFilters);
 
 applyStaticTranslations();
 refresh();
