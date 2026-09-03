@@ -2608,7 +2608,7 @@ class SettingsPanel:
         ttk.Button(
             reload_frame,
             text=_("gui", "settings", "reload"),
-            command=self._manager._twitch.state_change(State.INVENTORY_FETCH),
+            command=self._manager._twitch.force_reload,
         ).grid(column=1, row=0)
 
     def clear_selection(self) -> None:

@@ -523,7 +523,7 @@ class WebDashboard:
     async def _handle_reload(self, request: web.Request) -> web.Response:
         if not self._password_ok(request):
             return web.json_response({"error": "wrong password"}, status=401)
-        self._twitch.change_state(State.INVENTORY_FETCH)
+        self._twitch.force_reload()
         return web.json_response(self._state_dict())
 
 

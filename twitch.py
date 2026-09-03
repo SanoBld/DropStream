@@ -79,6 +79,11 @@ class SkipExtraJsonDecoder(json.JSONDecoder):
 
 SAFE_LOADS = lambda s: json.loads(s, cls=SkipExtraJsonDecoder)
 
+# Minimum time between two full inventory refetches that aren't explicitly forced
+# (initial fetch, manual reload, hourly maintenance reload). This avoids hammering
+# the GQL inventory endpoint every time a single drop/campaign finishes.
+INVENTORY_FETCH_COOLDOWN = timedelta(hours=6)
+
 
 class _AuthState:
     def __init__(self, twitch: Twitch):
@@ -451,6 +456,10 @@ class Twitch:
         self._drops: dict[str, TimedDrop] = {}
         self._campaigns: dict[str, DropsCampaign] = {}
         self._mnt_triggers: deque[datetime] = deque()
+        # Inventory fetch throttling: avoid re-downloading the whole inventory
+        # every time a drop/campaign completes; only do it periodically instead.
+        self._last_inventory_fetch: datetime | None = None
+        self._force_inventory_fetch: bool = True
         # NOTE: GQL is pretty volatile and breaks everything if one runs into their rate limit.
         # Do not modify the default, safe values.
         self._qgl_limiter = RateLimiter(capacity=5, window=1)
@@ -557,6 +566,11 @@ class Twitch:
             # prevent state changing once we switch to exit state
             self._state = state
         self._state_change.set()
+
+    def force_reload(self) -> None:
+        # explicit, user-requested reload: always bypasses the inventory fetch cooldown
+        self._force_inventory_fetch = True
+        self.change_state(State.INVENTORY_FETCH)
 
     def state_change(self, state: State) -> abc.Callable[[], None]:
         # this is identical to change_state, but defers the call
@@ -698,7 +712,8 @@ class Twitch:
                 self.gui.tray.change_icon("maint")
                 # ensure the websocket is running
                 await self.websocket.start()
-                await self.fetch_inventory()
+                await self.fetch_inventory(force=self._force_inventory_fetch)
+                self._force_inventory_fetch = False
                 self.gui.set_games(set(campaign.game for campaign in self.inventory))
                 # Save state on every inventory fetch
                 self.save()
@@ -1064,7 +1079,7 @@ class Twitch:
                 self.change_state(State.CHANNELS_CLEANUP)
         # this triggers a restart of this task every (up to) 60 minutes
         logger.log(CALL, "Maintenance task requests a reload")
-        self.change_state(State.INVENTORY_FETCH)
+        self.force_reload()
 
     def can_watch(self, channel: Channel) -> bool:
         """
@@ -1561,7 +1576,20 @@ class Twitch:
         }
         return self._merge_data(campaign_ids, fetched_data)
 
-    async def fetch_inventory(self) -> None:
+    async def fetch_inventory(self, force: bool = False) -> None:
+        now = datetime.now(timezone.utc)
+        if (
+            not force
+            and self._last_inventory_fetch is not None
+            and (now - self._last_inventory_fetch) < INVENTORY_FETCH_COOLDOWN
+        ):
+            remaining = INVENTORY_FETCH_COOLDOWN - (now - self._last_inventory_fetch)
+            logger.log(
+                CALL,
+                f"Skipping full inventory refresh (cooldown active, {remaining} remaining)",
+            )
+            return
+        self._last_inventory_fetch = now
         status_update = self.gui.status.update
         status_update(_("gui", "status", "fetching_inventory"))
         # fetch in-progress campaigns (inventory)
