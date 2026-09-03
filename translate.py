@@ -201,6 +201,8 @@ class GUISettingsGeneral(TypedDict):
     priority_mode: str
     priority_mode_info: str
     proxy: str
+    show_inventory_tab: str
+    show_inventory_tab_info: str
 
 
 class GUIThemes(TypedDict):
@@ -246,16 +248,12 @@ class GUIRemote(TypedDict):
     mode_control: str
     password_label: str
     password_placeholder: str
-    public_label: str
     show_viewers_label: str
     new_link: str
     link: str
     link_disabled: str
     copy_link: str
     open_link: str
-    public_link: str
-    public_link_resolving: str
-    public_link_unavailable: str
 
 
 class GUIPowerActions(TypedDict):
@@ -540,6 +538,11 @@ default_translation: Translation = {
                     "everything else, once nothing from the priority list is available."
                 ),
                 "proxy": "Proxy (requires restart):",
+                "show_inventory_tab": "Show Inventory tab (requires restart): ",
+                "show_inventory_tab_info": (
+                    "The Inventory tab can be hidden here if you'd rather check your drops "
+                    "from the web dashboard's own Inventory page instead."
+                ),
             },
             "themes": {
                 "auto": "Light/Dark (Auto)",
@@ -620,16 +623,12 @@ default_translation: Translation = {
             "mode_control": "View and control",
             "password_label": "Control password:",
             "password_placeholder": "Optional, leave empty for none",
-            "public_label": "Also show a public link: ",
             "show_viewers_label": "Show viewer count on page: ",
             "new_link": "Generate a new link",
             "link": "Share link:",
             "link_disabled": "Enable the dashboard to generate a link.",
             "copy_link": "Copy",
             "open_link": "Open",
-            "public_link": "Public share link:",
-            "public_link_resolving": "Looking up your public IP...",
-            "public_link_unavailable": "Couldn't determine a public IP right now.",
         },
         "help": {
             "links": {

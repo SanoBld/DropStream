@@ -1303,6 +1303,9 @@ class Notebook:
         # it shows through as a plain white/gray rectangle whenever a tab's content is shorter
         # than the window (e.g. after resizing taller, or with filters hiding rows).
         self._page_canvases: list[tk.Canvas] = []
+        # content widget -> wrapper page, so a tab can be identified by its content widget
+        # instead of a fragile hardcoded index that breaks if tabs are added/removed
+        self._content_to_page: dict[ttk.Widget, ttk.Widget] = {}
         # let the user cycle through tabs with the mouse wheel (while hovering the tab bar)
         # or Ctrl+PageUp/PageDown from anywhere, so tabs stay reachable even when the window
         # is too narrow to show every tab's label at once
@@ -1394,6 +1397,7 @@ class Notebook:
         canvas.configure(width=widget.winfo_reqwidth(), height=widget.winfo_reqheight())
 
         self._nb.add(page, text=name, **kwargs)
+        self._content_to_page[widget] = page
         if icon_key is not None:
             self._icon_keys[page] = icon_key
 
@@ -1412,6 +1416,12 @@ class Notebook:
 
     def current_tab(self) -> int:
         return self._nb.index("current")
+
+    def is_current(self, content_widget: ttk.Widget) -> bool:
+        # identifies a tab by its content widget rather than a hardcoded index, so it stays
+        # correct even if tabs are conditionally added/removed (e.g. Inventory tab)
+        page = self._content_to_page.get(content_widget)
+        return page is not None and str(self._nb.select()) == str(page)
 
     def add_view_event(self, callback: abc.Callable[[tk.Event[ttk.Notebook]], Any]):
         self._nb.bind("<<NotebookTabChanged>>", callback, True)
@@ -1725,6 +1735,7 @@ class CampaignDisplay(TypedDict):
 class InventoryOverview:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
+        self._master = master
         self._cache: ImageCache = manager._cache
         self._settings: Settings = manager._twitch.settings
         self._filters = {
@@ -1846,7 +1857,7 @@ class InventoryOverview:
             frame.grid_remove()
 
     def _on_tab_switched(self, event: tk.Event[ttk.Notebook]) -> None:
-        if self._manager.tabs.current_tab() == 2:  # Inventory is the 3rd tab
+        if self._manager.tabs.is_current(self._master):
             # if a low-power tray minimize cleared this tab, rebuild it before showing
             # anything, instead of showing a blank/half-broken tab
             self._manager.ensure_inventory_reloaded()
@@ -2030,7 +2041,7 @@ class InventoryOverview:
 
         drops_row.bind("<Configure>", rewrap)
         drops_row.after_idle(rewrap)
-        if self._manager.tabs.current_tab() == 2:  # Inventory is the 3rd tab
+        if self._manager.tabs.is_current(self._master):
             self._update_visibility(campaign)
             self._canvas_update()
 
@@ -2115,6 +2126,7 @@ class _SettingsVars(TypedDict):
     auto_action: StringVar
     auto_restart_enabled: IntVar
     auto_restart_minutes: StringVar
+    show_inventory_tab: IntVar
 
 
 class SettingsPanel:
@@ -2190,6 +2202,7 @@ class SettingsPanel:
             "auto_restart_enabled": IntVar(master, int(self._settings.auto_restart_enabled)),
             "auto_restart_minutes": StringVar(master, str(self._settings.auto_restart_minutes)),
             "low_power_tray_mode": IntVar(master, int(self._settings.low_power_tray_mode)),
+            "show_inventory_tab": IntVar(master, int(self._settings.show_inventory_tab)),
         }
         self._game_names: set[str] = set()
         master.rowconfigure(0, weight=1)
@@ -2282,6 +2295,21 @@ class SettingsPanel:
             variable=self._vars["use_system_accent"],
             command=self.update_use_system_accent,
         ).grid(column=1, row=irow, sticky="w")
+        ttk.Label(
+            checkboxes_frame, text=_("gui", "settings", "general", "show_inventory_tab")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Checkbutton(
+            checkboxes_frame,
+            variable=self._vars["show_inventory_tab"],
+            command=lambda: setattr(
+                self._settings,
+                "show_inventory_tab",
+                bool(self._vars["show_inventory_tab"].get()),
+            ),
+        ).grid(column=1, row=irow, sticky="w")
+        InfoTooltip(
+            checkboxes_frame, text=_("gui", "settings", "general", "show_inventory_tab_info")
+        ).grid(column=2, row=irow, sticky="w", padx=(4, 0))
         # proxy frame
         proxy_frame = ttk.Frame(general_center)
         proxy_frame.grid(column=0, row=2)
@@ -3073,20 +3101,15 @@ class RemoteAccessTab:
         master_var = tk.IntVar(master, int(self._settings.web_server_enabled))
         control_var = tk.IntVar(master, int(self._settings.web_server_allow_control))
         port_var = tk.StringVar(master, str(self._settings.web_server_port))
-        public_var = tk.IntVar(master, int(self._settings.web_server_public))
         show_viewers_var = tk.IntVar(master, int(self._settings.web_server_show_viewers))
         link_var = tk.StringVar(master, "")
-        public_link_var = tk.StringVar(master, "")
         self._vars: dict[str, tk.Variable] = {
             "enabled": master_var,
             "control": control_var,
             "port": port_var,
-            "public": public_var,
             "show_viewers": show_viewers_var,
             "link": link_var,
-            "public_link": public_link_var,
         }
-        self._public_ip: str | None = None
 
         irow = 0
         ttk.Label(
@@ -3141,16 +3164,6 @@ class RemoteAccessTab:
         self._password_entry.grid(column=1, row=irow, sticky="w")
         self._password_entry.bind("<FocusOut>", lambda e: self.update_server())
 
-        # Public link (opt-in): shows a second link built from the machine's public IP,
-        # for sharing beyond the local network. Still requires the user's router to forward
-        # the configured port - this only builds the URL, it doesn't open anything by itself.
-        ttk.Label(center, text=_("gui", "remote", "public_label")).grid(
-            column=0, row=(irow := irow + 1), sticky="e"
-        )
-        ttk.Checkbutton(
-            center, variable=public_var, command=self.update_server
-        ).grid(column=1, row=irow, sticky="w")
-
         # Also show the live viewer count on the dashboard page itself, not just here
         ttk.Label(center, text=_("gui", "remote", "show_viewers_label")).grid(
             column=0, row=(irow := irow + 1), sticky="e"
@@ -3178,28 +3191,17 @@ class RemoteAccessTab:
             link_row, text=_("gui", "remote", "open_link"), command=self.open_link, width=3
         ).grid(column=2, row=0, padx=(4, 0))
 
-        # Public share link, only shown once resolved
-        self._public_label = ttk.Label(center, text=_("gui", "remote", "public_link"))
-        self._public_row = ttk.Frame(center)
-        self._public_row.columnconfigure(0, weight=1)
-        public_entry = ttk.Entry(self._public_row, textvariable=public_link_var, state="readonly")
-        public_entry.grid(column=0, row=0, sticky="ew")
-        ttk.Button(
-            self._public_row, text=_("gui", "remote", "copy_link"),
-            command=self.copy_public_link, width=3,
-        ).grid(column=1, row=0, padx=(4, 0))
-        self._public_row_row = irow + 1
+        self._link_row = irow + 1
 
         self._update_link_display()
         self._update_password_state()
-        self._update_public_row()
 
         # Live count of browsers currently viewing the web dashboard (moved here from the
         # web page itself - it's more useful to the streamer at the source than to whoever
         # is looking at the dashboard). Only meaningful while the server is running.
         self._viewer_label = ttk.Label(center, text="")
         self._viewer_label.grid(
-            column=0, row=self._public_row_row + 2, columnspan=2, pady=(10, 0)
+            column=0, row=self._link_row + 2, columnspan=2, pady=(10, 0)
         )
         self._poll_viewers()
 
@@ -3222,23 +3224,10 @@ class RemoteAccessTab:
         state = "normal" if self._vars["control"].get() else "disabled"
         self._password_entry.configure(state=state)
 
-    def _update_public_row(self) -> None:
-        if self._vars["public"].get() and self._settings.web_server_enabled:
-            self._public_label.grid(
-                column=0, row=self._public_row_row, columnspan=2, sticky="w", pady=(8, 0)
-            )
-            self._public_row.grid(
-                column=0, row=self._public_row_row + 1, columnspan=2, sticky="ew"
-            )
-        else:
-            self._public_label.grid_forget()
-            self._public_row.grid_forget()
-
     def _update_link_display(self) -> None:
         from webserver import local_ip, new_token
         if not self._settings.web_server_enabled:
             self._vars["link"].set(_("gui", "remote", "link_disabled"))
-            self._vars["public_link"].set("")
             return
         if not self._settings.web_server_token:
             # previously the token was only ever generated inside the async server-start
@@ -3250,31 +3239,11 @@ class RemoteAccessTab:
         token = self._settings.web_server_token
         port = self._settings.web_server_port
         self._vars["link"].set(f"http://{local_ip()}:{port}/{token}")
-        if self._vars["public"].get():
-            self._refresh_public_link()
-
-    def _refresh_public_link(self) -> None:
-        # public IP lookup needs the network, so it's resolved asynchronously on the
-        # shared asyncio loop (same one tkinter is being pumped from) and applied once done
-        from webserver import public_ip
-
-        async def _resolve():
-            ip = await public_ip()
-            self._public_ip = ip
-            token = self._settings.web_server_token
-            port = self._settings.web_server_port
-            if ip and token and self._settings.web_server_enabled:
-                self._vars["public_link"].set(f"http://{ip}:{port}/{token}")
-            else:
-                self._vars["public_link"].set(_("gui", "remote", "public_link_unavailable"))
-        asyncio.create_task(_resolve())
-        self._vars["public_link"].set(_("gui", "remote", "public_link_resolving"))
 
     def update_server(self) -> None:
         self._settings.web_server_enabled = bool(self._vars["enabled"].get())
         self._settings.web_server_allow_control = bool(self._vars["control"].get())
         self._settings.web_server_password = self._password_entry.get()
-        self._settings.web_server_public = bool(self._vars["public"].get())
         self._settings.web_server_show_viewers = bool(self._vars["show_viewers"].get())
         try:
             port = int(self._vars["port"].get())
@@ -3287,7 +3256,6 @@ class RemoteAccessTab:
             self._settings.web_server_port = port
         self._update_password_state()
         self._update_link_display()
-        self._update_public_row()
         self._twitch.apply_web_server_settings()
 
     def regenerate_token(self) -> None:
@@ -3299,13 +3267,6 @@ class RemoteAccessTab:
 
     def copy_link(self) -> None:
         link = self._vars["link"].get()
-        if not link.startswith("http"):
-            return
-        self._manager._root.clipboard_clear()
-        self._manager._root.clipboard_append(link)
-
-    def copy_public_link(self) -> None:
-        link = self._vars["public_link"].get()
         if not link.startswith("http"):
             return
         self._manager._root.clipboard_clear()
@@ -3422,12 +3383,16 @@ class GUIManager:
         settings_frame = ttk.Frame(root_frame, padding=8)
         self.settings = SettingsPanel(self, settings_frame, games_frame)
         self.tabs.add_tab(games_frame, name=_("gui", "tabs", "games"), icon_key="games")
-        # Inventory tab
-        inv_frame = ttk.Frame(root_frame, padding=8)
-        self.inv = InventoryOverview(self, inv_frame)
-        self.tabs.add_tab(
-            inv_frame, name=_("gui", "tabs", "inventory"), icon_key="inventory", fill_height=True
-        )
+        # Inventory tab (optional - can be hidden in favor of the web dashboard's own
+        # Inventory view, see settings.show_inventory_tab)
+        self.inv: InventoryOverview | None = None
+        if self._twitch.settings.show_inventory_tab:
+            inv_frame = ttk.Frame(root_frame, padding=8)
+            self.inv = InventoryOverview(self, inv_frame)
+            self.tabs.add_tab(
+                inv_frame, name=_("gui", "tabs", "inventory"), icon_key="inventory",
+                fill_height=True,
+            )
 
         # Remote access tab: optional web dashboard, view or view+control, share link
         remote_frame = ttk.Frame(root_frame, padding=8)
@@ -3624,7 +3589,7 @@ class GUIManager:
         # rebuilds the Inventory tab (and re-fetches/re-decodes the images that were
         # dropped from RAM) after a low-power tray minimize. Real, awaited work behind a
         # loading screen - not a fake delay - since this can take a moment.
-        if not self._inventory_dirty:
+        if not self._inventory_dirty or self.inv is None:
             return
         self.show_loading(_("gui", "inventory", "reloading"))
         try:
@@ -4028,7 +3993,8 @@ class GUIManager:
             bg=surface, fg=fg, sel_bg=sel_bg, sel_fg=sel_fg
         )
         # Inventory canvas
-        self.inv.configure_theme(bg=bg)
+        if self.inv is not None:
+            self.inv.configure_theme(bg=bg)
         # Notebook tab wrapper canvases (scroll-on-overflow background, see Notebook.add_tab)
         self.tabs.configure_theme(bg=bg)
 

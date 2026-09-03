@@ -40,25 +40,6 @@ def local_ip() -> str:
         s.close()
 
 
-async def public_ip() -> str | None:
-    # best-effort public IP lookup, only used when the user opts into a public link. This is
-    # just for building a shareable URL - it doesn't open any port or expose anything by
-    # itself; the user's router still needs to forward the configured port for a public link
-    # to actually work. A short timeout keeps this from ever hanging the UI.
-    import aiohttp
-    try:
-        timeout = aiohttp.ClientTimeout(total=3)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get("https://api.ipify.org") as resp:
-                if resp.status == 200:
-                    text = (await resp.text()).strip()
-                    if text:
-                        return text
-    except Exception:
-        pass
-    return None
-
-
 PRIORITY_MODE_LABELS: dict[int, str] = {
     PriorityMode.PRIORITY_ONLY.value: "Priority list only",
     PriorityMode.PRIORITY_ONLY_CONTINUE.value: "Priority list only, then continue with the rest",
@@ -256,6 +237,7 @@ class WebDashboard:
                 })
                 if len(drops) >= 12:
                     break
+            acl = campaign.allowed_channels
             out.append({
                 "game": campaign.game.name,
                 "image_url": campaign.image_url,
@@ -265,6 +247,10 @@ class WebDashboard:
                 "claimed_drops": campaign.claimed_drops,
                 "total_drops": campaign.total_drops,
                 "starts_at": campaign.starts_at.isoformat(),
+                "ends_at": campaign.ends_at.isoformat(),
+                "linked": campaign.linked,
+                "link_url": campaign.link_url,
+                "allowed_channels": [ch.name for ch in acl],  # empty = all channels allowed
                 "drops": drops,
             })
             if len(out) >= 30:
@@ -576,6 +562,16 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     font-family: -apple-system, Segoe UI, Roboto, sans-serif;
   }
   .wrap { max-width: 860px; margin: 0 auto; }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .top-row { flex-direction: column; }
+    .grid { grid-template-columns: 1fr; }
+    .campaign-toolbar { flex-direction: column; }
+    .campaign-toolbar select { width: 100%; }
+    .campaign-card { flex-wrap: wrap; }
+    .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tab-btn { padding: 8px 10px; font-size: 12px; }
+  }
   .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
   h1 { font-size: 20px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
   .logo { display: inline-flex; }
@@ -685,6 +681,16 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .campaign-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
   .campaign-toolbar input[type=text] { flex: 1; }
   .campaign-toolbar select { width: auto; flex: 0 0 auto; }
+  .campaign-progress-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .campaign-progress-row .bar { flex: 1; }
+  .campaign-pct { font-size: 12px; color: var(--dim); white-space: nowrap; }
+  .campaign-details { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; }
+  .campaign-details.open { display: block; }
+  .campaign-details .row { align-items: flex-start; margin-bottom: 6px; }
+  .link-status { text-decoration: none; font-weight: 600; }
+  .link-status.linked { color: var(--green); }
+  .link-status.not-linked { color: var(--red); cursor: pointer; }
+  .link-status.not-linked:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -862,6 +868,12 @@ const I18N = {
     "sort_recent": "Most recent",
     "sort_progress": "Progress",
     "claimed": "Claimed",
+    "account_status": "Account link",
+    "linked": "Linked",
+    "not_linked": "Not linked - click to link",
+    "allowed_channels": "Allowed channels",
+    "all_channels": "All channels",
+    "ends_at": "Ends",
     "no_campaigns": "No campaigns to show yet.",
     "connection_lost": "Connection lost - retrying...",
     "modes": [
@@ -922,6 +934,12 @@ const I18N = {
     "sort_recent": "Plus récent",
     "sort_progress": "Progression",
     "claimed": "Récupéré",
+    "account_status": "Lien du compte",
+    "linked": "Lié",
+    "not_linked": "Non lié - cliquer pour lier",
+    "allowed_channels": "Chaînes autorisées",
+    "all_channels": "Toutes les chaînes",
+    "ends_at": "Se termine",
     "no_campaigns": "Aucune campagne à afficher pour le moment.",
     "connection_lost": "Connexion perdue, nouvelle tentative...",
     "modes": [
@@ -2275,12 +2293,60 @@ function renderCampaigns(campaigns) {
     game.className = "campaign-game";
     game.textContent = c.game + " - " + c.claimed_drops + "/" + c.total_drops;
     body.appendChild(game);
+    const progressRow = document.createElement("div");
+    progressRow.className = "campaign-progress-row";
     const bar = document.createElement("div");
     bar.className = "bar";
     const fill = document.createElement("div");
     fill.style.width = pct(c.progress);
     bar.appendChild(fill);
-    body.appendChild(bar);
+    progressRow.appendChild(bar);
+    const pctLabel = document.createElement("div");
+    pctLabel.className = "campaign-pct";
+    pctLabel.textContent = pct(c.progress);
+    progressRow.appendChild(pctLabel);
+    body.appendChild(progressRow);
+    const details = document.createElement("div");
+    details.className = "campaign-details";
+    progressRow.addEventListener("click", () => details.classList.toggle("open"));
+    const linkRow = document.createElement("div");
+    linkRow.className = "row";
+    const linkLabel = document.createElement("div");
+    linkLabel.className = "label";
+    linkLabel.textContent = t("account_status") + ":";
+    linkRow.appendChild(linkLabel);
+    const linkValue = document.createElement("a");
+    linkValue.href = c.link_url || "#";
+    linkValue.target = "_blank";
+    linkValue.rel = "noopener";
+    linkValue.className = "link-status " + (c.linked ? "linked" : "not-linked");
+    linkValue.textContent = c.linked ? t("linked") : t("not_linked");
+    linkRow.appendChild(linkValue);
+    details.appendChild(linkRow);
+    const acRow = document.createElement("div");
+    acRow.className = "row";
+    const acLabel = document.createElement("div");
+    acLabel.className = "label";
+    acLabel.textContent = t("allowed_channels") + ":";
+    acRow.appendChild(acLabel);
+    const acValue = document.createElement("div");
+    acValue.className = "value";
+    acValue.textContent = c.allowed_channels.length
+      ? c.allowed_channels.join(", ") : t("all_channels");
+    acRow.appendChild(acValue);
+    details.appendChild(acRow);
+    const endsRow = document.createElement("div");
+    endsRow.className = "row";
+    const endsLabel = document.createElement("div");
+    endsLabel.className = "label";
+    endsLabel.textContent = t("ends_at") + ":";
+    endsRow.appendChild(endsLabel);
+    const endsValue = document.createElement("div");
+    endsValue.className = "value";
+    endsValue.textContent = new Date(c.ends_at).toLocaleString();
+    endsRow.appendChild(endsValue);
+    details.appendChild(endsRow);
+    body.appendChild(details);
     const thumbs = document.createElement("div");
     thumbs.className = "drop-thumbs";
     for (const d of c.drops) {
