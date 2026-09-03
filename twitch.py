@@ -1637,7 +1637,8 @@ class Twitch:
         campaigns.sort(key=lambda c: c.eligible, reverse=True)
 
         self._drops.clear()
-        self.gui.inv.clear()
+        if self.gui.inv is not None:
+            self.gui.inv.clear()
         self.inventory.clear()
         self._campaigns.clear()
         self._mnt_triggers.clear()
@@ -1655,7 +1656,7 @@ class Twitch:
         status_update(
             _("gui", "status", "adding_campaigns").format(counter=f"(0/{len(campaigns)})")
         )
-        if self.gui._minimized and self.settings.low_power_tray_mode:
+        if self.gui.inv is None or (self.gui._minimized and self.settings.low_power_tray_mode):
             # eco mode: skip building the Inventory tab (widgets + images) entirely while
             # minimized - self.inventory above already has everything needed to rebuild it
             # later, so there's no point paying the RAM cost for a tab nobody can see right
