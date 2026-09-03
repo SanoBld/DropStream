@@ -140,7 +140,14 @@
             "and_more": "és még {amount}...",
             "percent_progress": "{minutes} percből {percent}",
             "minutes_progress": "{minutes} perc",
-            "reloading": "A készleted újratöltése, ez csak egy pillanatig tart..."
+            "reloading": "A készleted újratöltése, ez csak egy pillanatig tart...",
+            "server": {
+                "unknown": "Szerver: ismeretlen",
+                "checking": "Szerver: ellenőrzés...",
+                "ok": "Szerver: OK ({ms} ms)",
+                "down": "Szerver: elérhetetlen",
+                "check": "Ellenőrzés"
+            }
         },
         "settings": {
             "general": {
@@ -243,7 +250,8 @@
             "per_game": "Dropok játékonként",
             "total_drops": "Összesen begyűjtött dropok: {count}",
             "hours_saved": "Megspórolt nézési órák: {hours}",
-            "no_data": "Még nincs adat"
+            "no_data": "Még nincs adat",
+            "reload": "Újratöltés"
         },
         "remote": {
             "info": "Lehetővé teszi az élő állapot megtekintését, és ha úgy döntesz, ezen példány vezérlését (szüneteltetés/folytatás, prioritási mód) egy másik eszköz böngészőjéből, az alábbi hivatkozás segítségével. Bárki, akinek megvan a hivatkozás, megtekintheti; akinek megvan a hivatkozás és a jelszó is (ha be van állítva), az vezérelheti is, ezért csak megbízható emberekkel oszd meg.",

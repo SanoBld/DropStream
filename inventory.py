@@ -346,7 +346,12 @@ class TimedDrop(BaseDrop):
             delta = -self.real_current_minutes
         elif self.real_current_minutes + delta > self.required_minutes:
             delta = self.required_minutes - self.real_current_minutes
-        self.campaign._update_real_minutes(delta)
+        # bug fix: this used to call self.campaign._update_real_minutes(delta), which
+        # bumps EVERY drop in the campaign by delta instead of just this one - drops not
+        # yet being watched would get free progress, or worse, claim early
+        self._update_real_minutes(delta)
+        if (first_drop := self.campaign.first_drop) is not None:
+            first_drop.display()
 
 
 class DropsCampaign:
@@ -452,12 +457,6 @@ class DropsCampaign:
             key=lambda d: d.remaining_minutes,
         )
         return drops[0] if drops else None
-
-    def _update_real_minutes(self, delta: int) -> None:
-        for drop in self.drops:
-            drop._update_real_minutes(delta)
-        if (first_drop := self.first_drop) is not None:
-            first_drop.display()
 
     def _base_can_earn(
         self, channel: Channel | None = None, ignore_channel_status: bool = False

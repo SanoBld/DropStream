@@ -140,7 +140,14 @@
             "and_more": "i {amount} więcej...",
             "percent_progress": "{percent} z {minutes} min.",
             "minutes_progress": "{minutes} min.",
-            "reloading": "Ponowne ładowanie ekwipunku, to potrwa tylko chwilę..."
+            "reloading": "Ponowne ładowanie ekwipunku, to potrwa tylko chwilę...",
+            "server": {
+                "unknown": "Serwer: nieznany",
+                "checking": "Serwer: sprawdzanie...",
+                "ok": "Serwer: OK ({ms} ms)",
+                "down": "Serwer: niedostępny",
+                "check": "Sprawdź"
+            }
         },
         "settings": {
             "general": {
@@ -247,7 +254,8 @@
             "per_game": "Dropy na grę",
             "total_drops": "Łącznie odebranych dropów: {count}",
             "hours_saved": "Zaoszczędzone godziny oglądania: {hours}",
-            "no_data": "Brak danych"
+            "no_data": "Brak danych",
+            "reload": "Odśwież"
         },
         "remote": {
             "info": "Umożliwia podgląd stanu na żywo, a jeśli zdecydujesz, także sterowanie tą instancją (pauza/wznowienie, tryb priorytetu) z przeglądarki na innym urządzeniu, za pomocą poniższego linku. Każdy z linkiem może podglądać; każdy, kto ma link i hasło (jeśli ustawione), może również sterować, więc udostępniaj go wyłącznie zaufanym osobom.",
