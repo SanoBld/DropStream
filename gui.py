@@ -2181,6 +2181,7 @@ class _SettingsVars(TypedDict):
     priority_mode: StringVar
     tray_notifications: IntVar
     enable_badges_emotes: IntVar
+    mine_unlinked_campaigns: IntVar
     available_drops_check: IntVar
     schedule_enabled: IntVar
     schedule_start: StringVar
@@ -2254,6 +2255,9 @@ class SettingsPanel:
             "tray_notifications": IntVar(master, self._settings.tray_notifications),
             "enable_badges_emotes": IntVar(
                 master, int(self._settings.enable_badges_emotes)
+            ),
+            "mine_unlinked_campaigns": IntVar(
+                master, int(self._settings.mine_unlinked_campaigns)
             ),
             "available_drops_check": IntVar(
                 master, int(self._settings.available_drops_check)
@@ -2533,6 +2537,18 @@ class SettingsPanel:
                 self._settings,
                 "enable_badges_emotes",
                 bool(self._vars["enable_badges_emotes"].get()),
+            ),
+        ).grid(column=1, row=irow, sticky="w")
+        ttk.Label(
+            advanced_center, text=_("gui", "settings", "advanced", "mine_unlinked_campaigns")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Checkbutton(
+            advanced_center,
+            variable=self._vars["mine_unlinked_campaigns"],
+            command=lambda: setattr(
+                self._settings,
+                "mine_unlinked_campaigns",
+                bool(self._vars["mine_unlinked_campaigns"].get()),
             ),
         ).grid(column=1, row=irow, sticky="w")
         ttk.Label(
