@@ -1366,10 +1366,18 @@ class Twitch:
                     if drop_data is None or drop_data["dropID"] != drop.id:
                         break
                     await asyncio.sleep(2)
+            # show the next drop right away, instead of waiting for its first
+            # "drop-progress" message (which can take a while and leaves the
+            # UI stuck showing the old drop at 100%)
+            if (next_drop := campaign.first_drop) is not None:
+                next_drop.display()
             if campaign.can_earn(watching_channel):
                 self.restart_watching()
             else:
-                self.change_state(State.INVENTORY_FETCH)
+                # campaign done on this channel: force the refresh so the
+                # 6h battery-saving cooldown doesn't delay the switch to
+                # the next campaign
+                self.force_reload()
             return
         assert msg_type == "drop-progress"
         if drop is not None:
