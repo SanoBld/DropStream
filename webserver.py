@@ -869,7 +869,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <script>
 const I18N = {
   "en": {
-    "subtitle": "Remote dashboard for this instance.",
+en    "subtitle": "Remote dashboard for this instance.",
     "mode_view": "View only",
     "mode_control": "View & control",
     "mining": "Mining",
@@ -942,7 +942,7 @@ const I18N = {
     "exclude_list": "Exclude list"
   },
   "fr": {
-    "subtitle": "Tableau de bord distant pour cette instance.",
+fr    "subtitle": "Tableau de bord distant pour cette instance.",
     "mode_view": "Consultation uniquement",
     "mode_control": "Consultation et contrôle",
     "mining": "En cours",
@@ -1015,7 +1015,7 @@ const I18N = {
     "exclude_list": "Liste d'exclusion"
   },
   "de": {
-    "subtitle": "Fernsteuerungs-Dashboard für diese Instanz.",
+de    "subtitle": "Fernsteuerungs-Dashboard für diese Instanz.",
     "mode_view": "Nur ansehen",
     "mode_control": "Ansehen & steuern",
     "mining": "Aktiv",
@@ -1082,7 +1082,7 @@ const I18N = {
     "exclude_list": "Ausschlussliste"
   },
   "es": {
-    "subtitle": "Panel remoto para esta instancia.",
+es    "subtitle": "Panel remoto para esta instancia.",
     "mode_view": "Solo ver",
     "mode_control": "Ver y controlar",
     "mining": "Minando",
@@ -1149,7 +1149,7 @@ const I18N = {
     "exclude_list": "Lista de exclusión"
   },
   "it": {
-    "subtitle": "Pannello remoto per questa istanza.",
+it    "subtitle": "Pannello remoto per questa istanza.",
     "mode_view": "Solo visualizzazione",
     "mode_control": "Visualizzazione e controllo",
     "mining": "In corso",
@@ -1216,7 +1216,7 @@ const I18N = {
     "exclude_list": "Lista di esclusione"
   },
   "pt": {
-    "subtitle": "Painel remoto para esta instância.",
+pt    "subtitle": "Painel remoto para esta instância.",
     "mode_view": "Apenas visualizar",
     "mode_control": "Visualizar e controlar",
     "mining": "A minerar",
@@ -1283,7 +1283,7 @@ const I18N = {
     "exclude_list": "Lista de exclusão"
   },
   "nl": {
-    "subtitle": "Extern dashboard voor deze instantie.",
+nl    "subtitle": "Extern dashboard voor deze instantie.",
     "mode_view": "Alleen bekijken",
     "mode_control": "Bekijken & besturen",
     "mining": "Actief",
@@ -1350,7 +1350,7 @@ const I18N = {
     "exclude_list": "Uitsluitingslijst"
   },
   "da": {
-    "subtitle": "Fjernpanel for denne instans.",
+da    "subtitle": "Fjernpanel for denne instans.",
     "mode_view": "Kun visning",
     "mode_control": "Visning & styring",
     "mining": "Aktiv",
@@ -1417,7 +1417,7 @@ const I18N = {
     "exclude_list": "Udelukkelsesliste"
   },
   "no": {
-    "subtitle": "Fjernpanel for denne forekomsten.",
+no    "subtitle": "Fjernpanel for denne forekomsten.",
     "mode_view": "Kun visning",
     "mode_control": "Visning & styring",
     "mining": "Aktiv",
@@ -1484,7 +1484,7 @@ const I18N = {
     "exclude_list": "Ekskluderingsliste"
   },
   "pl": {
-    "subtitle": "Zdalny panel dla tej instancji.",
+pl    "subtitle": "Zdalny panel dla tej instancji.",
     "mode_view": "Tylko podgląd",
     "mode_control": "Podgląd i sterowanie",
     "mining": "Zdobywanie",
@@ -1551,7 +1551,7 @@ const I18N = {
     "exclude_list": "Lista wykluczeń"
   },
   "cs": {
-    "subtitle": "Vzdálený panel pro tuto instanci.",
+cs    "subtitle": "Vzdálený panel pro tuto instanci.",
     "mode_view": "Pouze zobrazení",
     "mode_control": "Zobrazení a ovládání",
     "mining": "Těžba",
@@ -1618,7 +1618,7 @@ const I18N = {
     "exclude_list": "Seznam vyloučení"
   },
   "ro": {
-    "subtitle": "Panou de la distanță pentru această instanță.",
+ro    "subtitle": "Panou de la distanță pentru această instanță.",
     "mode_view": "Doar vizualizare",
     "mode_control": "Vizualizare și control",
     "mining": "Activ",
@@ -1685,7 +1685,7 @@ const I18N = {
     "exclude_list": "Listă de excludere"
   },
   "hu": {
-    "subtitle": "Távoli irányítópult ehhez a példányhoz.",
+hu    "subtitle": "Távoli irányítópult ehhez a példányhoz.",
     "mode_view": "Csak megtekintés",
     "mode_control": "Megtekintés és vezérlés",
     "mining": "Bányászás",
@@ -1752,7 +1752,7 @@ const I18N = {
     "exclude_list": "Kizárási lista"
   },
   "tr": {
-    "subtitle": "Bu örnek için uzaktan panel.",
+tr    "subtitle": "Bu örnek için uzaktan panel.",
     "mode_view": "Yalnızca görüntüleme",
     "mode_control": "Görüntüleme ve kontrol",
     "mining": "Kazılıyor",
@@ -1819,7 +1819,7 @@ const I18N = {
     "exclude_list": "Hariç tutma listesi"
   },
   "ru": {
-    "subtitle": "Панель удалённого доступа для этого экземпляра.",
+ru    "subtitle": "Панель удалённого доступа для этого экземпляра.",
     "mode_view": "Только просмотр",
     "mode_control": "Просмотр и управление",
     "mining": "Добыча",
@@ -1886,7 +1886,7 @@ const I18N = {
     "exclude_list": "Список исключений"
   },
   "uk": {
-    "subtitle": "Панель віддаленого доступу для цього екземпляра.",
+uk    "subtitle": "Панель віддаленого доступу для цього екземпляра.",
     "mode_view": "Лише перегляд",
     "mode_control": "Перегляд і керування",
     "mining": "Видобуток",
@@ -1953,7 +1953,7 @@ const I18N = {
     "exclude_list": "Список виключень"
   },
   "ar": {
-    "subtitle": "لوحة تحكم عن بُعد لهذا التطبيق.",
+ar    "subtitle": "لوحة تحكم عن بُعد لهذا التطبيق.",
     "mode_view": "عرض فقط",
     "mode_control": "عرض وتحكم",
     "mining": "قيد التعدين",
@@ -2020,7 +2020,7 @@ const I18N = {
     "exclude_list": "قائمة الاستبعاد"
   },
   "ja": {
-    "subtitle": "このインスタンスのリモートダッシュボード。",
+ja    "subtitle": "このインスタンスのリモートダッシュボード。",
     "mode_view": "閲覧のみ",
     "mode_control": "閲覧と操作",
     "mining": "マイニング中",
@@ -2087,7 +2087,7 @@ const I18N = {
     "exclude_list": "除外リスト"
   },
   "zh-CN": {
-    "subtitle": "此实例的远程控制面板。",
+zh-CN    "subtitle": "此实例的远程控制面板。",
     "mode_view": "仅查看",
     "mode_control": "查看并控制",
     "mining": "正在挖取",
@@ -2154,7 +2154,7 @@ const I18N = {
     "exclude_list": "排除列表"
   },
   "zh-TW": {
-    "subtitle": "此實例的遠端控制面板。",
+zh-TW    "subtitle": "此實例的遠端控制面板。",
     "mode_view": "僅檢視",
     "mode_control": "檢視並控制",
     "mining": "挖取中",
@@ -2221,7 +2221,7 @@ const I18N = {
     "exclude_list": "排除清單"
   },
   "id": {
-    "subtitle": "Dasbor jarak jauh untuk instans ini.",
+id    "subtitle": "Dasbor jarak jauh untuk instans ini.",
     "mode_view": "Hanya lihat",
     "mode_control": "Lihat dan kendalikan",
     "mining": "Menambang",
