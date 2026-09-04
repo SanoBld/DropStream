@@ -489,30 +489,9 @@ class StatusBar:
         frame = ttk.LabelFrame(master, text=_("gui", "status", "name"), padding=(4, 0, 4, 4))
         frame.grid(column=0, row=0, columnspan=3, sticky="nsew", padx=2)
         frame.columnconfigure(0, weight=1)
-        frame.columnconfigure(0, weight=1)
         self.text_var = StringVar(frame, '')
         self._label = ttk.Label(frame, textvariable=self.text_var)
         self._label.grid(column=0, row=0, sticky="nsew")
-        # real reload button for this tab (the desktop Inventory tab has its own,
-        # but it can be hidden via settings.show_inventory_tab - this one is always here)
-        ttk.Button(
-            frame, text=_("gui", "dashboard", "reload"),
-            command=lambda: manager._twitch.reload_inventory(),
-        ).grid(column=1, row=0, sticky="e", padx=(6, 0))
-        self._server_status_var = StringVar(frame, _("gui", "inventory", "server", "unknown"))
-        ttk.Label(
-            frame, textvariable=self._server_status_var
-        ).grid(column=2, row=0, sticky="e", padx=(10, 4))
-        ttk.Button(
-            frame, text=_("gui", "inventory", "server", "check"),
-            command=lambda: asyncio.create_task(self._check_server(manager)),
-        ).grid(column=3, row=0, sticky="e")
-
-    async def _check_server(self, manager: GUIManager) -> None:
-        self._server_status_var.set(_("gui", "inventory", "server", "checking"))
-        ok, latency_ms = await manager._twitch.check_server_status()
-        key = "ok" if ok else "down"
-        self._server_status_var.set(_("gui", "inventory", "server", key).format(ms=latency_ms))
         # real reload button for this tab (the desktop Inventory tab has its own,
         # but it can be hidden via settings.show_inventory_tab - this one is always here)
         ttk.Button(
@@ -1288,7 +1267,10 @@ class TrayIcon:
             # nearly all cached images from RAM, they'll get rebuilt/redecoded once
             # restored. This is opt-in since it makes things noticeably slower right
             # after restoring, or when opening Inventory, while it reloads.
-            self._manager.inv.clear()
+            if self._manager.inv is not None:
+                # bug fix: this used to run unconditionally and crash with
+                # AttributeError when show_inventory_tab is disabled (inv is None)
+                self._manager.inv.clear()
             self._manager._cache.trim()
             self._manager._inventory_dirty = True
             gc.collect()
@@ -1505,9 +1487,6 @@ class DashboardTab:
         ttk.Button(
             top_row, text=_("gui", "dashboard", "reload"), command=self._reload_from_server
         ).grid(column=3, row=0, padx=(6, 0))
-        ttk.Button(
-            top_row, text=_("gui", "dashboard", "reload"), command=self._reload_from_server
-        ).grid(column=3, row=0, padx=(6, 0))
         # row 1: "pause until HH:MM" - on its own line, with a hint bubble + placeholder
         bottom_row = ttk.Frame(status_frame)
         bottom_row.grid(column=0, row=1, sticky="w", pady=(6, 0))
@@ -1621,10 +1600,6 @@ class DashboardTab:
         self._update_status_indicator()
 
     def _reload_from_server(self) -> None:
-        self._twitch.reload_inventory()
-        self.refresh_campaign(force=True)
-
-    def _reload_from_server(self) -> None:
         self._twitch.force_reload()
 
     def _pause_until(self) -> None:
@@ -1650,7 +1625,15 @@ class DashboardTab:
 
     def _poll_status(self) -> None:
         self._update_status_indicator()
-        self._manager._root.after(5000, self._poll_status)
+        # while minimized in eco mode nobody can see this widget refresh, so back off
+        # to a much longer interval instead of waking up every 5s for nothing
+        interval = self._eco_poll_interval()
+        self._manager._root.after(interval, self._poll_status)
+
+    def _eco_poll_interval(self) -> int:
+        if self._manager._minimized and self._twitch.settings.low_power_tray_mode:
+            return 60_000
+        return 5_000
 
     def refresh_campaign(self, *, force: bool = False) -> None:
         # schedules the async campaign rebuild (fetches/caches drop images).
@@ -1865,17 +1848,6 @@ class InventoryOverview:
         ttk.Button(
             filter_frame, text=_("gui", "inventory", "server", "check"),
             command=self.check_server_status,
-            filter_frame, text=_("gui", "inventory", "filter", "refresh"),
-            command=self.reload_from_server,
-        ).grid(column=(icolumn := icolumn + 1), row=0)
-        # server health check
-        self._server_status_var = StringVar(master, _("gui", "inventory", "server", "unknown"))
-        ttk.Label(
-            filter_frame, textvariable=self._server_status_var
-        ).grid(column=(icolumn := icolumn + 1), row=0, padx=(LABEL_SPACING, 4))
-        ttk.Button(
-            filter_frame, text=_("gui", "inventory", "server", "check"),
-            command=self.check_server_status,
         ).grid(column=(icolumn := icolumn + 1), row=0)
         # Inventory view
         self._canvas = tk.Canvas(master, scrollregion=(0, 0, 0, 0), highlightthickness=0)
@@ -1961,20 +1933,6 @@ class InventoryOverview:
             # visibility
             self._update_visibility(campaign)
         self._canvas_update()
-
-    def reload_from_server(self) -> None:
-        self._manager._twitch.reload_inventory()
-
-    def check_server_status(self) -> None:
-        asyncio.create_task(self._check_server_status_async())
-
-    async def _check_server_status_async(self) -> None:
-        self._server_status_var.set(_("gui", "inventory", "server", "checking"))
-        ok, latency_ms = await self._manager._twitch.check_server_status()
-        key = "ok" if ok else "down"
-        self._server_status_var.set(
-            _("gui", "inventory", "server", key).format(ms=latency_ms)
-        )
 
     def reload_from_server(self) -> None:
         self._manager._twitch.force_reload()
@@ -2231,6 +2189,7 @@ class _SettingsVars(TypedDict):
     auto_restart_enabled: IntVar
     auto_restart_minutes: StringVar
     show_inventory_tab: IntVar
+    low_power_tray_mode: IntVar
 
 
 class SettingsPanel:
@@ -2612,6 +2571,10 @@ class SettingsPanel:
         InfoTooltip(
             priority_mode_frame, text=_("gui", "settings", "general", "priority_mode_info")
         ).grid(column=2, row=0, sticky="w", padx=(4, 0))
+        ttk.Button(
+            priority_mode_frame, text=_("gui", "dashboard", "reload"),
+            command=lambda: self._manager._twitch.change_state(State.GAMES_UPDATE),
+        ).grid(column=3, row=0, padx=(10, 0))
 
         # Priority section
         priority_frame = ttk.LabelFrame(
@@ -2862,6 +2825,7 @@ class SettingsPanel:
             self._settings.priority.append(game_name)
             self._settings.alter()
             self.update_priority_choices()
+            self._manager._twitch.change_state(State.GAMES_UPDATE)
         else:
             # already there, set the selection on it
             self._priority_list.selection_set(existing_idx)
@@ -2900,6 +2864,7 @@ class SettingsPanel:
         self._settings.priority.pop(idx)
         self._settings.priority.insert(insert_idx, item)
         self._settings.alter()
+        self._manager._twitch.change_state(State.GAMES_UPDATE)
 
     def priority_delete(self) -> None:
         idx: int | None = self._priority_idx()
@@ -2909,12 +2874,14 @@ class SettingsPanel:
         del self._settings.priority[idx]
         self._settings.alter()
         self.update_priority_choices()
+        self._manager._twitch.change_state(State.GAMES_UPDATE)
 
     def priority_mode(self, event: tk.Event[ttk.Combobox]) -> None:
         mode_name: str = self._vars["priority_mode"].get()
         for value, name in self.PRIORITY_MODES.items():
             if mode_name == name:
                 self._settings.priority_mode = value
+                self._manager._twitch.change_state(State.GAMES_UPDATE)
                 break
 
     def sync_from_settings(self) -> None:
@@ -3015,6 +2982,7 @@ class SettingsPanel:
             self._settings.exclude.add(game_name)
             self._settings.alter()
             self.update_excluded_choices()
+            self._manager._twitch.change_state(State.GAMES_UPDATE)
             # insert it alphabetically
             for i, item in enumerate(self._exclude_list.get(0, "end")):
                 if game_name < item:
@@ -3047,6 +3015,7 @@ class SettingsPanel:
             self._settings.exclude.discard(item)
             self._settings.alter()
             self.update_excluded_choices()
+            self._manager._twitch.change_state(State.GAMES_UPDATE)
 
 
 class HelpTab:
@@ -3322,7 +3291,12 @@ class RemoteAccessTab:
             self._viewer_label.configure(text=text)
         else:
             self._viewer_label.configure(text="")
-        self._manager._root.after(5000, self._poll_viewers)
+        self._manager._root.after(self._eco_interval(), self._poll_viewers)
+
+    def _eco_interval(self) -> int:
+        if self._manager._minimized and self._twitch.settings.low_power_tray_mode:
+            return 60_000
+        return 5_000
 
     def _update_password_state(self) -> None:
         state = "normal" if self._vars["control"].get() else "disabled"
@@ -4336,7 +4310,8 @@ if __name__ == "__main__":
         )
         gui._root.update()
         gui.channels.get_selection()
-        # Inventory overview
+        # Inventory overview (this manual test always runs with the tab enabled)
+        assert gui.inv is not None
         drop = create_drop(
             "Wardrobe Cleaning", "Cleaning Masters", ["Fancy Pants"], 2, 7, 0, 240
         )

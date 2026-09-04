@@ -1,0 +1,276 @@
+{
+    "english_name": "Portuguese",
+    "status": {
+        "terminated": "\nAplicação Finalizada.\nFeche a janela para sair do programa.",
+        "watching": "Assistindo o: {channel}",
+        "goes_online": "{channel} esta ONLINE, Mudando...",
+        "goes_offline": "{channel} ficou OFFLINE, Mudando...",
+        "claimed_drop": "Coletou o drop: {drop}",
+        "no_channel": "Sem canal disponivel para assisitir. Esperando por um canal ONLINE...",
+        "no_campaign": "Sem campanhas ativas no momento para minerar. Esperando por uma campanha ativa...",
+        "auto_action": "Todos os drops resgatados por enquanto, executando a ação configurada: {action}",
+        "auto_restart": "O reinício automático está ativado: será relançado em {minutes} minuto(s), a menos que feche esta janela antes.",
+        "auto_restart_now": "A relançar agora..."
+    },
+    "login": {
+        "chrome": {
+            "startup": "Abrindo Google Chrome",
+            "login_to_complete": "Por Favor complete o login pela pagina web manualmente pressionando o botão Login novamente.",
+            "no_token": "Seu Token de autorização Twitch não foi encontrado",
+            "closed_window": "O Google Chrome foi fechado antes da autenticação ser concluída."
+        },
+        "error_code": "Código de erro do login: {error_code}",
+        "unexpected_content": "Ocorreu um erro inesperado, geralmente causado por redirecionamento de internet. Você precisa se autenticar para ter acesso à internet?",
+        "incorrect_login_pass": "Usuário e/ou senha incorreto(s)",
+        "incorrect_email_code": "Codigo de email incorreto",
+        "incorrect_twofa_code": "Codigo F2A incorreto",
+        "email_code_required": "Código no email necessário. Verifique sua caixa de entrada",
+        "twofa_code_required": "Token 2FA necessário."
+    },
+    "error": {
+        "captcha": "Seu login foi negado pelo CAPTCHA.\nPor favor tente em aproximadamente 12+ horas.",
+        "site_down": "Twitch está fora do ar, tentando novamente em {seconds} segundos...",
+        "no_connection": "Sem conexão com a TWITCH, reconectando em {seconds} segundos... ({url})"
+    },
+    "gui": {
+        "output": "Saída",
+        "status": {
+            "name": "Status",
+            "idle": "Em espera",
+            "exiting": "Saindo",
+            "terminated": "Finalizado",
+            "cleanup": "Limpando os Canais...",
+            "gathering": "Coletando Canais...",
+            "switching": "Mudando o canal...",
+            "fetching_inventory": "Coletando inventário...",
+            "fetching_campaigns": "Coletando campanhas...",
+            "adding_campaigns": "Adicionando as campanhas para o sistema... {counter}",
+            "paused": "Pausado",
+            "paused_until": "Pausado até {time}",
+            "scheduled": "Fora do horário programado",
+            "auto_restart": "Terminado - a reiniciar em {minutes} min"
+        },
+        "tabs": {
+            "main": "Tela Principal",
+            "inventory": "Inventario",
+            "settings": "Configurações",
+            "help": "Ajuda",
+            "dashboard": "Painel",
+            "remote": "Remoto"
+        },
+        "tray": {
+            "notification_title": "Drop coletado",
+            "minimize": "Minimizar para barra de tarefas",
+            "show": "Mostrar",
+            "quit": "Sair",
+            "pause": "Pausar",
+            "resume": "Retomar",
+            "switch_channel": "Mudar de canal"
+        },
+        "login": {
+            "name": "Tela de login",
+            "labels": "Status:\nUser ID:",
+            "logged_in": "Entrou",
+            "logged_out": "Saiu",
+            "logging_in": "Entrando...",
+            "required": "Login necessário",
+            "request": "Por favor, entre para continuar.",
+            "username": "Usuário",
+            "password": "Senha",
+            "twofa_code": "Código 2FA (opcional)",
+            "button": "Entrar"
+        },
+        "websocket": {
+            "name": "Status Websocket",
+            "websocket": "Websocket #{id}:",
+            "initializing": "Inicializando...",
+            "connected": "Conectado",
+            "disconnected": "Disconectado",
+            "connecting": "Conectando...",
+            "disconnecting": "Desconectando...",
+            "reconnecting": "Reconectando..."
+        },
+        "progress": {
+            "name": "Progresso da campanha",
+            "drop": "Drop:",
+            "game": "Jogo:",
+            "campaign": "Campanha:",
+            "remaining": "{time} restante",
+            "drop_progress": "Progresso:",
+            "campaign_progress": "Progresso:"
+        },
+        "channels": {
+            "name": "Canais",
+            "switch": "Trocar",
+            "online": "ONLINE  ✔",
+            "pending": "OFFLINE ⏳",
+            "offline": "OFFLINE ❌",
+            "headings": {
+                "channel": "Canal",
+                "status": "Status",
+                "game": "Jogo",
+                "viewers": "Visualizadores"
+            }
+        },
+        "inventory": {
+            "filter": {
+                "name": "Filtro",
+                "show": "Mostrar:",
+                "not_linked": "Não ligado",
+                "upcoming": "Se Aproximando",
+                "expired": "Expirado",
+                "excluded": "Excluido",
+                "finished": "Finalizado",
+                "refresh": "Atualizar"
+            },
+            "status": {
+                "linked": "Conectado ✔",
+                "not_linked": "Desconectado ❌",
+                "active": "Ativo ✔",
+                "upcoming": "Se aproximando ⏳",
+                "expired": "Expirado ❌",
+                "claimed": "Coletado ✔",
+                "ready_to_claim": "Pronto para coleta ⏳"
+            },
+            "starts": "Começa em: {time}",
+            "ends": "Termina em: {time}",
+            "allowed_channels": "Canais Autorizados:",
+            "all_channels": "Todos",
+            "and_more": "e {amount} mais...",
+            "percent_progress": "{percent} de {minutes} minutos",
+            "minutes_progress": "{minutes} minutos",
+            "reloading": "Recarregando seu inventário, isso vai levar só um instante...",
+            "server": {
+                "unknown": "Servidor: desconhecido",
+                "checking": "Servidor: verificando...",
+                "ok": "Servidor: OK ({ms} ms)",
+                "down": "Servidor: inacessível",
+                "check": "Verificar"
+            }
+        },
+        "settings": {
+            "general": {
+                "name": "Geral",
+                "autostart": "Auto-início: ",
+                "tray": "Auto-iniciar na área de notificação: ",
+                "tray_notifications": "Notificações: ",
+                "dark_mode": "Modo escuro: ",
+                "priority_only": "Apenas com prioridade: ",
+                "proxy": "Proxy (requer o reinício do app):",
+                "theme": "Tema: ",
+                "use_system_accent": "Usar cor de destaque do sistema: ",
+                "priority_mode": "Modo de prioridade: ",
+                "priority_mode_info": "Os jogos da lista de prioridade são sempre tentados primeiro, na ordem definida por você. \"Termina primeiro\"/\"Baixa disponibilidade primeiro\" determinam apenas a ordem para o restante, quando nada da lista de prioridade estiver mais disponível.",
+                "low_power_tray_mode": "Economizar RAM/bateria ao minimizar: ",
+                "low_power_tray_mode_info": "Enquanto minimizado na bandeja, o app limpa as imagens em cache e verifica atualizações com menos frequência para usar menos memória e bateria. A contrapartida: abrir a aba Inventário depois pode parecer um pouco mais lento por um instante, pois precisa recarregar - uma tela de carregamento é exibida enquanto isso acontece."
+            },
+            "game_name": "Nome do jogo",
+            "priority": "Prioridade",
+            "exclude": "Excluir",
+            "reload": "Recarregar",
+            "reload_text": "A maioria das mudanças requer o reinício do app para serem efetivadas: ",
+            "accounts": {
+                "name": "Contas",
+                "current": "Perfil ativo: {name}",
+                "create": "Criar",
+                "launch": "Iniciar (em paralelo)",
+                "switch": "Mudar para",
+                "delete": "Excluir",
+                "delete_confirm": "Excluir permanentemente o perfil \"{name}\" e todos os seus dados (configurações, cookies, cache, estatísticas)? Isso não pode ser desfeito."
+            },
+            "scheduler": {
+                "name": "Agendador",
+                "enabled": "Ativar agendamento: ",
+                "start": "Início (HH:MM): ",
+                "end": "Fim (HH:MM): ",
+                "auto_action": "Quando todos os drops estiverem prontos: "
+            },
+            "power_actions": {
+                "none": "Não fazer nada",
+                "sleep": "Colocar o PC em suspensão",
+                "shutdown": "Desligar o PC"
+            },
+            "themes": {
+                "auto": "Claro/Escuro (Auto)",
+                "light": "Claro",
+                "dark": "Escuro",
+                "modern_auto": "Cores da Twitch (Auto)",
+                "modern_light": "Cores da Twitch, claro",
+                "modern_dark": "Cores da Twitch, escuro"
+            },
+            "priority_modes": {
+                "priority_only": "Somente lista de prioridade",
+                "priority_only_continue": "Somente lista de prioridade, depois continuar com o restante",
+                "ending_soonest": "Termina primeiro",
+                "priority_ending_soonest": "Lista de prioridade primeiro, depois termina primeiro",
+                "low_availability": "Baixa disponibilidade primeiro",
+                "priority_low_availability": "Lista de prioridade primeiro, depois baixa disponibilidade"
+            },
+            "advanced": {
+                "name": "Avançado",
+                "warning": "Aviso!",
+                "warning_text": "Essas opções podem fazer o minerador funcionar incorretamente.\nSe tiver problemas, certifique-se de que todas essas opções estejam desativadas.",
+                "enable_badges_emotes": "Ativar suporte parcial para emblemas e emotes: ",
+                "available_drops_check": "Ativar verificação extra de drops disponíveis: "
+            },
+            "reliability": {
+                "name": "Fiabilidade",
+                "info": "A aplicação já tenta novamente algumas vezes por conta própria antes de desistir. Se, mesmo assim, acabar num ecrã \"Terminado\", esta opção relança-a automaticamente após um atraso.",
+                "enabled": "Reinício automático após falha: ",
+                "minutes": "Reiniciar após (minutos): "
+            }
+        },
+        "help": {
+            "links": {
+                "name": "Links Uteis",
+                "inventory": "Ver inventario da Twitch",
+                "campaigns": "Veja todas campanhas e gerencie conexões da sua conta"
+            },
+            "how_it_works": "Como funciona",
+            "how_it_works_text": "A cada poucos segundos, a aplicação simula assistir a uma transmissão específica ao solicitar os seus metadados, o que é suficiente para progredir nos drops ativos. Esta abordagem evita transferir qualquer vídeo ou áudio real. Uma ligação websocket persistente mantém atualizado o estado de cada canal (ONLINE ou OFFLINE), bem como o número de espetadores em direto.",
+            "getting_started": "Iniciando",
+            "getting_started_text": "1. Autentique-se na aplicação com a sua conta da Twitch.\n2. Certifique-se de que a sua conta está associada a todas as campanhas que pretende explorar.\n3. Para explorar tudo o que está disponível, altere o Modo de Prioridade para uma opção diferente de \"Apenas lista de prioridade\" e prima \"Recarregar\".\n4. Para explorar determinados jogos primeiro, use a lista \"Prioridade\" para definir a ordem pretendida. Os jogos no topo da lista são explorados antes dos que se encontram mais abaixo.\n5. Mantenha o \"Modo de Prioridade\" definido como \"Apenas lista de prioridade\" para evitar explorar jogos fora dessa lista. Este passo é totalmente opcional.\n6. Use a lista \"Excluir\" para indicar os jogos que nunca devem ser explorados.\n7. Qualquer alteração ao conteúdo das listas, ou ao Modo de Prioridade, exige que prima \"Recarregar\" para que as alterações tenham efeito.",
+            "invalidate": {
+                "button": "Invalidar token de autorização",
+                "text": "Use isto se precisar fazer login novamente, por exemplo, para trocar de conta. Isso invalida o token de autorização atual e encerra sua sessão."
+            }
+        },
+        "dashboard": {
+            "now_mining": "Minerando agora",
+            "campaign": "Campanha de drops",
+            "status": "Status",
+            "pause": "Pausar",
+            "resume": "Retomar",
+            "resume_at": "Retomar às: ",
+            "resume_at_info": "Exemplo: digite 14:30 e clique em \"Pausar até\" para pausar a mineração agora e retomar automaticamente às 14:30 (hoje, ou amanhã se esse horário já tiver passado).",
+            "pause_until": "Pausar até",
+            "drop_remaining": "Tempo restante para este drop: ",
+            "campaign_remaining": "Tempo restante para a campanha: ",
+            "weekly": "Últimos 7 dias",
+            "per_game": "Drops por jogo",
+            "total_drops": "Total de drops resgatados: {count}",
+            "hours_saved": "Horas de visualização economizadas: {hours}",
+            "no_data": "Ainda sem dados",
+            "reload": "Recarregar"
+        },
+        "remote": {
+            "info": "Permite ver o estado em tempo real e, se assim escolher, controlar esta instância (pausar/retomar, modo de prioridade) a partir de um navegador noutro dispositivo, através da ligação abaixo. Qualquer pessoa com a ligação pode ver; qualquer pessoa com a ligação e a palavra-passe (se definida) também pode controlar, por isso partilhe-a apenas com pessoas de confiança.",
+            "enabled": "Ativar painel web: ",
+            "port": "Porta: ",
+            "mode_label": "Modo de acesso: ",
+            "mode_view": "Apenas visualizar",
+            "mode_control": "Visualizar e controlar",
+            "password_label": "Palavra-passe de controlo: ",
+            "password_placeholder": "Opcional, deixe vazio para nenhuma",
+            "new_link": "Gerar nova ligação",
+            "link": "Ligação de partilha:",
+            "link_disabled": "Ative o painel para gerar uma ligação.",
+            "copy_link": "Copiar",
+            "public_label": "Mostrar também uma ligação pública: ",
+            "open_link": "Abrir",
+            "public_link": "Ligação pública de partilha:",
+            "public_link_resolving": "A procurar o seu IP público...",
+            "public_link_unavailable": "Não foi possível determinar um IP público neste momento."
+        }
+    }
+}
