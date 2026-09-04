@@ -8,6 +8,8 @@ import io
 import json
 from typing import Dict, TypedDict, NewType, TYPE_CHECKING
 
+import aiohttp
+
 from utils import json_load, json_save
 from constants import URLType, CACHE_PATH, CACHE_DB
 
@@ -36,6 +38,7 @@ default_database: Hashes = {}
 
 class ImageCache:
     LIFETIME = timedelta(days=7)
+    FETCH_TIMEOUT = 10  # seconds; images are non-critical, fail fast to a blank placeholder
 
     def __init__(self, manager: GUIManager) -> None:
         self._root = manager._root
@@ -99,6 +102,13 @@ class ImageCache:
         return ImageHash(f"{int(bits, 2):x}.png")
 
     async def get(self, url: URLType, size: ImageSize | None = None) -> PhotoImage:
+        # bug fix: image downloads used to go through Twitch.request(), which retries
+        # forever (capped backoff, unlimited attempts) on connection errors, all while
+        # holding self._lock for the whole download. One stalled image during a network
+        # blip would then block every other image fetch behind it - freezing the whole
+        # "adding campaigns" step, since it fires off one task per campaign concurrently.
+        # Images aren't critical (a blank placeholder is an acceptable fallback), so they
+        # get a short, bounded timeout instead, and the lock is released during the fetch.
         async with self._lock:
             image: Image | None = None
             if url in self._hashes:
@@ -115,16 +125,20 @@ class ImageCache:
                         self._evict_if_needed(self._images, self._MAX_IMAGES)
                     except (FileNotFoundError, Image_module.UnidentifiedImageError, OSError):
                         pass
+        if image is None:
+            try:
+                session = await self._twitch.get_session()
+                async with session.get(
+                    url, timeout=aiohttp.ClientTimeout(total=self.FETCH_TIMEOUT)
+                ) as response:
+                    if response.status != 404:
+                        image = Image_module.open(io.BytesIO(await response.read()))
+            except Exception:
+                pass
             if image is None:
-                try:
-                    async with self._twitch.request("GET", url) as response:
-                        if response.status != 404:
-                            image = Image_module.open(io.BytesIO(await response.read()))
-                except Exception:
-                    pass
-                if image is None:
-                    # use a blank white image as a fallback
-                    image = Image_module.new("RGB", (10, 10), (255, 255, 255))
+                # use a blank white image as a fallback
+                image = Image_module.new("RGB", (10, 10), (255, 255, 255))
+            async with self._lock:
                 img_hash = self._hash(image)
                 self._images[img_hash] = image
                 self._evict_if_needed(self._images, self._MAX_IMAGES)
@@ -139,18 +153,19 @@ class ImageCache:
         if size is None:
             size = image.size
         photo_key = (img_hash, size)
-        if photo_key in self._photos:
-            self._photos.move_to_end(photo_key)
-            return self._photos[photo_key]
-        if image.size != size:
-            try:
-                image = image.resize(size, Image_module.Resampling.LANCZOS)
-            except OSError:
-                # broken image data surfaced during resize; fall back to blank placeholder
-                image = Image_module.new("RGB", size, (255, 255, 255))
-        self._photos[photo_key] = photo = PhotoImage(master=self._root, image=image)
-        self._evict_if_needed(self._photos, self._MAX_PHOTOS)
-        return photo
+        async with self._lock:
+            if photo_key in self._photos:
+                self._photos.move_to_end(photo_key)
+                return self._photos[photo_key]
+            if image.size != size:
+                try:
+                    image = image.resize(size, Image_module.Resampling.LANCZOS)
+                except OSError:
+                    # broken image data surfaced during resize; fall back to blank placeholder
+                    image = Image_module.new("RGB", size, (255, 255, 255))
+            self._photos[photo_key] = photo = PhotoImage(master=self._root, image=image)
+            self._evict_if_needed(self._photos, self._MAX_PHOTOS)
+            return photo
 
     @staticmethod
     def _evict_if_needed(mapping: OrderedDict, max_size: int) -> None:

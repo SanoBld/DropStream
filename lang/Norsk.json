@@ -140,7 +140,14 @@
             "and_more": "og {amount} flere...",
             "percent_progress": "{percent} av {minutes} minutter",
             "minutes_progress": "{minutes} minutter",
-            "reloading": "Laster inn beholdningen din på nytt, det tar bare et øyeblikk..."
+            "reloading": "Laster inn beholdningen din på nytt, det tar bare et øyeblikk...",
+            "server": {
+                "unknown": "Server: ukjent",
+                "checking": "Server: sjekker...",
+                "ok": "Server: OK ({ms} ms)",
+                "down": "Server: utilgjengelig",
+                "check": "Sjekk"
+            }
         },
         "settings": {
             "general": {
@@ -243,7 +250,8 @@
             "per_game": "Drops per spill",
             "total_drops": "Totalt innløste drops: {count}",
             "hours_saved": "Sparte seertimer: {hours}",
-            "no_data": "Ingen data ennå"
+            "no_data": "Ingen data ennå",
+            "reload": "Last inn på nytt"
         },
         "remote": {
             "info": "Lar deg se live status og, hvis du velger det, styre denne forekomsten (pause/gjenoppta, prioritetsmodus) fra en nettleser på en annen enhet, ved hjelp av lenken nedenfor. Alle med lenken kan se den; alle med lenken og passordet (hvis angitt) kan også styre den, så del den kun med personer du stoler på.",

@@ -140,7 +140,14 @@
             "and_more": "e altri {amount}...",
             "percent_progress": "{percent} di {minutes} minuti",
             "minutes_progress": "{minutes} minuti",
-            "reloading": "Ricaricamento del tuo inventario, ci vorrà solo un momento..."
+            "reloading": "Ricaricamento del tuo inventario, ci vorrà solo un momento...",
+            "server": {
+                "unknown": "Server: sconosciuto",
+                "checking": "Server: controllo...",
+                "ok": "Server: OK ({ms} ms)",
+                "down": "Server: non raggiungibile",
+                "check": "Verifica"
+            }
         },
         "settings": {
             "general": {
@@ -244,7 +251,8 @@
             "per_game": "Drop per gioco",
             "total_drops": "Drop totali riscattati: {count}",
             "hours_saved": "Ore di visione risparmiate: {hours}",
-            "no_data": "Nessun dato ancora"
+            "no_data": "Nessun dato ancora",
+            "reload": "Ricarica"
         },
         "remote": {
             "info": "Consente di visualizzare lo stato in tempo reale e, se lo desideri, controllare questa istanza (pausa/ripresa, modalità priorità) da un browser su un altro dispositivo, tramite il link qui sotto. Chiunque abbia il link può visualizzare; chiunque abbia il link e la password (se impostata) può anche controllare, quindi condividilo solo con persone di fiducia.",

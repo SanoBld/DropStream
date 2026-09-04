@@ -460,6 +460,10 @@ class Twitch:
         # every time a drop/campaign completes; only do it periodically instead.
         self._last_inventory_fetch: datetime | None = None
         self._force_inventory_fetch: bool = True
+        # prevents two overlapping fetch_inventory runs (e.g. manual reload while
+        # the maintenance task is already fetching) from racing and clearing each
+        # other's data mid-way
+        self._inventory_fetch_lock: asyncio.Lock = asyncio.Lock()
         # NOTE: GQL is pretty volatile and breaks everything if one runs into their rate limit.
         # Do not modify the default, safe values.
         self._qgl_limiter = RateLimiter(capacity=5, window=1)
@@ -1452,6 +1456,19 @@ class Twitch:
             with suppress(asyncio.TimeoutError):
                 await asyncio.wait_for(self.gui.wait_until_closed(), timeout=delay)
 
+    async def check_server_status(self) -> tuple[bool, int]:
+        # quick health check, no retry loop: caller wants a fast yes/no + latency
+        session = await self.get_session()
+        start = time()
+        try:
+            async with session.head(
+                "https://gql.twitch.tv/gql", timeout=aiohttp.ClientTimeout(total=5)
+            ) as response:
+                ok = response.status < 500
+        except (aiohttp.ClientError, asyncio.TimeoutError):
+            ok = False
+        return ok, round((time() - start) * 1000)
+
     @overload
     async def gql_request(self, ops: GQLOperation) -> JsonType:
         ...
@@ -1589,6 +1606,14 @@ class Twitch:
                 f"Skipping full inventory refresh (cooldown active, {remaining} remaining)",
             )
             return
+        if self._inventory_fetch_lock.locked():
+            # a fetch is already running (e.g. maintenance task); avoid a second
+            # one racing it and clearing data mid-rebuild - just wait for it
+            logger.log(CALL, "Inventory refresh already running, waiting for it")
+        async with self._inventory_fetch_lock:
+            await self._fetch_inventory(now)
+
+    async def _fetch_inventory(self, now: datetime) -> None:
         self._last_inventory_fetch = now
         status_update = self.gui.status.update
         status_update(_("gui", "status", "fetching_inventory"))
@@ -1690,6 +1715,10 @@ class Twitch:
             # later, so there's no point paying the RAM cost for a tab nobody can see right
             # now. It gets rebuilt (with a loading screen) the next time it's opened.
             self.gui._inventory_dirty = True
+            # bug fix: this branch never touches the "(0/N)" counter set above, so it used
+            # to stay frozen on screen looking stuck until the next full fetch (an hour+
+            # later) even though everything was actually working fine
+            status_update(_("gui", "status", "idle"))
         else:
             add_campaign_tasks: list[asyncio.Task[None]] = [
                 asyncio.create_task(self.gui.inv.add_campaign(campaign))
