@@ -140,7 +140,14 @@
             "and_more": "og {amount} mere...",
             "percent_progress": "{percent} af {minutes} minutter",
             "minutes_progress": "{minutes} minutter",
-            "reloading": "Genindlæser din beholdning, det tager kun et øjeblik..."
+            "reloading": "Genindlæser din beholdning, det tager kun et øjeblik...",
+            "server": {
+                "unknown": "Server: ukendt",
+                "checking": "Server: kontrollerer...",
+                "ok": "Server: OK ({ms} ms)",
+                "down": "Server: utilgængelig",
+                "check": "Kontroller"
+            }
         },
         "settings": {
             "general": {
@@ -244,7 +251,8 @@
             "per_game": "Drops pr. spil",
             "total_drops": "Drops indløst i alt: {count}",
             "hours_saved": "Sparede seertimer: {hours}",
-            "no_data": "Ingen data endnu"
+            "no_data": "Ingen data endnu",
+            "reload": "Genindlæs"
         },
         "remote": {
             "info": "Lader dig se live status og, hvis du vælger det, styre denne instans (pause/genoptag, prioritetstilstand) fra en browser på en anden enhed, via linket nedenfor. Alle med linket kan se det; alle med linket og adgangskoden (hvis angivet) kan også styre det, så del det kun med personer, du stoler på.",

@@ -140,7 +140,14 @@
             "and_more": "dan {amount} yang lainnya...",
             "percent_progress": "{percent} dari {minutes} menit",
             "minutes_progress": "{minutes} menit",
-            "reloading": "Memuat ulang inventaris kamu, ini hanya butuh sebentar..."
+            "reloading": "Memuat ulang inventaris kamu, ini hanya butuh sebentar...",
+            "server": {
+                "unknown": "Server: tidak diketahui",
+                "checking": "Server: memeriksa...",
+                "ok": "Server: OK ({ms} md)",
+                "down": "Server: tidak dapat dijangkau",
+                "check": "Periksa"
+            }
         },
         "settings": {
             "general": {
@@ -244,7 +251,8 @@
             "per_game": "Drop per Game",
             "total_drops": "Total drop diklaim: {count}",
             "hours_saved": "Jam tonton yang dihemat: {hours}",
-            "no_data": "Belum ada data"
+            "no_data": "Belum ada data",
+            "reload": "Muat ulang"
         },
         "remote": {
             "info": "Memungkinkan Anda melihat status langsung dan, jika Anda memilih, mengendalikan instans ini (jeda/lanjutkan, mode prioritas) dari peramban di perangkat lain, menggunakan tautan di bawah ini. Siapa pun dengan tautan dapat melihat; siapa pun dengan tautan dan kata sandi (jika diatur) juga dapat mengendalikan, jadi bagikan hanya kepada orang yang Anda percaya.",

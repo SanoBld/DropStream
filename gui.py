@@ -488,9 +488,30 @@ class StatusBar:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         frame = ttk.LabelFrame(master, text=_("gui", "status", "name"), padding=(4, 0, 4, 4))
         frame.grid(column=0, row=0, columnspan=3, sticky="nsew", padx=2)
+        frame.columnconfigure(0, weight=1)
         self.text_var = StringVar(frame, '')
         self._label = ttk.Label(frame, textvariable=self.text_var)
         self._label.grid(column=0, row=0, sticky="nsew")
+        # real reload button for this tab (the desktop Inventory tab has its own,
+        # but it can be hidden via settings.show_inventory_tab - this one is always here)
+        ttk.Button(
+            frame, text=_("gui", "dashboard", "reload"),
+            command=lambda: manager._twitch.reload_inventory(),
+        ).grid(column=1, row=0, sticky="e", padx=(6, 0))
+        self._server_status_var = StringVar(frame, _("gui", "inventory", "server", "unknown"))
+        ttk.Label(
+            frame, textvariable=self._server_status_var
+        ).grid(column=2, row=0, sticky="e", padx=(10, 4))
+        ttk.Button(
+            frame, text=_("gui", "inventory", "server", "check"),
+            command=lambda: asyncio.create_task(self._check_server(manager)),
+        ).grid(column=3, row=0, sticky="e")
+
+    async def _check_server(self, manager: GUIManager) -> None:
+        self._server_status_var.set(_("gui", "inventory", "server", "checking"))
+        ok, latency_ms = await manager._twitch.check_server_status()
+        key = "ok" if ok else "down"
+        self._server_status_var.set(_("gui", "inventory", "server", key).format(ms=latency_ms))
 
     def update(self, text: str):
         self.text_var.set(text)
@@ -1460,6 +1481,9 @@ class DashboardTab:
             top_row, text=_("gui", "dashboard", "pause"), command=self._toggle_pause
         )
         self._pause_btn.grid(column=2, row=0, padx=(16, 0))
+        ttk.Button(
+            top_row, text=_("gui", "dashboard", "reload"), command=self._reload_from_server
+        ).grid(column=3, row=0, padx=(6, 0))
         # row 1: "pause until HH:MM" - on its own line, with a hint bubble + placeholder
         bottom_row = ttk.Frame(status_frame)
         bottom_row.grid(column=0, row=1, sticky="w", pady=(6, 0))
@@ -1571,6 +1595,10 @@ class DashboardTab:
     def _toggle_pause(self) -> None:
         self._twitch.toggle_pause()
         self._update_status_indicator()
+
+    def _reload_from_server(self) -> None:
+        self._twitch.reload_inventory()
+        self.refresh_campaign(force=True)
 
     def _pause_until(self) -> None:
         if self._resume_at_entry._ph:
@@ -1799,7 +1827,17 @@ class InventoryOverview:
             padding=(0, 0, LABEL_SPACING, 0),
         ).grid(column=(icolumn := icolumn + 1), row=0)
         ttk.Button(
-            filter_frame, text=_("gui", "inventory", "filter", "refresh"), command=self.refresh
+            filter_frame, text=_("gui", "inventory", "filter", "refresh"),
+            command=self.reload_from_server,
+        ).grid(column=(icolumn := icolumn + 1), row=0)
+        # server health check
+        self._server_status_var = StringVar(master, _("gui", "inventory", "server", "unknown"))
+        ttk.Label(
+            filter_frame, textvariable=self._server_status_var
+        ).grid(column=(icolumn := icolumn + 1), row=0, padx=(LABEL_SPACING, 4))
+        ttk.Button(
+            filter_frame, text=_("gui", "inventory", "server", "check"),
+            command=self.check_server_status,
         ).grid(column=(icolumn := icolumn + 1), row=0)
         # Inventory view
         self._canvas = tk.Canvas(master, scrollregion=(0, 0, 0, 0), highlightthickness=0)
@@ -1885,6 +1923,20 @@ class InventoryOverview:
             # visibility
             self._update_visibility(campaign)
         self._canvas_update()
+
+    def reload_from_server(self) -> None:
+        self._manager._twitch.reload_inventory()
+
+    def check_server_status(self) -> None:
+        asyncio.create_task(self._check_server_status_async())
+
+    async def _check_server_status_async(self) -> None:
+        self._server_status_var.set(_("gui", "inventory", "server", "checking"))
+        ok, latency_ms = await self._manager._twitch.check_server_status()
+        key = "ok" if ok else "down"
+        self._server_status_var.set(
+            _("gui", "inventory", "server", key).format(ms=latency_ms)
+        )
 
     def _canvas_update(self, event: tk.Event[tk.Canvas] | None = None):
         # stretch the inner frame to the canvas's width, so campaign cards use the full

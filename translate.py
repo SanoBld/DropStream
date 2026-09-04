@@ -97,6 +97,7 @@ class GUIDashboard(TypedDict):
     resume_at: str
     resume_at_info: str
     pause_until: str
+    reload: str
     weekly: str
     per_game: str
     total_drops: str
@@ -166,6 +167,14 @@ class GUIInvFilter(TypedDict):
     refresh: str
 
 
+class GUIInvServer(TypedDict):
+    unknown: str
+    checking: str
+    ok: str
+    down: str
+    check: str
+
+
 class GUIInvStatus(TypedDict):
     linked: str
     not_linked: str
@@ -178,6 +187,7 @@ class GUIInvStatus(TypedDict):
 
 class GUIInventory(TypedDict):
     filter: GUIInvFilter
+    server: GUIInvServer
     status: GUIInvStatus
     starts: str
     ends: str
@@ -426,6 +436,7 @@ default_translation: Translation = {
                 "passed today)."
             ),
             "pause_until": "Pause until",
+            "reload": "Reload",
             "weekly": "Last 7 days",
             "per_game": "Drops per game",
             "total_drops": "Total drops claimed: {count}",
@@ -496,6 +507,13 @@ default_translation: Translation = {
                 "excluded": "Excluded",
                 "finished": "Finished",
                 "refresh": "Refresh",
+            },
+            "server": {
+                "unknown": "Server: unknown",
+                "checking": "Server: checking...",
+                "ok": "Server: OK ({ms} ms)",
+                "down": "Server: unreachable",
+                "check": "Check",
             },
             "status": {
                 "linked": "Linked ✔",

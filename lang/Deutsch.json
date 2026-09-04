@@ -140,7 +140,14 @@
             "and_more": "und {amount} weitere...",
             "percent_progress": "{percent} von {minutes} Minuten",
             "minutes_progress": "{minutes} Minuten",
-            "reloading": "Inventar wird neu geladen, das dauert nur einen Moment..."
+            "reloading": "Inventar wird neu geladen, das dauert nur einen Moment...",
+            "server": {
+                "unknown": "Server: unbekannt",
+                "checking": "Server: wird geprüft...",
+                "ok": "Server: OK ({ms} ms)",
+                "down": "Server: nicht erreichbar",
+                "check": "Prüfen"
+            }
         },
         "settings": {
             "general": {
@@ -244,7 +251,8 @@
             "per_game": "Drops pro Spiel",
             "total_drops": "Insgesamt eingelöste Drops: {count}",
             "hours_saved": "Gesparte Zuschauerstunden: {hours}",
-            "no_data": "Noch keine Daten"
+            "no_data": "Noch keine Daten",
+            "reload": "Neu laden"
         },
         "remote": {
             "info": "Ermöglicht es, den Live-Status einzusehen und, falls gewünscht, diese Instanz (Pause/Fortsetzen, Prioritätsmodus) über einen Browser auf einem anderen Gerät zu steuern, mithilfe des unten stehenden Links. Jeder mit dem Link kann einsehen; jeder mit dem Link und dem Passwort (falls gesetzt) kann auch steuern, also teilen Sie ihn nur mit vertrauenswürdigen Personen.",

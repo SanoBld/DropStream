@@ -141,7 +141,14 @@
             "and_more": "en {amount} Andere...",
             "percent_progress": "{percent} van {minutes} Minuten",
             "minutes_progress": "{minutes} Minuten",
-            "reloading": "Je inventaris wordt herladen, dit duurt maar even..."
+            "reloading": "Je inventaris wordt herladen, dit duurt maar even...",
+            "server": {
+                "unknown": "Server: onbekend",
+                "checking": "Server: controleren...",
+                "ok": "Server: OK ({ms} ms)",
+                "down": "Server: onbereikbaar",
+                "check": "Controleren"
+            }
         },
         "settings": {
             "general": {
@@ -245,7 +252,8 @@
             "per_game": "Drops per game",
             "total_drops": "Totaal geclaimde drops: {count}",
             "hours_saved": "Bespaarde kijkuren: {hours}",
-            "no_data": "Nog geen gegevens"
+            "no_data": "Nog geen gegevens",
+            "reload": "Herladen"
         },
         "remote": {
             "info": "Hiermee kun je de live status bekijken en, indien gewenst, deze instantie besturen (pauzeren/hervatten, prioriteitsmodus) vanaf een browser op een ander apparaat, via de onderstaande link. Iedereen met de link kan bekijken; iedereen met de link en het wachtwoord (indien ingesteld) kan ook besturen, deel deze dus alleen met mensen die je vertrouwt.",
