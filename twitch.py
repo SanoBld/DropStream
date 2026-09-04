@@ -1593,17 +1593,6 @@ class Twitch:
         }
         return self._merge_data(campaign_ids, fetched_data)
 
-    def reload_inventory(self) -> None:
-        # entry point for manual "Reload" buttons: logs errors instead of
-        # silently swallowing them like a bare asyncio.create_task would
-        task = asyncio.create_task(self.fetch_inventory(force=True))
-        task.add_done_callback(self._log_reload_errors)
-
-    @staticmethod
-    def _log_reload_errors(task: asyncio.Task[None]) -> None:
-        if not task.cancelled() and (exc := task.exception()) is not None:
-            logger.error("Manual inventory reload failed", exc_info=exc)
-
     async def fetch_inventory(self, force: bool = False) -> None:
         now = datetime.now(timezone.utc)
         if (

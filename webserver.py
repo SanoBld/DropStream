@@ -732,6 +732,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="dashboard" data-i18n="tab_dashboard"></button>
     <button class="tab-btn" data-tab="campaigns" data-i18n="tab_campaigns"></button>
+    <button class="tab-btn" data-tab="stats" data-i18n="tab_stats"></button>
     <button class="tab-btn" data-tab="control" id="control-tab-btn" data-i18n="tab_control"></button>
   </div>
 
@@ -816,6 +817,17 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     </div>
   </div>
 
+  <div class="tab-panel" id="tab-stats">
+    <div class="card">
+      <div class="label" data-i18n="stats_weekly_title"></div>
+      <canvas id="chart-weekly" width="600" height="220" style="width:100%;height:220px"></canvas>
+    </div>
+    <div class="card">
+      <div class="label" data-i18n="drops_per_game_title"></div>
+      <canvas id="chart-per-game" width="600" height="220" style="width:100%;height:220px"></canvas>
+    </div>
+  </div>
+
   <div class="tab-panel" id="tab-control">
     <div class="card" id="control-locked" style="display:none">
       <div class="notice" data-i18n="locked_notice"></div>
@@ -876,6 +888,7 @@ const I18N = {
     "hours_saved": "Watch hours saved",
     "priority_mode": "Priority mode",
     "priority_list": "Priority list",
+    "stats_weekly_title": "Last 7 days",
     "drops_per_game_title": "Drops per game",
     "campaigns_title": "Drop campaigns",
     "campaign_search_placeholder": "Search campaigns or games...",
@@ -906,6 +919,7 @@ const I18N = {
     ],
     "tab_dashboard": "Dashboard",
     "tab_campaigns": "Campaigns",
+    "tab_stats": "Stats",
     "tab_control": "Control",
     "theme_light": "Light",
     "theme_dark": "Dark",
@@ -947,6 +961,7 @@ const I18N = {
     "hours_saved": "Heures de visionnage économisées",
     "priority_mode": "Mode de priorité",
     "priority_list": "Liste de priorité",
+    "stats_weekly_title": "7 derniers jours",
     "drops_per_game_title": "Drops par jeu",
     "campaigns_title": "Campagnes de drops",
     "campaign_search_placeholder": "Rechercher une campagne ou un jeu...",
@@ -977,6 +992,7 @@ const I18N = {
     ],
     "tab_dashboard": "Tableau de bord",
     "tab_campaigns": "Campagnes",
+    "tab_stats": "Statistiques",
     "tab_control": "Contrôle",
     "theme_light": "Clair",
     "theme_dark": "Sombre",
@@ -1018,6 +1034,7 @@ const I18N = {
     "hours_saved": "Gesparte Zuschauzeit",
     "priority_mode": "Prioritätsmodus",
     "priority_list": "Prioritätsliste",
+    "stats_weekly_title": "Letzte 7 Tage",
     "drops_per_game_title": "Drops pro Spiel",
     "campaigns_title": "Drop-Kampagnen",
     "campaign_search_placeholder": "Kampagnen oder Spiele suchen...",
@@ -1037,6 +1054,7 @@ const I18N = {
     ],
     "tab_dashboard": "Übersicht",
     "tab_campaigns": "Kampagnen",
+    "tab_stats": "Statistiken",
     "tab_control": "Steuerung",
     "theme_light": "Hell",
     "theme_dark": "Dunkel",
@@ -1083,6 +1101,7 @@ const I18N = {
     "hours_saved": "Horas de visionado ahorradas",
     "priority_mode": "Modo de prioridad",
     "priority_list": "Lista de prioridad",
+    "stats_weekly_title": "Últimos 7 días",
     "drops_per_game_title": "Drops por juego",
     "campaigns_title": "Campañas de drops",
     "campaign_search_placeholder": "Buscar campañas o juegos...",
@@ -1102,6 +1121,7 @@ const I18N = {
     ],
     "tab_dashboard": "Panel",
     "tab_campaigns": "Campañas",
+    "tab_stats": "Estadísticas",
     "tab_control": "Control",
     "theme_light": "Claro",
     "theme_dark": "Oscuro",
@@ -1148,6 +1168,7 @@ const I18N = {
     "hours_saved": "Ore di visione risparmiate",
     "priority_mode": "Modalità priorità",
     "priority_list": "Lista priorità",
+    "stats_weekly_title": "Ultimi 7 giorni",
     "drops_per_game_title": "Drop per gioco",
     "campaigns_title": "Campagne drop",
     "campaign_search_placeholder": "Cerca campagne o giochi...",
@@ -1167,6 +1188,7 @@ const I18N = {
     ],
     "tab_dashboard": "Pannello",
     "tab_campaigns": "Campagne",
+    "tab_stats": "Statistiche",
     "tab_control": "Controllo",
     "theme_light": "Chiaro",
     "theme_dark": "Scuro",
@@ -1213,6 +1235,7 @@ const I18N = {
     "hours_saved": "Horas de visualização poupadas",
     "priority_mode": "Modo de prioridade",
     "priority_list": "Lista de prioridade",
+    "stats_weekly_title": "Últimos 7 dias",
     "drops_per_game_title": "Drops por jogo",
     "campaigns_title": "Campanhas de drops",
     "campaign_search_placeholder": "Pesquisar campanhas ou jogos...",
@@ -1232,6 +1255,7 @@ const I18N = {
     ],
     "tab_dashboard": "Painel",
     "tab_campaigns": "Campanhas",
+    "tab_stats": "Estatísticas",
     "tab_control": "Controlo",
     "theme_light": "Claro",
     "theme_dark": "Escuro",
@@ -1278,6 +1302,7 @@ const I18N = {
     "hours_saved": "Bespaarde kijkuren",
     "priority_mode": "Prioriteitsmodus",
     "priority_list": "Prioriteitslijst",
+    "stats_weekly_title": "Laatste 7 dagen",
     "drops_per_game_title": "Drops per spel",
     "campaigns_title": "Drop-campagnes",
     "campaign_search_placeholder": "Campagnes of games zoeken...",
@@ -1297,6 +1322,7 @@ const I18N = {
     ],
     "tab_dashboard": "Dashboard",
     "tab_campaigns": "Campagnes",
+    "tab_stats": "Statistieken",
     "tab_control": "Besturing",
     "theme_light": "Licht",
     "theme_dark": "Donker",
@@ -1343,6 +1369,7 @@ const I18N = {
     "hours_saved": "Sparede seetimer",
     "priority_mode": "Prioritetstilstand",
     "priority_list": "Prioritetsliste",
+    "stats_weekly_title": "Sidste 7 dage",
     "drops_per_game_title": "Drops pr. spil",
     "campaigns_title": "Drop-kampagner",
     "campaign_search_placeholder": "Søg kampagner eller spil...",
@@ -1362,6 +1389,7 @@ const I18N = {
     ],
     "tab_dashboard": "Oversigt",
     "tab_campaigns": "Kampagner",
+    "tab_stats": "Statistik",
     "tab_control": "Styring",
     "theme_light": "Lys",
     "theme_dark": "Mørk",
@@ -1408,6 +1436,7 @@ const I18N = {
     "hours_saved": "Sparte seertimer",
     "priority_mode": "Prioritetsmodus",
     "priority_list": "Prioritetsliste",
+    "stats_weekly_title": "Siste 7 dager",
     "drops_per_game_title": "Drops per spill",
     "campaigns_title": "Drop-kampanjer",
     "campaign_search_placeholder": "Søk kampanjer eller spill...",
@@ -1427,6 +1456,7 @@ const I18N = {
     ],
     "tab_dashboard": "Oversikt",
     "tab_campaigns": "Kampanjer",
+    "tab_stats": "Statistikk",
     "tab_control": "Styring",
     "theme_light": "Lys",
     "theme_dark": "Mørk",
@@ -1473,6 +1503,7 @@ const I18N = {
     "hours_saved": "Zaoszczędzone godziny oglądania",
     "priority_mode": "Tryb priorytetu",
     "priority_list": "Lista priorytetowa",
+    "stats_weekly_title": "Ostatnie 7 dni",
     "drops_per_game_title": "Dropy wg gry",
     "campaigns_title": "Kampanie dropów",
     "campaign_search_placeholder": "Szukaj kampanii lub gier...",
@@ -1492,6 +1523,7 @@ const I18N = {
     ],
     "tab_dashboard": "Panel",
     "tab_campaigns": "Kampanie",
+    "tab_stats": "Statystyki",
     "tab_control": "Sterowanie",
     "theme_light": "Jasny",
     "theme_dark": "Ciemny",
@@ -1538,6 +1570,7 @@ const I18N = {
     "hours_saved": "Ušetřené hodiny sledování",
     "priority_mode": "Režim priority",
     "priority_list": "Seznam priorit",
+    "stats_weekly_title": "Posledních 7 dní",
     "drops_per_game_title": "Dropy podle hry",
     "campaigns_title": "Kampaně dropů",
     "campaign_search_placeholder": "Hledat kampaně nebo hry...",
@@ -1557,6 +1590,7 @@ const I18N = {
     ],
     "tab_dashboard": "Přehled",
     "tab_campaigns": "Kampaně",
+    "tab_stats": "Statistiky",
     "tab_control": "Ovládání",
     "theme_light": "Světlý",
     "theme_dark": "Tmavý",
@@ -1603,6 +1637,7 @@ const I18N = {
     "hours_saved": "Ore de vizionare economisite",
     "priority_mode": "Mod de prioritate",
     "priority_list": "Listă de prioritate",
+    "stats_weekly_title": "Ultimele 7 zile",
     "drops_per_game_title": "Drop-uri pe joc",
     "campaigns_title": "Campanii de drop-uri",
     "campaign_search_placeholder": "Caută campanii sau jocuri...",
@@ -1622,6 +1657,7 @@ const I18N = {
     ],
     "tab_dashboard": "Panou",
     "tab_campaigns": "Campanii",
+    "tab_stats": "Statistici",
     "tab_control": "Control",
     "theme_light": "Luminos",
     "theme_dark": "Întunecat",
@@ -1668,6 +1704,7 @@ const I18N = {
     "hours_saved": "Megtakarított nézési órák",
     "priority_mode": "Prioritási mód",
     "priority_list": "Prioritási lista",
+    "stats_weekly_title": "Elmúlt 7 nap",
     "drops_per_game_title": "Dropok játékonként",
     "campaigns_title": "Drop kampányok",
     "campaign_search_placeholder": "Kampányok vagy játékok keresése...",
@@ -1687,6 +1724,7 @@ const I18N = {
     ],
     "tab_dashboard": "Áttekintés",
     "tab_campaigns": "Kampányok",
+    "tab_stats": "Statisztika",
     "tab_control": "Vezérlés",
     "theme_light": "Világos",
     "theme_dark": "Sötét",
@@ -1733,6 +1771,7 @@ const I18N = {
     "hours_saved": "Kazanılan izleme saati",
     "priority_mode": "Öncelik modu",
     "priority_list": "Öncelik listesi",
+    "stats_weekly_title": "Son 7 gün",
     "drops_per_game_title": "Oyuna göre droplar",
     "campaigns_title": "Drop kampanyaları",
     "campaign_search_placeholder": "Kampanya veya oyun ara...",
@@ -1752,6 +1791,7 @@ const I18N = {
     ],
     "tab_dashboard": "Panel",
     "tab_campaigns": "Kampanyalar",
+    "tab_stats": "İstatistikler",
     "tab_control": "Kontrol",
     "theme_light": "Açık",
     "theme_dark": "Koyu",
@@ -1798,6 +1838,7 @@ const I18N = {
     "hours_saved": "Сэкономлено часов просмотра",
     "priority_mode": "Режим приоритета",
     "priority_list": "Список приоритета",
+    "stats_weekly_title": "Последние 7 дней",
     "drops_per_game_title": "Дропы по играм",
     "campaigns_title": "Кампании дропов",
     "campaign_search_placeholder": "Поиск кампаний или игр...",
@@ -1817,6 +1858,7 @@ const I18N = {
     ],
     "tab_dashboard": "Обзор",
     "tab_campaigns": "Кампании",
+    "tab_stats": "Статистика",
     "tab_control": "Управление",
     "theme_light": "Светлая",
     "theme_dark": "Тёмная",
@@ -1863,6 +1905,7 @@ const I18N = {
     "hours_saved": "Заощаджено годин перегляду",
     "priority_mode": "Режим пріоритету",
     "priority_list": "Список пріоритету",
+    "stats_weekly_title": "Останні 7 днів",
     "drops_per_game_title": "Дропи за іграми",
     "campaigns_title": "Кампанії дропів",
     "campaign_search_placeholder": "Пошук кампаній або ігор...",
@@ -1882,6 +1925,7 @@ const I18N = {
     ],
     "tab_dashboard": "Огляд",
     "tab_campaigns": "Кампанії",
+    "tab_stats": "Статистика",
     "tab_control": "Керування",
     "theme_light": "Світла",
     "theme_dark": "Темна",
@@ -1928,6 +1972,7 @@ const I18N = {
     "hours_saved": "ساعات المشاهدة الموفرة",
     "priority_mode": "وضع الأولوية",
     "priority_list": "قائمة الأولوية",
+    "stats_weekly_title": "آخر 7 أيام",
     "drops_per_game_title": "الدروبات حسب اللعبة",
     "campaigns_title": "حملات الدروب",
     "campaign_search_placeholder": "البحث عن الحملات أو الألعاب...",
@@ -1947,6 +1992,7 @@ const I18N = {
     ],
     "tab_dashboard": "لوحة القيادة",
     "tab_campaigns": "الحملات",
+    "tab_stats": "الإحصائيات",
     "tab_control": "التحكم",
     "theme_light": "فاتح",
     "theme_dark": "داكن",
@@ -1993,6 +2039,7 @@ const I18N = {
     "hours_saved": "節約した視聴時間",
     "priority_mode": "優先モード",
     "priority_list": "優先リスト",
+    "stats_weekly_title": "過去7日間",
     "drops_per_game_title": "ゲーム別ドロップ",
     "campaigns_title": "ドロップキャンペーン",
     "campaign_search_placeholder": "キャンペーンやゲームを検索...",
@@ -2012,6 +2059,7 @@ const I18N = {
     ],
     "tab_dashboard": "ダッシュボード",
     "tab_campaigns": "キャンペーン",
+    "tab_stats": "統計",
     "tab_control": "操作",
     "theme_light": "ライト",
     "theme_dark": "ダーク",
@@ -2058,6 +2106,7 @@ const I18N = {
     "hours_saved": "节省的观看时长",
     "priority_mode": "优先模式",
     "priority_list": "优先列表",
+    "stats_weekly_title": "最近7天",
     "drops_per_game_title": "各游戏掉落数",
     "campaigns_title": "掉落活动",
     "campaign_search_placeholder": "搜索活动或游戏...",
@@ -2077,6 +2126,7 @@ const I18N = {
     ],
     "tab_dashboard": "仪表盘",
     "tab_campaigns": "活动",
+    "tab_stats": "统计",
     "tab_control": "控制",
     "theme_light": "浅色",
     "theme_dark": "深色",
@@ -2123,6 +2173,7 @@ const I18N = {
     "hours_saved": "節省的觀看時數",
     "priority_mode": "優先模式",
     "priority_list": "優先清單",
+    "stats_weekly_title": "最近7天",
     "drops_per_game_title": "各遊戲掉落數",
     "campaigns_title": "掉落活動",
     "campaign_search_placeholder": "搜尋活動或遊戲...",
@@ -2142,6 +2193,7 @@ const I18N = {
     ],
     "tab_dashboard": "儀表板",
     "tab_campaigns": "活動",
+    "tab_stats": "統計",
     "tab_control": "控制",
     "theme_light": "淺色",
     "theme_dark": "深色",
@@ -2188,6 +2240,7 @@ const I18N = {
     "hours_saved": "Jam tontonan yang dihemat",
     "priority_mode": "Mode prioritas",
     "priority_list": "Daftar prioritas",
+    "stats_weekly_title": "7 hari terakhir",
     "drops_per_game_title": "Drop per game",
     "campaigns_title": "Kampanye drop",
     "campaign_search_placeholder": "Cari kampanye atau game...",
@@ -2207,6 +2260,7 @@ const I18N = {
     ],
     "tab_dashboard": "Dasbor",
     "tab_campaigns": "Kampanye",
+    "tab_stats": "Statistik",
     "tab_control": "Kontrol",
     "theme_light": "Terang",
     "theme_dark": "Gelap",
@@ -2310,12 +2364,18 @@ applyTheme(currentTheme);
 });
 
 // -- tabs --
+let lastStats = null;
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    // canvases report 0 width while their tab is hidden (display:none), so redraw
+    // once this tab becomes visible instead of relying on the last background poll
+    if (btn.dataset.tab === "stats" && lastStats) {
+      renderCharts(lastStats.weekly, lastStats.per_game);
+    }
   });
 });
 
@@ -2356,6 +2416,50 @@ async function post(path, body) {
     document.getElementById("password-err").style.display = "block";
   }
   return res;
+}
+
+function renderCharts(weekly, perGame) {
+  drawBarChart("chart-weekly", weekly.map(([label]) => label), weekly.map(([, count]) => count));
+  drawBarChart(
+    "chart-per-game",
+    perGame.map((e) => e.game),
+    perGame.map((e) => e.count),
+  );
+}
+
+function drawBarChart(canvasId, labels, values) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  // match the canvas's actual rendered (CSS) size so it stays crisp on any screen
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.round(rect.width * dpr));
+  canvas.height = Math.max(1, Math.round(rect.height * dpr));
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+  if (!labels.length) return;
+  const max = Math.max(1, ...values);
+  const padBottom = 24, padTop = 10;
+  const barAreaH = h - padBottom - padTop;
+  const barW = w / labels.length;
+  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#7c5cff";
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue("--dim").trim() || "#888";
+  ctx.font = "11px sans-serif";
+  ctx.textAlign = "center";
+  labels.forEach((label, i) => {
+    const value = values[i];
+    const barH = (value / max) * barAreaH;
+    const x = i * barW + barW * 0.2;
+    const barW2 = barW * 0.6;
+    const y = padTop + barAreaH - barH;
+    ctx.fillStyle = accent;
+    ctx.fillRect(x, y, barW2, barH);
+    ctx.fillStyle = textColor;
+    if (value > 0) ctx.fillText(String(value), x + barW2 / 2, y - 4);
+    ctx.fillText(String(label).slice(0, 10), i * barW + barW / 2, h - 6);
+  });
 }
 
 function renderRankList(perGame) {
@@ -2699,6 +2803,10 @@ async function refresh() {
     if (!applyingMode) modeSelect.value = s.priority_mode.value;
 
     renderRankList(s.stats.per_game);
+    lastStats = s.stats;
+    if (document.getElementById("tab-stats").classList.contains("active")) {
+      renderCharts(s.stats.weekly, s.stats.per_game);
+    }
     renderEditList(
       document.getElementById("priority-edit-list"),
       document.getElementById("priority-empty"),
