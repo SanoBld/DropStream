@@ -724,16 +724,27 @@ class Twitch:
                 self.change_state(State.GAMES_UPDATE)
             elif self._state is State.GAMES_UPDATE:
                 # claim drops from expired and active campaigns
+                claimed_any = False
                 for campaign in self.inventory:
                     if not campaign.upcoming:
                         for drop in campaign.drops:
                             if drop.can_claim:
                                 try:
                                     await drop.claim()
+                                    claimed_any = True
                                 except Exception:
                                     # a failure claiming (or in any UI-side hook it triggers)
                                     # must never stop mining from continuing with other drops
                                     logger.exception(f"Failed to claim drop {drop.id}")
+                if claimed_any:
+                    # this claim path bypasses the websocket "drop-claim" handler, so the
+                    # GUI/web dashboard never got told to move on from the drop that just
+                    # got claimed - it kept showing it stuck at 100% until something else
+                    # (like a manual refresh) forced a redraw
+                    watching = self.watching_channel.get_with_default(None)
+                    campaign = self.get_active_campaign(watching)
+                    if campaign is not None and (next_drop := campaign.first_drop) is not None:
+                        next_drop.display()
                 # figure out which games we want
                 self.wanted_games.clear()
                 exclude = self.settings.exclude
@@ -1366,10 +1377,18 @@ class Twitch:
                     if drop_data is None or drop_data["dropID"] != drop.id:
                         break
                     await asyncio.sleep(2)
+            # show the next drop right away, instead of waiting for its first
+            # "drop-progress" message (which can take a while and leaves the
+            # UI stuck showing the old drop at 100%)
+            if (next_drop := campaign.first_drop) is not None:
+                next_drop.display()
             if campaign.can_earn(watching_channel):
                 self.restart_watching()
             else:
-                self.change_state(State.INVENTORY_FETCH)
+                # campaign done on this channel: force the refresh so the
+                # 6h battery-saving cooldown doesn't delay the switch to
+                # the next campaign
+                self.force_reload()
             return
         assert msg_type == "drop-progress"
         if drop is not None:
@@ -1394,7 +1413,11 @@ class Twitch:
                 "quests_viewer_reward_campaign_earned_emote",  # emote confirmation
                 # badge confirmation?
             ):
-                self.change_state(State.INVENTORY_FETCH)
+                # force_reload (not a plain change_state) so this isn't silently
+                # skipped by the 6h battery-saving cooldown - that was leaving
+                # the UI frozen at 100% on same-game drop switches, with no
+                # notification shown, until the user manually refreshed
+                self.force_reload()
                 await self.gql_request(
                     GQL_QUERIES["NotificationsDelete"].with_variables(
                         {"input": {"id": data["id"]}}

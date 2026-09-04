@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from collections import defaultdict
 
 from constants import STATS_PATH
+
+RANGE_DAYS: dict[str, int] = {"day": 1, "week": 7, "month": 30, "3months": 90}
 
 
 class StatsTracker:
@@ -71,3 +73,63 @@ class StatsTracker:
 
     def total_drops_claimed(self) -> int:
         return len(self._events)
+
+    def _range_bounds(self, range_key: str) -> tuple[date, date]:
+        today = datetime.now().date()
+        if range_key in RANGE_DAYS:
+            return today - timedelta(days=RANGE_DAYS[range_key] - 1), today
+        # "all": start from the oldest recorded event (or today if there's none yet)
+        if self._events:
+            oldest = min(
+                datetime.strptime(e["date"], "%Y-%m-%d").date() for e in self._events
+            )
+        else:
+            oldest = today
+        return oldest, today
+
+    def stats_for_range(self, range_key: str) -> dict:
+        """
+        Returns totals + a chart-ready series for the requested period
+        ("day"/"week"/"month"/"3months"/"all"). Long periods are bucketed
+        by week instead of by day, so the chart doesn't turn into a wall
+        of unreadable bars.
+        """
+        start, end = self._range_bounds(range_key)
+        span_days = (end - start).days + 1
+        bucket_days = 7 if span_days > 60 else 1
+
+        drop_buckets: dict[date, int] = defaultdict(int)
+        minute_buckets: dict[date, int] = defaultdict(int)
+        game_counts: dict[str, int] = defaultdict(int)
+        total_minutes = 0
+        total_drops = 0
+        for event in self._events:
+            day = datetime.strptime(event["date"], "%Y-%m-%d").date()
+            if not (start <= day <= end):
+                continue
+            bucket = start + timedelta(days=((day - start).days // bucket_days) * bucket_days)
+            drop_buckets[bucket] += 1
+            minute_buckets[bucket] += event["minutes"]
+            game_counts[event["game"]] += 1
+            total_minutes += event["minutes"]
+            total_drops += 1
+
+        series: list[dict] = []
+        cursor = start
+        while cursor <= end:
+            series.append({
+                "label": cursor.strftime("%d/%m"),
+                "drops": drop_buckets.get(cursor, 0),
+                "hours": round(minute_buckets.get(cursor, 0) / 60, 2),
+            })
+            cursor += timedelta(days=bucket_days)
+
+        per_game = sorted(game_counts.items(), key=lambda kv: kv[1], reverse=True)[:8]
+        return {
+            "range": range_key,
+            "bucketed_weekly": bucket_days == 7,
+            "series": series,
+            "per_game": [{"game": g, "count": c} for g, c in per_game],
+            "total_drops": total_drops,
+            "hours_saved": round(total_minutes / 60, 2),
+        }
