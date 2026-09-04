@@ -277,6 +277,7 @@ class GUISettingsAdvanced(TypedDict):
     warning: str
     warning_text: str
     enable_badges_emotes: str
+    mine_unlinked_campaigns: str
     available_drops_check: str
 
 
@@ -588,6 +589,7 @@ default_translation: Translation = {
                     "make sure all of these options are disabled."
                 ),
                 "enable_badges_emotes": "Enable partial support for badges and emotes: ",
+                "mine_unlinked_campaigns": "Mine campaigns even if the account isn't linked: ",
                 "available_drops_check": "Enable extra available drops check: ",
             },
             "priority_modes": {
