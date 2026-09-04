@@ -131,6 +131,7 @@ class WebDashboard:
             web.get(f"/{token}/favicon.ico", self._handle_favicon),
             web.get(f"/{token}/api/state", self._handle_state),
             web.get(f"/{token}/api/campaigns", self._handle_campaigns),
+            web.get(f"/{token}/api/stats", self._handle_stats),
         ]
         if settings.web_server_allow_control:
             routes += [
@@ -138,6 +139,7 @@ class WebDashboard:
                 web.post(f"/{token}/api/pause_for", self._handle_pause_for),
                 web.post(f"/{token}/api/resume", self._handle_resume),
                 web.post(f"/{token}/api/priority_mode", self._handle_priority_mode),
+                web.post(f"/{token}/api/mine_unlinked", self._handle_mine_unlinked),
                 web.post(f"/{token}/api/priority/add", self._handle_priority_add),
                 web.post(f"/{token}/api/priority/remove", self._handle_priority_remove),
                 web.post(f"/{token}/api/priority/move", self._handle_priority_move),
@@ -330,6 +332,7 @@ class WebDashboard:
             },
             "priority_list": list(settings.priority),
             "exclude_list": sorted(settings.exclude),
+            "mine_unlinked_campaigns": settings.mine_unlinked_campaigns,
             "available_games": available_games,
             "stats": {
                 "total_drops": twitch.stats.total_drops_claimed(),
@@ -385,6 +388,12 @@ class WebDashboard:
     async def _handle_campaigns(self, request: web.Request) -> web.Response:
         return web.json_response({"campaigns": self._campaigns_list()})
 
+    async def _handle_stats(self, request: web.Request) -> web.Response:
+        range_key = request.query.get("range", "week")
+        if range_key not in ("day", "week", "month", "3months", "all"):
+            range_key = "week"
+        return web.json_response(self._twitch.stats.stats_for_range(range_key))
+
     async def _handle_pause(self, request: web.Request) -> web.Response:
         if not self._password_ok(request):
             return web.json_response({"error": "wrong password"}, status=401)
@@ -422,6 +431,18 @@ class WebDashboard:
         except (json.JSONDecodeError, KeyError, ValueError):
             return web.json_response({"error": "invalid mode"}, status=400)
         # keep the desktop GUI's settings panel in sync with changes made here
+        if self._twitch.gui is not None:
+            self._twitch.gui.settings.sync_from_settings()
+        return web.json_response(self._state_dict())
+
+    async def _handle_mine_unlinked(self, request: web.Request) -> web.Response:
+        if not self._password_ok(request):
+            return web.json_response({"error": "wrong password"}, status=401)
+        try:
+            body = await request.json()
+            self._twitch.settings.mine_unlinked_campaigns = bool(body["enabled"])
+        except (json.JSONDecodeError, KeyError):
+            return web.json_response({"error": "invalid value"}, status=400)
         if self._twitch.gui is not None:
             self._twitch.gui.settings.sync_from_settings()
         return web.json_response(self._state_dict())
@@ -643,8 +664,40 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .rank-item img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; background: var(--input-bg); flex-shrink: 0; }
-  .rank-name { flex: 1; font-size: 13px; }
-  .rank-count { font-size: 12px; color: var(--dim); }
+  .rank-name {
+    flex: 1; font-size: 13px; min-width: 0; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .rank-count { font-size: 12px; color: var(--dim); flex-shrink: 0; }
+  .stats-filter {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .stats-filter button {
+    background: var(--input-bg); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 999px; padding: 6px 14px; font-size: 12px; cursor: pointer; white-space: nowrap;
+  }
+  .stats-filter button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .stats-card-title {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  }
+  .chart-wrap { position: relative; width: 100%; height: 220px; }
+  .chart-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .stats-empty {
+    display: none; text-align: center; color: var(--dim); font-size: 13px; padding: 30px 0;
+  }
+  .switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch span {
+    position: absolute; inset: 0; background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: 999px; cursor: pointer; transition: background .2s;
+  }
+  .switch span::before {
+    content: ""; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px;
+    background: var(--fg); border-radius: 50%; transition: transform .2s;
+  }
+  .switch input:checked + span { background: var(--accent); border-color: var(--accent); }
+  .switch input:checked + span::before { transform: translateX(18px); background: #fff; }
+  .switch input:disabled + span { opacity: .5; cursor: not-allowed; }
   .campaign-list { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
   .campaign-card { display: flex; gap: 12px; padding: 10px; background: var(--card2); border-radius: 8px; }
   .campaign-card img.boxart { width: 48px; height: 64px; border-radius: 6px; object-fit: cover; background: var(--input-bg); flex-shrink: 0; }
@@ -818,13 +871,41 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   </div>
 
   <div class="tab-panel" id="tab-stats">
+    <div class="stats-filter" id="stats-filter">
+      <button data-range="day" data-i18n="range_day"></button>
+      <button data-range="week" data-i18n="range_week"></button>
+      <button data-range="month" data-i18n="range_month"></button>
+      <button data-range="3months" data-i18n="range_3months"></button>
+      <button data-range="all" data-i18n="range_all"></button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label" data-i18n="total_drops"></div>
+        <div class="value" id="stat-range-total" style="font-size:22px">-</div>
+      </div>
+      <div class="card">
+        <div class="label" data-i18n="hours_saved"></div>
+        <div class="value" id="stat-range-hours" style="font-size:22px">-</div>
+      </div>
+    </div>
+
     <div class="card">
-      <div class="label" data-i18n="stats_weekly_title"></div>
-      <canvas id="chart-weekly" width="600" height="220" style="width:100%;height:220px"></canvas>
+      <div class="stats-card-title">
+        <div class="label" id="chart-drops-title" data-i18n="stats_drops_title"></div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-weekly"></canvas></div>
+      <div class="stats-empty" id="chart-drops-empty" data-i18n="stats_no_data"></div>
+    </div>
+    <div class="card">
+      <div class="label" id="chart-hours-title" data-i18n="stats_hours_title"></div>
+      <div class="chart-wrap"><canvas id="chart-hours"></canvas></div>
+      <div class="stats-empty" id="chart-hours-empty" data-i18n="stats_no_data"></div>
     </div>
     <div class="card">
       <div class="label" data-i18n="drops_per_game_title"></div>
-      <canvas id="chart-per-game" width="600" height="220" style="width:100%;height:220px"></canvas>
+      <ul class="rank-list" id="rank-list-stats"></ul>
+      <div class="stats-empty" id="rank-list-empty" data-i18n="stats_no_data"></div>
     </div>
   </div>
 
@@ -845,6 +926,16 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           <input type="text" id="priority-input" list="game-options">
           <button class="action" id="priority-add-btn" data-i18n="add"></button>
         </div>
+      </div>
+      <div class="card">
+        <div class="row">
+          <div class="label" data-i18n="mine_unlinked"></div>
+          <label class="switch">
+            <input type="checkbox" id="mine-unlinked-toggle">
+            <span></span>
+          </label>
+        </div>
+        <div class="muted" data-i18n="mine_unlinked_hint"></div>
       </div>
       <div class="card">
         <div class="label" data-i18n="exclude_list"></div>
@@ -939,7 +1030,17 @@ const I18N = {
     "remove": "Remove",
     "empty_priority": "Priority list is empty.",
     "empty_exclude": "Exclude list is empty.",
-    "exclude_list": "Exclude list"
+    "exclude_list": "Exclude list",
+    "range_day": "Today",
+    "range_week": "7 days",
+    "range_month": "30 days",
+    "range_3months": "3 months",
+    "range_all": "All time",
+    "stats_drops_title": "Drops claimed",
+    "stats_hours_title": "Watch hours saved",
+    "stats_no_data": "No data for this period.",
+    "mine_unlinked": "Mine unlinked campaigns",
+    "mine_unlinked_hint": "Also mine drops when Twitch reports the game account as not linked."
   },
   "fr": {
     "subtitle": "Tableau de bord distant pour cette instance.",
@@ -1012,7 +1113,17 @@ const I18N = {
     "remove": "Retirer",
     "empty_priority": "La liste de priorité est vide.",
     "empty_exclude": "La liste d'exclusion est vide.",
-    "exclude_list": "Liste d'exclusion"
+    "exclude_list": "Liste d'exclusion",
+    "range_day": "Aujourd'hui",
+    "range_week": "7 jours",
+    "range_month": "30 jours",
+    "range_3months": "3 mois",
+    "range_all": "Depuis le début",
+    "stats_drops_title": "Drops récupérés",
+    "stats_hours_title": "Heures de visionnage économisées",
+    "stats_no_data": "Aucune donnée sur cette période.",
+    "mine_unlinked": "Miner les campagnes non liées",
+    "mine_unlinked_hint": "Miner aussi les drops quand Twitch indique que le compte du jeu n'est pas lié."
   },
   "de": {
     "subtitle": "Fernsteuerungs-Dashboard für diese Instanz.",
@@ -2364,7 +2475,7 @@ applyTheme(currentTheme);
 });
 
 // -- tabs --
-let lastStats = null;
+let statsRange = localStorage.getItem("statsRange") || "week";
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -2373,11 +2484,47 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
     // canvases report 0 width while their tab is hidden (display:none), so redraw
     // once this tab becomes visible instead of relying on the last background poll
-    if (btn.dataset.tab === "stats" && lastStats) {
-      renderCharts(lastStats.weekly, lastStats.per_game);
+    if (btn.dataset.tab === "stats") {
+      loadStats(statsRange);
     }
   });
 });
+
+function setStatsRangeButtons() {
+  document.querySelectorAll("#stats-filter button").forEach(b => {
+    b.classList.toggle("active", b.dataset.range === statsRange);
+  });
+}
+setStatsRangeButtons();
+document.querySelectorAll("#stats-filter button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    statsRange = btn.dataset.range;
+    localStorage.setItem("statsRange", statsRange);
+    setStatsRangeButtons();
+    loadStats(statsRange);
+  });
+});
+
+async function loadStats(range) {
+  let data;
+  try {
+    const res = await fetch(`${base}/api/stats?range=${encodeURIComponent(range)}`);
+    if (!res.ok) return;
+    data = await res.json();
+  } catch (e) {
+    return;
+  }
+  if (statsRange !== range) return; // a newer filter click already superseded this one
+  document.getElementById("stat-range-total").textContent = data.total_drops;
+  document.getElementById("stat-range-hours").textContent = data.hours_saved;
+  const labels = data.series.map(p => p.label);
+  drawBarChart("chart-weekly", labels, data.series.map(p => p.drops));
+  drawBarChart("chart-hours", labels, data.series.map(p => p.hours));
+  document.getElementById("chart-drops-empty").style.display = data.total_drops ? "none" : "block";
+  document.getElementById("chart-hours-empty").style.display = data.hours_saved ? "none" : "block";
+  renderRankList(data.per_game, "rank-list-stats");
+  document.getElementById("rank-list-empty").style.display = data.per_game.length ? "none" : "block";
+}
 
 const base = location.pathname.endsWith("/") ? location.pathname.slice(0, -1) : location.pathname;
 const PRIORITY_MODES = [0, 3, 1, 4, 2, 5];
@@ -2389,6 +2536,13 @@ for (const value of PRIORITY_MODES) {
   modeSelect.appendChild(opt);
 }
 let applyingMode = false;
+const mineUnlinkedToggle = document.getElementById("mine-unlinked-toggle");
+let applyingMineUnlinked = false;
+mineUnlinkedToggle.addEventListener("change", async () => {
+  applyingMineUnlinked = true;
+  await post("/api/mine_unlinked", { enabled: mineUnlinkedToggle.checked });
+  applyingMineUnlinked = false;
+});
 let password = "";
 let lastPaused = false;
 
@@ -2402,6 +2556,7 @@ function fmtMinutes(mins) {
 function setControlsEnabled(enabled) {
   document.getElementById("toggle-btn").disabled = !enabled;
   modeSelect.disabled = !enabled;
+  mineUnlinkedToggle.disabled = !enabled;
   document.getElementById("priority-add-btn").disabled = !enabled;
   document.getElementById("exclude-add-btn").disabled = !enabled;
   document.getElementById("reload-btn").disabled = !enabled;
@@ -2416,15 +2571,6 @@ async function post(path, body) {
     document.getElementById("password-err").style.display = "block";
   }
   return res;
-}
-
-function renderCharts(weekly, perGame) {
-  drawBarChart("chart-weekly", weekly.map(([label]) => label), weekly.map(([, count]) => count));
-  drawBarChart(
-    "chart-per-game",
-    perGame.map((e) => e.game),
-    perGame.map((e) => e.count),
-  );
 }
 
 function drawBarChart(canvasId, labels, values) {
@@ -2462,8 +2608,9 @@ function drawBarChart(canvasId, labels, values) {
   });
 }
 
-function renderRankList(perGame) {
-  const list = document.getElementById("rank-list");
+function renderRankList(perGame, listId = "rank-list") {
+  const list = document.getElementById(listId);
+  if (!list) return;
   list.innerHTML = "";
   perGame.forEach((entry, i) => {
     const li = document.createElement("li");
@@ -2803,10 +2950,11 @@ async function refresh() {
     if (!applyingMode) modeSelect.value = s.priority_mode.value;
 
     renderRankList(s.stats.per_game);
-    lastStats = s.stats;
-    if (document.getElementById("tab-stats").classList.contains("active")) {
-      renderCharts(s.stats.weekly, s.stats.per_game);
-    }
+
+    // wire the "mine unlinked campaigns" toggle to the current setting, without
+    // fighting the user while they're actively dragging it (mirrors the
+    // applyingMode guard used for the priority-mode select above)
+    if (!applyingMineUnlinked) mineUnlinkedToggle.checked = !!s.mine_unlinked_campaigns;
     renderEditList(
       document.getElementById("priority-edit-list"),
       document.getElementById("priority-empty"),

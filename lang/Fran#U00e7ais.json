@@ -202,7 +202,8 @@
                 "warning": "Attention !",
                 "warning_text": "Ces options peuvent perturber le fonctionnement du mineur.\nSi vous rencontrez des problèmes, assurez-vous qu'elles sont toutes désactivées.",
                 "enable_badges_emotes": "Activer le support partiel des badges et émotes : ",
-                "available_drops_check": "Activer la vérification supplémentaire des drops disponibles : "
+                "available_drops_check": "Activer la vérification supplémentaire des drops disponibles : ",
+                "mine_unlinked_campaigns": "Miner les campagnes même si le compte n'est pas lié : "
             },
             "reliability": {
                 "name": "Fiabilité",
