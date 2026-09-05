@@ -485,8 +485,8 @@ class Twitch:
                 )
             else:
                 self.print(
-                    "Discord Rich Presence: couldn't connect. "
-                    "Make sure Discord is running on this PC."
+                    "Discord Rich Presence: couldn't connect "
+                    f"({self.discord_rpc._last_error or 'is Discord running?'})."
                 )
         # Storing and watching channels
         self.channels: OrderedDict[int, Channel] = OrderedDict()

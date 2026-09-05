@@ -2252,8 +2252,8 @@ class SettingsPanel:
                     )
                 else:
                     self._twitch.print(
-                        "Discord Rich Presence: couldn't connect. "
-                        "Make sure Discord is running on this PC, then try again."
+                        "Discord Rich Presence: couldn't connect "
+                        f"({self._twitch.discord_rpc._last_error or 'is Discord running?'})."
                     )
         else:
             self._twitch.discord_rpc.close()
