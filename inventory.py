@@ -183,7 +183,9 @@ class BaseDrop:
             # be allowed to propagate up and kill the core mining loop (claim() is called
             # directly from the main state machine, which isn't wrapped in a task_wrapper).
             try:
-                self._twitch.stats.record_claim(self.campaign.game.name, self.required_minutes)
+                self._twitch.stats.record_claim(
+                    self.campaign.game.name, self.required_minutes, self.campaign.image_url
+                )
             except Exception:
                 logger.exception("Failed to record stats for a claimed drop")
             try:

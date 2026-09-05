@@ -304,8 +304,10 @@ class WebDashboard:
         priority_value = (
             priority_mode.value if isinstance(priority_mode, PriorityMode) else int(priority_mode)
         )
-        # best-effort box art per game name, so the "drops per game" ranking can show art too
-        game_images = {c.game.name: c.image_url for c in twitch.inventory}
+        # prefer the box art saved at claim time (works for finished/no-longer-active
+        # campaigns too), falling back to the current inventory for anything older
+        game_images = dict(twitch.stats._game_images())
+        game_images.update({c.game.name: c.image_url for c in twitch.inventory})
         per_game = [
             {"game": name, "count": count, "image_url": game_images.get(name)}
             for name, count in twitch.stats.drops_per_game()
@@ -698,6 +700,13 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .switch input:checked + span { background: var(--accent); border-color: var(--accent); }
   .switch input:checked + span::before { transform: translateX(18px); background: #fff; }
   .switch input:disabled + span { opacity: .5; cursor: not-allowed; }
+  .link-hover { cursor: pointer; text-decoration: none; color: inherit; }
+  .link-hover:hover { text-decoration: underline; }
+  .drop-thumb-pct {
+    position: absolute; bottom: 2px; right: 2px; font-size: 10px; font-weight: 600;
+    background: rgba(0,0,0,.65); color: #fff; padding: 1px 4px; border-radius: 4px;
+  }
+  .drop-thumb { position: relative; }
   .campaign-list { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
   .campaign-card { display: flex; gap: 12px; padding: 10px; background: var(--card2); border-radius: 8px; }
   .campaign-card img.boxart { width: 48px; height: 64px; border-radius: 6px; object-fit: cover; background: var(--input-bg); flex-shrink: 0; }
@@ -735,6 +744,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .campaign-toolbar input[type=text] { flex: 1; }
   .campaign-toolbar select { width: auto; flex: 0 0 auto; }
   .campaign-progress-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .campaign-progress-row:hover .campaign-pct { text-decoration: underline; }
   .campaign-progress-row .bar { flex: 1; }
   .campaign-pct { font-size: 12px; color: var(--dim); white-space: nowrap; }
   .campaign-details { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; }
@@ -829,7 +839,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 
     <div class="card" id="channel-card" style="display:none">
       <div class="label" data-i18n="watching"></div>
-      <div class="value" id="channel-name"></div>
+      <a class="value link-hover" id="channel-name" target="_blank" rel="noopener"></a>
     </div>
 
     <div class="grid">
@@ -1190,7 +1200,23 @@ const I18N = {
     "filter_all": "Alle Konten",
     "filter_linked_only": "Nur verknüpfte",
     "filter_not_linked_only": "Nur nicht verknüpfte",
-    "exclude_list": "Ausschlussliste"
+    "exclude_list": "Ausschlussliste",
+    "account_status": "Kontostatus",
+    "all_channels": "Alle Kanäle",
+    "allowed_channels": "Erlaubte Kanäle",
+    "ends_at": "Endet am",
+    "linked": "Verknüpft",
+    "not_linked": "Nicht verknüpft",
+    "mine_unlinked": "Nicht verknüpfte Kampagnen minen",
+    "mine_unlinked_hint": "Auch Drops minen, wenn Twitch das Spielkonto als nicht verknüpft meldet.",
+    "range_day": "Heute",
+    "range_week": "7 Tage",
+    "range_month": "30 Tage",
+    "range_3months": "3 Monate",
+    "range_all": "Gesamt",
+    "stats_drops_title": "Erhaltene Drops",
+    "stats_hours_title": "Gesparte Stunden",
+    "stats_no_data": "Keine Daten für diesen Zeitraum."
   },
   "es": {
     "subtitle": "Panel remoto para esta instancia.",
@@ -1257,7 +1283,23 @@ const I18N = {
     "filter_all": "Todas las cuentas",
     "filter_linked_only": "Solo vinculadas",
     "filter_not_linked_only": "Solo no vinculadas",
-    "exclude_list": "Lista de exclusión"
+    "exclude_list": "Lista de exclusión",
+    "account_status": "Estado de la cuenta",
+    "all_channels": "Todos los canales",
+    "allowed_channels": "Canales permitidos",
+    "ends_at": "Finaliza el",
+    "linked": "Vinculada",
+    "not_linked": "No vinculada",
+    "mine_unlinked": "Minar campañas no vinculadas",
+    "mine_unlinked_hint": "Minar drops también cuando Twitch indica que la cuenta del juego no está vinculada.",
+    "range_day": "Hoy",
+    "range_week": "7 días",
+    "range_month": "30 días",
+    "range_3months": "3 meses",
+    "range_all": "Todo",
+    "stats_drops_title": "Drops obtenidos",
+    "stats_hours_title": "Horas de visionado ahorradas",
+    "stats_no_data": "Sin datos para este período."
   },
   "it": {
     "subtitle": "Pannello remoto per questa istanza.",
@@ -1324,7 +1366,23 @@ const I18N = {
     "filter_all": "Tutti gli account",
     "filter_linked_only": "Solo collegati",
     "filter_not_linked_only": "Solo non collegati",
-    "exclude_list": "Lista di esclusione"
+    "exclude_list": "Lista di esclusione",
+    "account_status": "Stato account",
+    "all_channels": "Tutti i canali",
+    "allowed_channels": "Canali consentiti",
+    "ends_at": "Termina il",
+    "linked": "Collegato",
+    "not_linked": "Non collegato",
+    "mine_unlinked": "Estrai campagne non collegate",
+    "mine_unlinked_hint": "Estrai i drop anche quando Twitch segnala che l'account di gioco non è collegato.",
+    "range_day": "Oggi",
+    "range_week": "7 giorni",
+    "range_month": "30 giorni",
+    "range_3months": "3 mesi",
+    "range_all": "Sempre",
+    "stats_drops_title": "Drop ottenuti",
+    "stats_hours_title": "Ore di visione risparmiate",
+    "stats_no_data": "Nessun dato per questo periodo."
   },
   "pt": {
     "subtitle": "Painel remoto para esta instância.",
@@ -1391,7 +1449,23 @@ const I18N = {
     "filter_all": "Todas as contas",
     "filter_linked_only": "Somente vinculadas",
     "filter_not_linked_only": "Somente não vinculadas",
-    "exclude_list": "Lista de exclusão"
+    "exclude_list": "Lista de exclusão",
+    "account_status": "Estado da conta",
+    "all_channels": "Todos os canais",
+    "allowed_channels": "Canais permitidos",
+    "ends_at": "Termina em",
+    "linked": "Vinculada",
+    "not_linked": "Não vinculada",
+    "mine_unlinked": "Minerar campanhas não vinculadas",
+    "mine_unlinked_hint": "Também minerar drops quando a Twitch indicar que a conta do jogo não está vinculada.",
+    "range_day": "Hoje",
+    "range_week": "7 dias",
+    "range_month": "30 dias",
+    "range_3months": "3 meses",
+    "range_all": "Todo o período",
+    "stats_drops_title": "Drops obtidos",
+    "stats_hours_title": "Horas de visualização poupadas",
+    "stats_no_data": "Sem dados para este período."
   },
   "nl": {
     "subtitle": "Extern dashboard voor deze instantie.",
@@ -1458,7 +1532,23 @@ const I18N = {
     "filter_all": "Alle accounts",
     "filter_linked_only": "Alleen gekoppeld",
     "filter_not_linked_only": "Alleen niet gekoppeld",
-    "exclude_list": "Uitsluitingslijst"
+    "exclude_list": "Uitsluitingslijst",
+    "account_status": "Accountstatus",
+    "all_channels": "Alle kanalen",
+    "allowed_channels": "Toegestane kanalen",
+    "ends_at": "Eindigt op",
+    "linked": "Gekoppeld",
+    "not_linked": "Niet gekoppeld",
+    "mine_unlinked": "Niet-gekoppelde campagnes minen",
+    "mine_unlinked_hint": "Ook drops minen wanneer Twitch aangeeft dat het spelaccount niet gekoppeld is.",
+    "range_day": "Vandaag",
+    "range_week": "7 dagen",
+    "range_month": "30 dagen",
+    "range_3months": "3 maanden",
+    "range_all": "Altijd",
+    "stats_drops_title": "Verkregen drops",
+    "stats_hours_title": "Bespaarde kijkuren",
+    "stats_no_data": "Geen gegevens voor deze periode."
   },
   "da": {
     "subtitle": "Fjernpanel for denne instans.",
@@ -1525,7 +1615,23 @@ const I18N = {
     "filter_all": "Alle konti",
     "filter_linked_only": "Kun tilknyttede",
     "filter_not_linked_only": "Kun ikke-tilknyttede",
-    "exclude_list": "Udelukkelsesliste"
+    "exclude_list": "Udelukkelsesliste",
+    "account_status": "Kontostatus",
+    "all_channels": "Alle kanaler",
+    "allowed_channels": "Tilladte kanaler",
+    "ends_at": "Slutter den",
+    "linked": "Forbundet",
+    "not_linked": "Ikke forbundet",
+    "mine_unlinked": "Udvind ikke-forbundne kampagner",
+    "mine_unlinked_hint": "Udvind også drops, når Twitch rapporterer at spilkontoen ikke er forbundet.",
+    "range_day": "I dag",
+    "range_week": "7 dage",
+    "range_month": "30 dage",
+    "range_3months": "3 måneder",
+    "range_all": "Alt",
+    "stats_drops_title": "Hentede drops",
+    "stats_hours_title": "Sparede sete timer",
+    "stats_no_data": "Ingen data for denne periode."
   },
   "no": {
     "subtitle": "Fjernpanel for denne forekomsten.",
@@ -1592,7 +1698,23 @@ const I18N = {
     "filter_all": "Alle kontoer",
     "filter_linked_only": "Kun tilkoblede",
     "filter_not_linked_only": "Kun ikke tilkoblede",
-    "exclude_list": "Ekskluderingsliste"
+    "exclude_list": "Ekskluderingsliste",
+    "account_status": "Kontostatus",
+    "all_channels": "Alle kanaler",
+    "allowed_channels": "Tillatte kanaler",
+    "ends_at": "Slutter",
+    "linked": "Koblet til",
+    "not_linked": "Ikke koblet til",
+    "mine_unlinked": "Utvinn ikke-koblede kampanjer",
+    "mine_unlinked_hint": "Utvinn drops også når Twitch rapporterer at spillkontoen ikke er koblet til.",
+    "range_day": "I dag",
+    "range_week": "7 dager",
+    "range_month": "30 dager",
+    "range_3months": "3 måneder",
+    "range_all": "Alt",
+    "stats_drops_title": "Hentede drops",
+    "stats_hours_title": "Sparte seertimer",
+    "stats_no_data": "Ingen data for denne perioden."
   },
   "pl": {
     "subtitle": "Zdalny panel dla tej instancji.",
@@ -1659,7 +1781,23 @@ const I18N = {
     "filter_all": "Wszystkie konta",
     "filter_linked_only": "Tylko połączone",
     "filter_not_linked_only": "Tylko niepołączone",
-    "exclude_list": "Lista wykluczeń"
+    "exclude_list": "Lista wykluczeń",
+    "account_status": "Status konta",
+    "all_channels": "Wszystkie kanały",
+    "allowed_channels": "Dozwolone kanały",
+    "ends_at": "Kończy się",
+    "linked": "Połączone",
+    "not_linked": "Niepołączone",
+    "mine_unlinked": "Wydobywaj niepołączone kampanie",
+    "mine_unlinked_hint": "Wydobywaj dropy nawet gdy Twitch zgłasza, że konto gry nie jest połączone.",
+    "range_day": "Dziś",
+    "range_week": "7 dni",
+    "range_month": "30 dni",
+    "range_3months": "3 miesiące",
+    "range_all": "Cały okres",
+    "stats_drops_title": "Odebrane dropy",
+    "stats_hours_title": "Zaoszczędzone godziny oglądania",
+    "stats_no_data": "Brak danych dla tego okresu."
   },
   "cs": {
     "subtitle": "Vzdálený panel pro tuto instanci.",
@@ -1726,7 +1864,23 @@ const I18N = {
     "filter_all": "Všechny účty",
     "filter_linked_only": "Pouze propojené",
     "filter_not_linked_only": "Pouze nepropojené",
-    "exclude_list": "Seznam vyloučení"
+    "exclude_list": "Seznam vyloučení",
+    "account_status": "Stav účtu",
+    "all_channels": "Všechny kanály",
+    "allowed_channels": "Povolené kanály",
+    "ends_at": "Končí",
+    "linked": "Propojeno",
+    "not_linked": "Nepropojeno",
+    "mine_unlinked": "Těžit nepropojené kampaně",
+    "mine_unlinked_hint": "Těžit dropy i když Twitch hlásí, že herní účet není propojen.",
+    "range_day": "Dnes",
+    "range_week": "7 dní",
+    "range_month": "30 dní",
+    "range_3months": "3 měsíce",
+    "range_all": "Vše",
+    "stats_drops_title": "Získané dropy",
+    "stats_hours_title": "Ušetřené hodiny sledování",
+    "stats_no_data": "Pro toto období nejsou k dispozici žádná data."
   },
   "ro": {
     "subtitle": "Panou de la distanță pentru această instanță.",
@@ -1793,7 +1947,23 @@ const I18N = {
     "filter_all": "Toate conturile",
     "filter_linked_only": "Doar conectate",
     "filter_not_linked_only": "Doar neconectate",
-    "exclude_list": "Listă de excludere"
+    "exclude_list": "Listă de excludere",
+    "account_status": "Stare cont",
+    "all_channels": "Toate canalele",
+    "allowed_channels": "Canale permise",
+    "ends_at": "Se încheie la",
+    "linked": "Conectat",
+    "not_linked": "Neconectat",
+    "mine_unlinked": "Minează campanii neconectate",
+    "mine_unlinked_hint": "Minează drop-uri și când Twitch raportează că nu contul de joc nu este conectat.",
+    "range_day": "Azi",
+    "range_week": "7 zile",
+    "range_month": "30 zile",
+    "range_3months": "3 luni",
+    "range_all": "Tot timpul",
+    "stats_drops_title": "Drop-uri obținute",
+    "stats_hours_title": "Ore de vizionare economisite",
+    "stats_no_data": "Nu există date pentru această perioadă."
   },
   "hu": {
     "subtitle": "Távoli irányítópult ehhez a példányhoz.",
@@ -1860,7 +2030,23 @@ const I18N = {
     "filter_all": "Minden fiók",
     "filter_linked_only": "Csak összekötött",
     "filter_not_linked_only": "Csak nem összekötött",
-    "exclude_list": "Kizárási lista"
+    "exclude_list": "Kizárási lista",
+    "account_status": "Fiók állapota",
+    "all_channels": "Minden csatorna",
+    "allowed_channels": "Engedélyezett csatornák",
+    "ends_at": "Vége",
+    "linked": "Összekapcsolva",
+    "not_linked": "Nincs összekapcsolva",
+    "mine_unlinked": "Nem összekapcsolt kampányok bányászata",
+    "mine_unlinked_hint": "Dropok bányászata akkor is, ha a Twitch szerint a játékfiók nincs összekapcsolva.",
+    "range_day": "Ma",
+    "range_week": "7 nap",
+    "range_month": "30 nap",
+    "range_3months": "3 hónap",
+    "range_all": "Összes",
+    "stats_drops_title": "Megszerzett dropok",
+    "stats_hours_title": "Megtakarított nézési órák",
+    "stats_no_data": "Nincs adat erre az időszakra."
   },
   "tr": {
     "subtitle": "Bu örnek için uzaktan panel.",
@@ -1927,7 +2113,23 @@ const I18N = {
     "filter_all": "Tüm hesaplar",
     "filter_linked_only": "Yalnızca bağlı",
     "filter_not_linked_only": "Yalnızca bağlı olmayan",
-    "exclude_list": "Hariç tutma listesi"
+    "exclude_list": "Hariç tutma listesi",
+    "account_status": "Hesap durumu",
+    "all_channels": "Tüm kanallar",
+    "allowed_channels": "İzin verilen kanallar",
+    "ends_at": "Bitiş",
+    "linked": "Bağlı",
+    "not_linked": "Bağlı değil",
+    "mine_unlinked": "Bağlı olmayan kampanyaları madenle",
+    "mine_unlinked_hint": "Twitch oyun hesabının bağlı olmadığını bildirse bile drop madenciliği yap.",
+    "range_day": "Bugün",
+    "range_week": "7 gün",
+    "range_month": "30 gün",
+    "range_3months": "3 ay",
+    "range_all": "Tüm zamanlar",
+    "stats_drops_title": "Alınan droplar",
+    "stats_hours_title": "Kazanılan izleme saati",
+    "stats_no_data": "Bu dönem için veri yok."
   },
   "ru": {
     "subtitle": "Панель удалённого доступа для этого экземпляра.",
@@ -1994,7 +2196,23 @@ const I18N = {
     "filter_all": "Все аккаунты",
     "filter_linked_only": "Только привязанные",
     "filter_not_linked_only": "Только непривязанные",
-    "exclude_list": "Список исключений"
+    "exclude_list": "Список исключений",
+    "account_status": "Статус аккаунта",
+    "all_channels": "Все каналы",
+    "allowed_channels": "Разрешённые каналы",
+    "ends_at": "Заканчивается",
+    "linked": "Привязан",
+    "not_linked": "Не привязан",
+    "mine_unlinked": "Майнить непривязанные кампании",
+    "mine_unlinked_hint": "Майнить дропы, даже если Twitch сообщает, что игровой аккаунт не привязан.",
+    "range_day": "Сегодня",
+    "range_week": "7 дней",
+    "range_month": "30 дней",
+    "range_3months": "3 месяца",
+    "range_all": "Всё время",
+    "stats_drops_title": "Полученные дропы",
+    "stats_hours_title": "Сэкономленные часы просмотра",
+    "stats_no_data": "Нет данных за этот период."
   },
   "uk": {
     "subtitle": "Панель віддаленого доступу для цього екземпляра.",
@@ -2061,7 +2279,23 @@ const I18N = {
     "filter_all": "Всі акаунти",
     "filter_linked_only": "Тільки прив'язані",
     "filter_not_linked_only": "Тільки непов'язані",
-    "exclude_list": "Список виключень"
+    "exclude_list": "Список виключень",
+    "account_status": "Статус акаунта",
+    "all_channels": "Усі канали",
+    "allowed_channels": "Дозволені канали",
+    "ends_at": "Закінчується",
+    "linked": "Прив'язано",
+    "not_linked": "Не прив'язано",
+    "mine_unlinked": "Майнити неприв'язані кампанії",
+    "mine_unlinked_hint": "Майнити дропи, навіть якщо Twitch повідомляє, що ігровий акаунт не прив'язаний.",
+    "range_day": "Сьогодні",
+    "range_week": "7 днів",
+    "range_month": "30 днів",
+    "range_3months": "3 місяці",
+    "range_all": "Увесь час",
+    "stats_drops_title": "Отримані дропи",
+    "stats_hours_title": "Заощаджені години перегляду",
+    "stats_no_data": "Немає даних за цей період."
   },
   "ar": {
     "subtitle": "لوحة تحكم عن بُعد لهذا التطبيق.",
@@ -2128,7 +2362,23 @@ const I18N = {
     "filter_all": "كل الحسابات",
     "filter_linked_only": "المرتبطة فقط",
     "filter_not_linked_only": "غير المرتبطة فقط",
-    "exclude_list": "قائمة الاستبعاد"
+    "exclude_list": "قائمة الاستبعاد",
+    "account_status": "حالة الحساب",
+    "all_channels": "جميع القنوات",
+    "allowed_channels": "القنوات المسموح بها",
+    "ends_at": "ينتهي في",
+    "linked": "مرتبط",
+    "not_linked": "غير مرتبط",
+    "mine_unlinked": "تعدين الحملات غير المرتبطة",
+    "mine_unlinked_hint": "تعدين الدروبس أيضًا عندما يفيد Twitch بأن حساب اللعبة غير مرتبط.",
+    "range_day": "اليوم",
+    "range_week": "7 أيام",
+    "range_month": "30 يومًا",
+    "range_3months": "3 أشهر",
+    "range_all": "كل الوقت",
+    "stats_drops_title": "الدروبس المستلمة",
+    "stats_hours_title": "ساعات المشاهدة الموفرة",
+    "stats_no_data": "لا توجد بيانات لهذه الفترة."
   },
   "ja": {
     "subtitle": "このインスタンスのリモートダッシュボード。",
@@ -2195,7 +2445,23 @@ const I18N = {
     "filter_all": "すべてのアカウント",
     "filter_linked_only": "連携済みのみ",
     "filter_not_linked_only": "未連携のみ",
-    "exclude_list": "除外リスト"
+    "exclude_list": "除外リスト",
+    "account_status": "アカウント状態",
+    "all_channels": "すべてのチャンネル",
+    "allowed_channels": "許可されたチャンネル",
+    "ends_at": "終了日時",
+    "linked": "リンク済み",
+    "not_linked": "未リンク",
+    "mine_unlinked": "未リンクのキャンペーンもマイニングする",
+    "mine_unlinked_hint": "Twitchがゲームアカウント未リンクと報告した場合でもドロップをマイニングします。",
+    "range_day": "今日",
+    "range_week": "7日間",
+    "range_month": "30日間",
+    "range_3months": "3か月",
+    "range_all": "全期間",
+    "stats_drops_title": "獲得したドロップ",
+    "stats_hours_title": "節約した視聴時間",
+    "stats_no_data": "この期間のデータはありません。"
   },
   "zh-CN": {
     "subtitle": "此实例的远程控制面板。",
@@ -2262,7 +2528,23 @@ const I18N = {
     "filter_all": "所有账户",
     "filter_linked_only": "仅已关联",
     "filter_not_linked_only": "仅未关联",
-    "exclude_list": "排除列表"
+    "exclude_list": "排除列表",
+    "account_status": "账户状态",
+    "all_channels": "所有频道",
+    "allowed_channels": "允许的频道",
+    "ends_at": "结束时间",
+    "linked": "已关联",
+    "not_linked": "未关联",
+    "mine_unlinked": "挖掘未关联的活动",
+    "mine_unlinked_hint": "即使 Twitch 报告游戏账户未关联，也继续挖掘掉落。",
+    "range_day": "今天",
+    "range_week": "7天",
+    "range_month": "30天",
+    "range_3months": "3个月",
+    "range_all": "全部时间",
+    "stats_drops_title": "已获得的掉落",
+    "stats_hours_title": "节省的观看时长",
+    "stats_no_data": "该时间段没有数据。"
   },
   "zh-TW": {
     "subtitle": "此實例的遠端控制面板。",
@@ -2329,7 +2611,23 @@ const I18N = {
     "filter_all": "所有帳號",
     "filter_linked_only": "僅已連結",
     "filter_not_linked_only": "僅未連結",
-    "exclude_list": "排除清單"
+    "exclude_list": "排除清單",
+    "account_status": "帳戶狀態",
+    "all_channels": "所有頻道",
+    "allowed_channels": "允許的頻道",
+    "ends_at": "結束時間",
+    "linked": "已連結",
+    "not_linked": "未連結",
+    "mine_unlinked": "挖掘未連結的活動",
+    "mine_unlinked_hint": "即使 Twitch 回報遊戲帳戶未連結，也繼續挖掘掉落物。",
+    "range_day": "今天",
+    "range_week": "7天",
+    "range_month": "30天",
+    "range_3months": "3個月",
+    "range_all": "全部時間",
+    "stats_drops_title": "已獲得的掉落物",
+    "stats_hours_title": "節省的觀看時數",
+    "stats_no_data": "此期間沒有資料。"
   },
   "id": {
     "subtitle": "Dasbor jarak jauh untuk instans ini.",
@@ -2396,7 +2694,23 @@ const I18N = {
     "filter_all": "Semua akun",
     "filter_linked_only": "Hanya yang tertaut",
     "filter_not_linked_only": "Hanya yang belum tertaut",
-    "exclude_list": "Daftar pengecualian"
+    "exclude_list": "Daftar pengecualian",
+    "account_status": "Status akun",
+    "all_channels": "Semua saluran",
+    "allowed_channels": "Saluran yang diizinkan",
+    "ends_at": "Berakhir pada",
+    "linked": "Tertaut",
+    "not_linked": "Tidak tertaut",
+    "mine_unlinked": "Tambang kampanye yang tidak tertaut",
+    "mine_unlinked_hint": "Tetap menambang drop meskipun Twitch melaporkan akun game tidak tertaut.",
+    "range_day": "Hari ini",
+    "range_week": "7 hari",
+    "range_month": "30 hari",
+    "range_3months": "3 bulan",
+    "range_all": "Sepanjang waktu",
+    "stats_drops_title": "Drop yang diperoleh",
+    "stats_hours_title": "Jam tontonan yang dihemat",
+    "stats_no_data": "Tidak ada data untuk periode ini."
   }
 };
 const LANG_NAMES = {
@@ -2594,6 +2908,9 @@ function drawBarChart(canvasId, labels, values) {
   const textColor = getComputedStyle(document.documentElement).getPropertyValue("--dim").trim() || "#888";
   ctx.font = "11px sans-serif";
   ctx.textAlign = "center";
+  // skip labels when bars are too narrow for them to fit without overlapping
+  // (e.g. ~90 daily bars for the 3-month view) - show at most one label per ~46px
+  const labelStep = Math.max(1, Math.ceil(46 / barW));
   labels.forEach((label, i) => {
     const value = values[i];
     const barH = (value / max) * barAreaH;
@@ -2603,8 +2920,10 @@ function drawBarChart(canvasId, labels, values) {
     ctx.fillStyle = accent;
     ctx.fillRect(x, y, barW2, barH);
     ctx.fillStyle = textColor;
-    if (value > 0) ctx.fillText(String(value), x + barW2 / 2, y - 4);
-    ctx.fillText(String(label).slice(0, 10), i * barW + barW / 2, h - 6);
+    if (value > 0 && barW > 18) ctx.fillText(String(value), x + barW2 / 2, y - 4);
+    if (i % labelStep === 0) {
+      ctx.fillText(String(label).slice(0, 10), i * barW + barW / 2, h - 6);
+    }
   });
 }
 
@@ -2730,8 +3049,20 @@ function renderCampaigns(campaigns) {
     acRow.appendChild(acLabel);
     const acValue = document.createElement("div");
     acValue.className = "value";
-    acValue.textContent = c.allowed_channels.length
-      ? c.allowed_channels.join(", ") : t("all_channels");
+    if (c.allowed_channels.length) {
+      c.allowed_channels.forEach((chName, i) => {
+        if (i > 0) acValue.appendChild(document.createTextNode(", "));
+        const chLink = document.createElement("a");
+        chLink.className = "link-hover";
+        chLink.href = "https://twitch.tv/" + encodeURIComponent(chName);
+        chLink.target = "_blank";
+        chLink.rel = "noopener";
+        chLink.textContent = chName;
+        acValue.appendChild(chLink);
+      });
+    } else {
+      acValue.textContent = t("all_channels");
+    }
     acRow.appendChild(acValue);
     details.appendChild(acRow);
     const endsRow = document.createElement("div");
@@ -2761,6 +3092,11 @@ function renderCampaigns(campaigns) {
         check.className = "check";
         check.textContent = "✓";
         thumb.appendChild(check);
+      } else if (d.progress > 0) {
+        const pctBadge = document.createElement("div");
+        pctBadge.className = "drop-thumb-pct";
+        pctBadge.textContent = pct(d.progress);
+        thumb.appendChild(pctBadge);
       }
       thumbs.appendChild(thumb);
     }
@@ -2939,7 +3275,9 @@ async function refresh() {
       let label = s.watching_channel.name;
       if (s.watching_channel.game) label += " - " + s.watching_channel.game;
       if (s.watching_channel.viewers != null) label += " (" + s.watching_channel.viewers + " " + t("viewers") + ")";
-      document.getElementById("channel-name").textContent = label;
+      const channelNameEl = document.getElementById("channel-name");
+      channelNameEl.textContent = label;
+      channelNameEl.href = "https://twitch.tv/" + encodeURIComponent(s.watching_channel.name);
     } else {
       channelCard.style.display = "none";
     }

@@ -40,11 +40,12 @@ class StatsTracker:
         with STATS_PATH.open("w", encoding="utf8") as file:
             json.dump(self._events, file, indent=4)
 
-    def record_claim(self, game_name: str, minutes: int) -> None:
+    def record_claim(self, game_name: str, minutes: int, image_url: str | None = None) -> None:
         self._events.append({
             "date": datetime.now().strftime("%Y-%m-%d"),
             "game": game_name,
             "minutes": max(0, minutes),
+            "image_url": image_url,
         })
         self._save()
 
@@ -66,6 +67,15 @@ class StatsTracker:
         for event in self._events:
             counts[event["game"]] += 1
         return sorted(counts.items(), key=lambda kv: kv[1], reverse=True)[:top_n]
+
+    def _game_images(self) -> dict[str, str]:
+        # most recent claim's box art wins, in case it ever changes for a game
+        images: dict[str, str] = {}
+        for event in self._events:
+            url = event.get("image_url")
+            if url:
+                images[event["game"]] = url
+        return images
 
     def total_hours_saved(self) -> float:
         # "hours saved" = time we didn't have to manually watch to earn these drops
@@ -125,11 +135,14 @@ class StatsTracker:
             cursor += timedelta(days=bucket_days)
 
         per_game = sorted(game_counts.items(), key=lambda kv: kv[1], reverse=True)[:8]
+        images = self._game_images()
         return {
             "range": range_key,
             "bucketed_weekly": bucket_days == 7,
             "series": series,
-            "per_game": [{"game": g, "count": c} for g, c in per_game],
+            "per_game": [
+                {"game": g, "count": c, "image_url": images.get(g)} for g, c in per_game
+            ],
             "total_drops": total_drops,
             "hours_saved": round(total_minutes / 60, 2),
         }
