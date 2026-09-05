@@ -8,16 +8,18 @@ from typing import Any
 logger = logging.getLogger("DropStream")
 
 try:
-    from pypresence.presence import Presence
+    from pypresence.presence import Presence, ActivityType
     from pypresence.exceptions import PyPresenceException
 except ImportError:
     Presence = None  # type: ignore[assignment,misc]
+    ActivityType = None  # type: ignore[assignment,misc]
     PyPresenceException = Exception  # type: ignore[assignment,misc]
 
 # DropStream's own Discord Application, used by default so Rich Presence works
 # out of the box. Users who prefer their own branded application can still
 # override this with their own client ID in Settings.
 DEFAULT_CLIENT_ID = "1545749912262680717"
+GITHUB_URL = "https://github.com/SanoBld/DropStream"
 
 
 class DiscordRPC:
@@ -74,14 +76,21 @@ class DiscordRPC:
     def _update_sync(self, channel_name: str, game_name: str | None, image_url: str | None) -> None:
         if not self._connected or self._rpc is None:
             return
+        twitch_url = f"https://twitch.tv/{channel_name}"
         try:
             self._rpc.update(
+                activity_type=ActivityType.WATCHING,
                 state=f"Watching {channel_name}",
+                state_url=twitch_url,
                 details=game_name or "Mining drops",
                 large_image=image_url or "dropstream_logo",
                 large_text=game_name or "DropStream",
+                large_url=GITHUB_URL,
                 start=self._start_time,
-                buttons=[{"label": "Open on Twitch", "url": f"https://twitch.tv/{channel_name}"}],
+                buttons=[
+                    {"label": "Open on Twitch", "url": twitch_url},
+                    {"label": "DropStream on GitHub", "url": GITHUB_URL},
+                ],
             )
         except (PyPresenceException, Exception):
             # Discord was closed mid-session, or the pipe broke - just drop the
