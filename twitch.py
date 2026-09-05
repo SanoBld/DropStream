@@ -1162,11 +1162,23 @@ class Twitch:
             self.print(status_text)
             self.gui.status.update(status_text)
         if self.settings.discord_rpc_enabled:
-            campaign = self.get_active_campaign(channel)
+            image_url: str | None
+            source = self.settings.discord_rpc_image
+            if source == "streamer":
+                # publicly reachable live preview thumbnail, no auth required
+                image_url = (
+                    f"https://static-cdn.jtvnw.net/previews-ttv/"
+                    f"live_user_{channel._login}-440x248.jpg"
+                )
+            elif source == "game":
+                campaign = self.get_active_campaign(channel)
+                image_url = campaign.image_url if campaign is not None else None
+            else:  # "logo"
+                image_url = None
             self.discord_rpc.update(
                 channel_name=channel.name,
                 game_name=channel.game.name if channel.game is not None else None,
-                image_url=campaign.image_url if campaign is not None else None,
+                image_url=image_url,
             )
 
     def stop_watching(self):

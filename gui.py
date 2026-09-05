@@ -2184,6 +2184,7 @@ class _SettingsVars(TypedDict):
     mine_unlinked_campaigns: IntVar
     discord_rpc_enabled: IntVar
     discord_client_id: StringVar
+    discord_rpc_image: StringVar
     available_drops_check: IntVar
     schedule_enabled: IntVar
     schedule_start: StringVar
@@ -2233,6 +2234,15 @@ class SettingsPanel:
             "modern_auto": _("gui", "settings", "themes", "modern_auto"),
             "modern_light": _("gui", "settings", "themes", "modern_light"),
             "modern_dark": _("gui", "settings", "themes", "modern_dark"),
+        }
+
+    @cached_property
+    def DISCORD_RPC_IMAGES(self) -> dict[str, str]:
+        # NOTE: order matters, it's the order shown in the dropdown
+        return {
+            "game": _("gui", "settings", "advanced", "discord_rpc_image_game"),
+            "streamer": _("gui", "settings", "advanced", "discord_rpc_image_streamer"),
+            "logo": _("gui", "settings", "advanced", "discord_rpc_image_logo"),
         }
 
     def _on_discord_rpc_toggle(self) -> None:
@@ -2289,6 +2299,7 @@ class SettingsPanel:
                 master, int(self._settings.discord_rpc_enabled)
             ),
             "discord_client_id": StringVar(master, self._settings.discord_client_id),
+            "discord_rpc_image": StringVar(master, self._settings.discord_rpc_image),
             "available_drops_check": IntVar(
                 master, int(self._settings.available_drops_check)
             ),
@@ -2605,6 +2616,28 @@ class SettingsPanel:
                 ),
             ),
         )
+        ttk.Label(
+            advanced_center, text=_("gui", "settings", "advanced", "discord_rpc_image")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        discord_image_combo = ttk.Combobox(
+            advanced_center,
+            textvariable=self._vars["discord_rpc_image"],
+            values=list(self.DISCORD_RPC_IMAGES.values()),
+            state="readonly",
+            width=18,
+        )
+        discord_image_combo.grid(column=1, row=irow, sticky="w")
+        discord_image_keys = list(self.DISCORD_RPC_IMAGES.keys())
+        discord_image_combo.current(
+            discord_image_keys.index(self._settings.discord_rpc_image)
+            if self._settings.discord_rpc_image in discord_image_keys else 0
+        )
+
+        def _on_discord_image_select(_event: object = None) -> None:
+            idx = discord_image_combo.current()
+            self._settings.discord_rpc_image = discord_image_keys[idx]
+
+        discord_image_combo.bind("<<ComboboxSelected>>", _on_discord_image_select)
         ttk.Label(
             advanced_center, text=_("gui", "settings", "advanced", "available_drops_check")
         ).grid(column=0, row=(irow := irow + 1), sticky="e")

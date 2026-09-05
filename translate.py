@@ -280,6 +280,10 @@ class GUISettingsAdvanced(TypedDict):
     mine_unlinked_campaigns: str
     discord_rpc_enabled: str
     discord_client_id: str
+    discord_rpc_image: str
+    discord_rpc_image_game: str
+    discord_rpc_image_streamer: str
+    discord_rpc_image_logo: str
     available_drops_check: str
 
 
@@ -594,6 +598,10 @@ default_translation: Translation = {
                 "mine_unlinked_campaigns": "Mine campaigns even if the account isn't linked: ",
                 "discord_rpc_enabled": "Show currently watched channel on Discord: ",
                 "discord_client_id": "Discord Application ID: ",
+                "discord_rpc_image": "Discord cover image: ",
+                "discord_rpc_image_game": "Game box art",
+                "discord_rpc_image_streamer": "Streamer's live preview",
+                "discord_rpc_image_logo": "DropStream logo",
                 "available_drops_check": "Enable extra available drops check: ",
             },
             "priority_modes": {

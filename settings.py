@@ -29,6 +29,7 @@ class SettingsFile(TypedDict):
     mine_unlinked_campaigns: bool
     discord_rpc_enabled: bool
     discord_client_id: str
+    discord_rpc_image: str  # "logo" | "streamer" | "game"
     available_drops_check: bool
     priority_mode: PriorityMode
     # scheduler: daily run window + action once nothing's left to farm today
@@ -66,6 +67,7 @@ default_settings: SettingsFile = {
     "mine_unlinked_campaigns": False,
     "discord_rpc_enabled": False,
     "discord_client_id": "1545749912262680717",
+    "discord_rpc_image": "game",
     "available_drops_check": False,
     "priority_mode": PriorityMode.PRIORITY_ONLY,
     "schedule_enabled": False,
@@ -109,6 +111,7 @@ class Settings:
     mine_unlinked_campaigns: bool
     discord_rpc_enabled: bool
     discord_client_id: str
+    discord_rpc_image: str  # "logo" | "streamer" | "game"
     available_drops_check: bool
     priority_mode: PriorityMode
     schedule_enabled: bool
