@@ -444,8 +444,6 @@ class Twitch:
         self.settings: Settings = settings
         self.stats: StatsTracker = StatsTracker()
         self.discord_rpc: DiscordRPC = DiscordRPC(settings.discord_client_id)
-        if settings.discord_rpc_enabled:
-            self.discord_rpc.connect()
         # State management
         self._state: State = State.IDLE
         self._state_change = asyncio.Event()
@@ -477,6 +475,19 @@ class Twitch:
         self._auth_state: _AuthState = _AuthState(self)
         # GUI
         self.gui = GUIManager(self)
+        if settings.discord_rpc_enabled:
+            if self.discord_rpc.connect():
+                self.print("Discord Rich Presence: connected.")
+            elif not self.discord_rpc.pypresence_installed:
+                self.print(
+                    "Discord Rich Presence: 'pypresence' isn't installed. "
+                    "Run: pip install pypresence"
+                )
+            else:
+                self.print(
+                    "Discord Rich Presence: couldn't connect. "
+                    "Make sure Discord is running on this PC."
+                )
         # Storing and watching channels
         self.channels: OrderedDict[int, Channel] = OrderedDict()
         self.watching_channel: AwaitableValue[Channel] = AwaitableValue()

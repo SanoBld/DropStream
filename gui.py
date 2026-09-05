@@ -2239,10 +2239,22 @@ class SettingsPanel:
         enabled = bool(self._vars["discord_rpc_enabled"].get())
         self._settings.discord_rpc_enabled = enabled
         if enabled:
-            self._twitch.discord_rpc.connect()
-            watching = self._twitch.watching_channel.get_with_default(None)
-            if watching is not None:
-                self._twitch.watch(watching, update_status=False)
+            if self._twitch.discord_rpc.connect():
+                self._twitch.print("Discord Rich Presence: connected.")
+                watching = self._twitch.watching_channel.get_with_default(None)
+                if watching is not None:
+                    self._twitch.watch(watching, update_status=False)
+            else:
+                if not self._twitch.discord_rpc.pypresence_installed:
+                    self._twitch.print(
+                        "Discord Rich Presence: 'pypresence' isn't installed. "
+                        "Run: pip install pypresence"
+                    )
+                else:
+                    self._twitch.print(
+                        "Discord Rich Presence: couldn't connect. "
+                        "Make sure Discord is running on this PC, then try again."
+                    )
         else:
             self._twitch.discord_rpc.close()
 

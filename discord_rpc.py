@@ -7,7 +7,7 @@ from typing import Any
 logger = logging.getLogger("DropStream")
 
 try:
-    from pypresence import Presence
+    from pypresence.presence import Presence
     from pypresence.exceptions import PyPresenceException
 except ImportError:
     Presence = None  # type: ignore[assignment,misc]
@@ -35,6 +35,10 @@ class DiscordRPC:
     @property
     def available(self) -> bool:
         return Presence is not None and bool(self._client_id)
+
+    @property
+    def pypresence_installed(self) -> bool:
+        return Presence is not None
 
     def connect(self) -> bool:
         if Presence is None:
