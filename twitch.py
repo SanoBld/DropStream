@@ -19,6 +19,7 @@ from translate import _
 from gui import GUIManager
 from scheduler import PowerAction, within_window, run_power_action
 from stats import StatsTracker
+from discord_rpc import DiscordRPC
 from channel import Channel
 from websocket import WebsocketPool
 from webserver import WebDashboard
@@ -442,6 +443,9 @@ class Twitch:
     def __init__(self, settings: Settings):
         self.settings: Settings = settings
         self.stats: StatsTracker = StatsTracker()
+        self.discord_rpc: DiscordRPC = DiscordRPC(settings.discord_client_id)
+        if settings.discord_rpc_enabled:
+            self.discord_rpc.connect()
         # State management
         self._state: State = State.IDLE
         self._state_change = asyncio.Event()
@@ -526,6 +530,7 @@ class Twitch:
     async def shutdown(self) -> None:
         start_time = time()
         self.stop_watching()
+        self.discord_rpc.close()
         if self._watching_task is not None:
             self._watching_task.cancel()
             self._watching_task = None
@@ -1145,11 +1150,20 @@ class Twitch:
             status_text = _("status", "watching").format(channel=channel.name)
             self.print(status_text)
             self.gui.status.update(status_text)
+        if self.settings.discord_rpc_enabled:
+            campaign = self.get_active_campaign(channel)
+            self.discord_rpc.update(
+                channel_name=channel.name,
+                game_name=channel.game.name if channel.game is not None else None,
+                image_url=campaign.image_url if campaign is not None else None,
+            )
 
     def stop_watching(self):
         self.gui.clear_drop()
         self.watching_channel.clear()
         self.gui.channels.clear_watching()
+        if self.settings.discord_rpc_enabled:
+            self.discord_rpc.clear()
 
     def restart_watching(self):
         self.gui.progress.stop_timer()

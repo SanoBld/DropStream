@@ -278,6 +278,8 @@ class GUISettingsAdvanced(TypedDict):
     warning_text: str
     enable_badges_emotes: str
     mine_unlinked_campaigns: str
+    discord_rpc_enabled: str
+    discord_client_id: str
     available_drops_check: str
 
 
@@ -590,6 +592,8 @@ default_translation: Translation = {
                 ),
                 "enable_badges_emotes": "Enable partial support for badges and emotes: ",
                 "mine_unlinked_campaigns": "Mine campaigns even if the account isn't linked: ",
+                "discord_rpc_enabled": "Show currently watched channel on Discord: ",
+                "discord_client_id": "Discord Application ID: ",
                 "available_drops_check": "Enable extra available drops check: ",
             },
             "priority_modes": {

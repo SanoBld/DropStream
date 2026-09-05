@@ -27,6 +27,8 @@ class SettingsFile(TypedDict):
     # mine drops for campaigns even when Twitch says the game account isn't linked
     # (Twitch sometimes reports this wrong; the claim can still go through)
     mine_unlinked_campaigns: bool
+    discord_rpc_enabled: bool
+    discord_client_id: str
     available_drops_check: bool
     priority_mode: PriorityMode
     # scheduler: daily run window + action once nothing's left to farm today
@@ -62,6 +64,8 @@ default_settings: SettingsFile = {
     "tray_notifications": True,
     "enable_badges_emotes": False,
     "mine_unlinked_campaigns": False,
+    "discord_rpc_enabled": False,
+    "discord_client_id": "1545749912262680717",
     "available_drops_check": False,
     "priority_mode": PriorityMode.PRIORITY_ONLY,
     "schedule_enabled": False,
@@ -103,6 +107,8 @@ class Settings:
     tray_notifications: bool
     enable_badges_emotes: bool
     mine_unlinked_campaigns: bool
+    discord_rpc_enabled: bool
+    discord_client_id: str
     available_drops_check: bool
     priority_mode: PriorityMode
     schedule_enabled: bool

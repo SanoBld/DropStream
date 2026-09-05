@@ -2182,6 +2182,8 @@ class _SettingsVars(TypedDict):
     tray_notifications: IntVar
     enable_badges_emotes: IntVar
     mine_unlinked_campaigns: IntVar
+    discord_rpc_enabled: IntVar
+    discord_client_id: StringVar
     available_drops_check: IntVar
     schedule_enabled: IntVar
     schedule_start: StringVar
@@ -2233,8 +2235,20 @@ class SettingsPanel:
             "modern_dark": _("gui", "settings", "themes", "modern_dark"),
         }
 
+    def _on_discord_rpc_toggle(self) -> None:
+        enabled = bool(self._vars["discord_rpc_enabled"].get())
+        self._settings.discord_rpc_enabled = enabled
+        if enabled:
+            self._twitch.discord_rpc.connect()
+            watching = self._twitch.watching_channel.get_with_default(None)
+            if watching is not None:
+                self._twitch.watch(watching, update_status=False)
+        else:
+            self._twitch.discord_rpc.close()
+
     def __init__(self, manager: GUIManager, master: ttk.Widget, games_master: ttk.Widget):
         self._manager = manager
+        self._twitch = manager._twitch
         self._settings: Settings = manager._twitch.settings
         priority_mode = self._settings.priority_mode
         if priority_mode not in self.PRIORITY_MODES:
@@ -2259,6 +2273,10 @@ class SettingsPanel:
             "mine_unlinked_campaigns": IntVar(
                 master, int(self._settings.mine_unlinked_campaigns)
             ),
+            "discord_rpc_enabled": IntVar(
+                master, int(self._settings.discord_rpc_enabled)
+            ),
+            "discord_client_id": StringVar(master, self._settings.discord_client_id),
             "available_drops_check": IntVar(
                 master, int(self._settings.available_drops_check)
             ),
@@ -2552,6 +2570,30 @@ class SettingsPanel:
             ),
         ).grid(column=1, row=irow, sticky="w")
         ttk.Label(
+            advanced_center, text=_("gui", "settings", "advanced", "discord_rpc_enabled")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Checkbutton(
+            advanced_center,
+            variable=self._vars["discord_rpc_enabled"],
+            command=self._on_discord_rpc_toggle,
+        ).grid(column=1, row=irow, sticky="w")
+        ttk.Label(
+            advanced_center, text=_("gui", "settings", "advanced", "discord_client_id")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ttk.Entry(
+            advanced_center, textvariable=self._vars["discord_client_id"], width=24
+        ).grid(column=1, row=irow, sticky="w")
+        self._vars["discord_client_id"].trace_add(
+            "write",
+            lambda *_a: (
+                setattr(self._settings, "discord_client_id", self._vars["discord_client_id"].get()),
+                setattr(
+                    self._twitch.discord_rpc, "_client_id",
+                    self._vars["discord_client_id"].get(),
+                ),
+            ),
+        )
+        ttk.Label(
             advanced_center, text=_("gui", "settings", "advanced", "available_drops_check")
         ).grid(column=0, row=(irow := irow + 1), sticky="e")
         ttk.Checkbutton(
@@ -2686,7 +2728,7 @@ class SettingsPanel:
 
         # Reload button
         reload_frame = ttk.Frame(center_frame)
-        reload_frame.grid(column=0, row=4, pady=4)
+        reload_frame.grid(column=0, row=5, pady=4)
         ttk.Label(reload_frame, text=_("gui", "settings", "reload_text")).grid(column=0, row=0)
         ttk.Button(
             reload_frame,
