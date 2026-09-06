@@ -169,7 +169,17 @@
                 "warning": "Advarsel!",
                 "warning_text": "Disse alternativene vil føre til at utvinneren oppfører seg feil.\nHvis du opplever problemer, sørg for at alle disse alternativene er deaktivert.",
                 "enable_badges_emotes": "Aktiver delvis støtte for merker og emotes: ",
-                "available_drops_check": "Aktiver ekstra sjekk av tilgjengelige drops: "
+                "available_drops_check": "Aktiver ekstra sjekk av tilgjengelige drops: ",
+                "mine_unlinked_campaigns": "Utvinn kampanjer selv om kontoen ikke er koblet til: ",
+                "discord_rpc_enabled": "Vis kanalen som ses på nå, på Discord: ",
+                "discord_client_id": "Discord-applikasjons-ID: ",
+                "discord_rpc_image": "Discord-forsidebilde: ",
+                "discord_rpc_image_game": "Spillets omslagsbilde",
+                "discord_rpc_image_streamer": "Strømmerens direktevisning",
+                "discord_rpc_image_logo": "DropStream-logo",
+                "discord_rpc_header": "Linjen „Ser på“ viser: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Strømmerens navn"
             },
             "priority_modes": {
                 "priority_only": "Kun prioritetsliste",

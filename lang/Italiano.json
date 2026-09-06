@@ -212,7 +212,17 @@
                 "warning": "Attenzione!",
                 "warning_text": "Queste opzioni possono causare un malfunzionamento del miner.\nSe riscontri problemi, assicurati che tutte queste opzioni siano disattivate.",
                 "enable_badges_emotes": "Attiva supporto parziale per badge ed emote: ",
-                "available_drops_check": "Attiva controllo extra dei drop disponibili: "
+                "available_drops_check": "Attiva controllo extra dei drop disponibili: ",
+                "mine_unlinked_campaigns": "Estrarre campagne anche se l'account non è collegato: ",
+                "discord_rpc_enabled": "Mostra il canale attualmente guardato su Discord: ",
+                "discord_client_id": "ID applicazione Discord: ",
+                "discord_rpc_image": "Immagine di copertina Discord: ",
+                "discord_rpc_image_game": "Copertina del gioco",
+                "discord_rpc_image_streamer": "Anteprima live dello streamer",
+                "discord_rpc_image_logo": "Logo di DropStream",
+                "discord_rpc_header": "La riga «In visione» mostra: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Il nome dello streamer"
             },
             "reliability": {
                 "name": "Affidabilità",

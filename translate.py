@@ -284,6 +284,9 @@ class GUISettingsAdvanced(TypedDict):
     discord_rpc_image_game: str
     discord_rpc_image_streamer: str
     discord_rpc_image_logo: str
+    discord_rpc_header: str
+    discord_rpc_header_app: str
+    discord_rpc_header_streamer: str
     available_drops_check: str
 
 
@@ -602,6 +605,9 @@ default_translation: Translation = {
                 "discord_rpc_image_game": "Game box art",
                 "discord_rpc_image_streamer": "Streamer's live preview",
                 "discord_rpc_image_logo": "DropStream logo",
+                "discord_rpc_header": "\"Watching\" line shows: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "The streamer's name",
                 "available_drops_check": "Enable extra available drops check: ",
             },
             "priority_modes": {

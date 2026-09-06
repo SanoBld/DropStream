@@ -212,7 +212,17 @@
                 "warning": "Advarsel!",
                 "warning_text": "Disse indstillinger kan få minearbejderen til at fungere forkert.\nHvis du oplever problemer, skal du sørge for, at alle disse indstillinger er deaktiveret.",
                 "enable_badges_emotes": "Aktivér delvis support til badges og emotes: ",
-                "available_drops_check": "Aktivér ekstra kontrol af tilgængelige drops: "
+                "available_drops_check": "Aktivér ekstra kontrol af tilgængelige drops: ",
+                "mine_unlinked_campaigns": "Udvind kampagner, selv hvis kontoen ikke er forbundet: ",
+                "discord_rpc_enabled": "Vis den aktuelt sete kanal på Discord: ",
+                "discord_client_id": "Discord-applikations-ID: ",
+                "discord_rpc_image": "Discord-forsidebillede: ",
+                "discord_rpc_image_game": "Spillets cover",
+                "discord_rpc_image_streamer": "Streamerens livevisning",
+                "discord_rpc_image_logo": "DropStream-logo",
+                "discord_rpc_header": "Linjen „Ser på“ viser: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Streamerens navn"
             },
             "reliability": {
                 "name": "Pålidelighed",

@@ -1179,6 +1179,7 @@ class Twitch:
                 channel_name=channel.name,
                 game_name=channel.game.name if channel.game is not None else None,
                 image_url=image_url,
+                show_streamer_in_header=(self.settings.discord_rpc_header == "streamer"),
             )
 
     def stop_watching(self):

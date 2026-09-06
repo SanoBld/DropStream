@@ -8,11 +8,12 @@ from typing import Any
 logger = logging.getLogger("DropStream")
 
 try:
-    from pypresence.presence import Presence, ActivityType
+    from pypresence.presence import Presence, ActivityType, StatusDisplayType
     from pypresence.exceptions import PyPresenceException
 except ImportError:
     Presence = None  # type: ignore[assignment,misc]
     ActivityType = None  # type: ignore[assignment,misc]
+    StatusDisplayType = None  # type: ignore[assignment,misc]
     PyPresenceException = Exception  # type: ignore[assignment,misc]
 
 # DropStream's own Discord Application, used by default so Rich Presence works
@@ -20,6 +21,9 @@ except ImportError:
 # override this with their own client ID in Settings.
 DEFAULT_CLIENT_ID = "1545749912262680717"
 GITHUB_URL = "https://github.com/SanoBld/DropStream"
+# served directly from the repo, so no manual Discord "Rich Presence Assets"
+# upload is required for the logo option to work
+LOGO_URL = "https://raw.githubusercontent.com/SanoBld/DropStream/main/icons/dropstream_logo.png"
 
 
 class DiscordRPC:
@@ -73,17 +77,30 @@ class DiscordRPC:
             return False
         return self._executor.submit(self._connect_sync).result()
 
-    def _update_sync(self, channel_name: str, game_name: str | None, image_url: str | None) -> None:
+    def _update_sync(
+        self,
+        channel_name: str,
+        game_name: str | None,
+        image_url: str | None,
+        show_streamer_in_header: bool,
+    ) -> None:
         if not self._connected or self._rpc is None:
             return
         twitch_url = f"https://twitch.tv/{channel_name}"
         try:
             self._rpc.update(
                 activity_type=ActivityType.WATCHING,
+                # controls what's shown in the compact "Watching ..." header seen
+                # in the friends list / member list; the app name (DropStream) or
+                # the streamer's name, depending on the user's Settings choice
+                status_display_type=(
+                    StatusDisplayType.STATE if show_streamer_in_header
+                    else StatusDisplayType.NAME
+                ),
                 state=f"Watching {channel_name}",
                 state_url=twitch_url,
                 details=game_name or "Mining drops",
-                large_image=image_url or "dropstream_logo",
+                large_image=image_url or LOGO_URL,
                 large_text=game_name or "DropStream",
                 large_url=GITHUB_URL,
                 start=self._start_time,
@@ -98,10 +115,19 @@ class DiscordRPC:
             logger.info("Discord Rich Presence: lost connection to Discord")
             self._connected = False
 
-    def update(self, *, channel_name: str, game_name: str | None, image_url: str | None) -> None:
+    def update(
+        self,
+        *,
+        channel_name: str,
+        game_name: str | None,
+        image_url: str | None,
+        show_streamer_in_header: bool = False,
+    ) -> None:
         if not self._connected:
             return
-        self._executor.submit(self._update_sync, channel_name, game_name, image_url)
+        self._executor.submit(
+            self._update_sync, channel_name, game_name, image_url, show_streamer_in_header
+        )
 
     def _clear_sync(self) -> None:
         if self._connected and self._rpc is not None:

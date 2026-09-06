@@ -2185,6 +2185,7 @@ class _SettingsVars(TypedDict):
     discord_rpc_enabled: IntVar
     discord_client_id: StringVar
     discord_rpc_image: StringVar
+    discord_rpc_header: StringVar
     available_drops_check: IntVar
     schedule_enabled: IntVar
     schedule_start: StringVar
@@ -2245,6 +2246,14 @@ class SettingsPanel:
             "logo": _("gui", "settings", "advanced", "discord_rpc_image_logo"),
         }
 
+    @cached_property
+    def DISCORD_RPC_HEADERS(self) -> dict[str, str]:
+        # NOTE: order matters, it's the order shown in the dropdown
+        return {
+            "app": _("gui", "settings", "advanced", "discord_rpc_header_app"),
+            "streamer": _("gui", "settings", "advanced", "discord_rpc_header_streamer"),
+        }
+
     def _on_discord_rpc_toggle(self) -> None:
         enabled = bool(self._vars["discord_rpc_enabled"].get())
         self._settings.discord_rpc_enabled = enabled
@@ -2300,6 +2309,7 @@ class SettingsPanel:
             ),
             "discord_client_id": StringVar(master, self._settings.discord_client_id),
             "discord_rpc_image": StringVar(master, self._settings.discord_rpc_image),
+            "discord_rpc_header": StringVar(master, self._settings.discord_rpc_header),
             "available_drops_check": IntVar(
                 master, int(self._settings.available_drops_check)
             ),
@@ -2638,6 +2648,28 @@ class SettingsPanel:
             self._settings.discord_rpc_image = discord_image_keys[idx]
 
         discord_image_combo.bind("<<ComboboxSelected>>", _on_discord_image_select)
+        ttk.Label(
+            advanced_center, text=_("gui", "settings", "advanced", "discord_rpc_header")
+        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        discord_header_combo = ttk.Combobox(
+            advanced_center,
+            textvariable=self._vars["discord_rpc_header"],
+            values=list(self.DISCORD_RPC_HEADERS.values()),
+            state="readonly",
+            width=18,
+        )
+        discord_header_combo.grid(column=1, row=irow, sticky="w")
+        discord_header_keys = list(self.DISCORD_RPC_HEADERS.keys())
+        discord_header_combo.current(
+            discord_header_keys.index(self._settings.discord_rpc_header)
+            if self._settings.discord_rpc_header in discord_header_keys else 0
+        )
+
+        def _on_discord_header_select(_event: object = None) -> None:
+            idx = discord_header_combo.current()
+            self._settings.discord_rpc_header = discord_header_keys[idx]
+
+        discord_header_combo.bind("<<ComboboxSelected>>", _on_discord_header_select)
         ttk.Label(
             advanced_center, text=_("gui", "settings", "advanced", "available_drops_check")
         ).grid(column=0, row=(irow := irow + 1), sticky="e")

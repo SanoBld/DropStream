@@ -169,7 +169,17 @@
                 "warning": "Figyelem!",
                 "warning_text": "Ezek a beállítások a bányászó hibás működését okozhatják.\nHa bármilyen problémát tapasztalsz, győződj meg róla, hogy mindegyik ki van kapcsolva.",
                 "enable_badges_emotes": "Jelvények és emote-ok részleges támogatása: ",
-                "available_drops_check": "Extra ellenőrzés az elérhető dropokhoz: "
+                "available_drops_check": "Extra ellenőrzés az elérhető dropokhoz: ",
+                "mine_unlinked_campaigns": "Kampányok bányászata akkor is, ha a fiók nincs összekapcsolva: ",
+                "discord_rpc_enabled": "Az éppen nézett csatorna megjelenítése a Discordon: ",
+                "discord_client_id": "Discord alkalmazásazonosító: ",
+                "discord_rpc_image": "Discord borítókép: ",
+                "discord_rpc_image_game": "Játék borítója",
+                "discord_rpc_image_streamer": "A streamer élő előnézete",
+                "discord_rpc_image_logo": "DropStream logó",
+                "discord_rpc_header": "A „Nézi” sor a következőt mutatja: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "A streamer nevét"
             },
             "priority_modes": {
                 "priority_only": "Csak a prioritási lista",

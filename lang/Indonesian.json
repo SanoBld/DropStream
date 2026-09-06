@@ -212,7 +212,17 @@
                 "warning": "Peringatan!",
                 "warning_text": "Opsi ini dapat menyebabkan miner tidak berfungsi dengan benar.\nJika mengalami masalah, pastikan semua opsi ini dinonaktifkan.",
                 "enable_badges_emotes": "Aktifkan dukungan parsial untuk lencana dan emote: ",
-                "available_drops_check": "Aktifkan pemeriksaan tambahan drop yang tersedia: "
+                "available_drops_check": "Aktifkan pemeriksaan tambahan drop yang tersedia: ",
+                "mine_unlinked_campaigns": "Tetap tambang kampanye meskipun akun tidak tertaut: ",
+                "discord_rpc_enabled": "Tampilkan saluran yang sedang ditonton di Discord: ",
+                "discord_client_id": "ID Aplikasi Discord: ",
+                "discord_rpc_image": "Gambar sampul Discord: ",
+                "discord_rpc_image_game": "Sampul game",
+                "discord_rpc_image_streamer": "Pratinjau langsung streamer",
+                "discord_rpc_image_logo": "Logo DropStream",
+                "discord_rpc_header": "Baris “Menonton” menampilkan: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Nama streamer"
             },
             "reliability": {
                 "name": "Keandalan",

@@ -213,7 +213,17 @@
                 "warning": "Waarschuwing!",
                 "warning_text": "Deze opties kunnen ervoor zorgen dat de miner niet goed werkt.\nAls je problemen ondervindt, zorg dan dat al deze opties zijn uitgeschakeld.",
                 "enable_badges_emotes": "Gedeeltelijke ondersteuning voor badges en emotes inschakelen: ",
-                "available_drops_check": "Extra controle van beschikbare drops inschakelen: "
+                "available_drops_check": "Extra controle van beschikbare drops inschakelen: ",
+                "mine_unlinked_campaigns": "Campagnes ook minen als het account niet gekoppeld is: ",
+                "discord_rpc_enabled": "Huidig bekeken kanaal tonen op Discord: ",
+                "discord_client_id": "Discord-toepassings-ID: ",
+                "discord_rpc_image": "Discord-omslagafbeelding: ",
+                "discord_rpc_image_game": "Boxart van het spel",
+                "discord_rpc_image_streamer": "Live-voorbeeld van de streamer",
+                "discord_rpc_image_logo": "DropStream-logo",
+                "discord_rpc_header": "De regel „Aan het kijken” toont: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "De naam van de streamer"
             },
             "reliability": {
                 "name": "Betrouwbaarheid",

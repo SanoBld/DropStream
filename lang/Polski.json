@@ -169,7 +169,17 @@
                 "warning": "Ostrzeżenie!",
                 "warning_text": "Te opcje mogą powodować nieprawidłowe działanie aplikacji.\nW przypadku problemów upewnij się, że wszystkie te opcje są wyłączone.",
                 "enable_badges_emotes": "Włącz częściową obsługę odznak i emotek: ",
-                "available_drops_check": "Włącz dodatkowe sprawdzanie dostępnych dropów: "
+                "available_drops_check": "Włącz dodatkowe sprawdzanie dostępnych dropów: ",
+                "mine_unlinked_campaigns": "Wydobywaj kampanie nawet gdy konto nie jest połączone: ",
+                "discord_rpc_enabled": "Pokazuj aktualnie oglądany kanał na Discordzie: ",
+                "discord_client_id": "ID aplikacji Discord: ",
+                "discord_rpc_image": "Obraz okładki Discord: ",
+                "discord_rpc_image_game": "Okładka gry",
+                "discord_rpc_image_streamer": "Podgląd na żywo streamera",
+                "discord_rpc_image_logo": "Logo DropStream",
+                "discord_rpc_header": "Wiersz „Ogląda” pokazuje: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Nazwę streamera"
             },
             "priority_modes": {
                 "priority_only": "Tylko lista priorytetów",

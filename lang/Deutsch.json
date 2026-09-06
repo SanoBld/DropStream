@@ -212,7 +212,17 @@
                 "warning": "Warnung!",
                 "warning_text": "Diese Optionen können dazu führen, dass der Miner nicht mehr richtig funktioniert.\nWenn Probleme auftreten, stellen Sie sicher, dass alle diese Optionen deaktiviert sind.",
                 "enable_badges_emotes": "Teilweise Unterstützung für Badges und Emotes aktivieren: ",
-                "available_drops_check": "Zusätzliche Prüfung verfügbarer Drops aktivieren: "
+                "available_drops_check": "Zusätzliche Prüfung verfügbarer Drops aktivieren: ",
+                "mine_unlinked_campaigns": "Kampagnen auch minen, wenn das Konto nicht verknüpft ist: ",
+                "discord_rpc_enabled": "Aktuell angesehenen Kanal auf Discord anzeigen: ",
+                "discord_client_id": "Discord-Anwendungs-ID: ",
+                "discord_rpc_image": "Discord-Titelbild: ",
+                "discord_rpc_image_game": "Spiel-Cover",
+                "discord_rpc_image_streamer": "Live-Vorschau des Streamers",
+                "discord_rpc_image_logo": "DropStream-Logo",
+                "discord_rpc_header": "Die Zeile „Sieht zu“ zeigt: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Den Namen des Streamers"
             },
             "reliability": {
                 "name": "Zuverlässigkeit",
