@@ -901,12 +901,21 @@ class ConsoleOutput:
         xscroll.grid(column=0, row=1, sticky="ew")
         yscroll.grid(column=1, row=0, sticky="ns")
 
+    # keep the console from growing forever over a long mining session - each
+    # entry is retained in the Tk widget's own memory, and Twitch update lines
+    # arrive constantly, so an unbounded log here is a slow but real RAM leak
+    MAX_LINES = 1000
+    TRIM_TO = 800
+
     def print(self, message: str):
         stamp = datetime.now().strftime("%X")
         if '\n' in message:
             message = message.replace('\n', f"\n{stamp}: ")
         self._text.config(state="normal")
         self._text.insert("end", f"{stamp}: {message}\n")
+        line_count = int(self._text.index("end-1c").split(".")[0])
+        if line_count > self.MAX_LINES:
+            self._text.delete("1.0", f"{line_count - self.TRIM_TO}.0")
         self._text.see("end")  # scroll to the newly added line
         self._text.config(state="disabled")
 

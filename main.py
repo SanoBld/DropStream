@@ -23,6 +23,7 @@ if __name__ == "__main__":
     import signal
     import asyncio
     import logging
+    import logging.handlers
     import argparse
     import warnings
     import traceback
@@ -181,7 +182,11 @@ if __name__ == "__main__":
         logger = logging.getLogger("TwitchDrops")
         logger.setLevel(settings.logging_level)
         if settings.log:
-            handler = logging.FileHandler(LOG_PATH, encoding="utf8")
+            # rotate at 5MB so the log file doesn't grow forever over long-running
+            # sessions; keep one backup so recent history survives a rotation
+            handler = logging.handlers.RotatingFileHandler(
+                LOG_PATH, encoding="utf8", maxBytes=5 * 1024 * 1024, backupCount=1
+            )
             handler.setFormatter(FILE_FORMATTER)
             logger.addHandler(handler)
         logging.getLogger("TwitchDrops.gql").setLevel(settings.debug_gql)
