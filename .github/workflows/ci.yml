@@ -133,8 +133,67 @@ jobs:
           name: DropStream.Windows.Installer
           path: installer\Output\DropStream-Setup.exe
 
+  windows-arm64:
+    name: Windows (ARM64)
+    runs-on: windows-11-arm
+    needs:
+      - validate
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set version (if provided)
+        if: ${{ github.event.inputs.version != '' }}
+        shell: bash
+        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
+
+      - name: Set up variables
+        id: vars
+        run: |
+          Add-Content $env:GITHUB_OUTPUT "sha_short=$(git rev-parse --short HEAD)"
+
+      - name: Append git revision to project version
+        run: |
+          (Get-Content version.py) `
+          -Replace '^__version__\s*=\s*"[^"]+', "`$0.${{steps.vars.outputs.sha_short}}" |`
+          Out-File version.py
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{env.PYTHON_VERSION}}
+
+      - name: Install project dependencies
+        run: |
+          python3 -m pip install wheel
+          python3 -m pip install -r requirements.txt
+
+      - name: Install PyInstaller
+        run: |
+          python3 -m pip install pyinstaller
+
+      - name: Create portable executable
+        run: |
+          pyinstaller build.spec
+
+      - name: Create release folder
+        run: |
+          $FolderName = 'DropStream'
+          New-Item $FolderName -ItemType Directory
+          Copy-Item dist\*.exe $FolderName
+          Copy-Item manual.txt $FolderName
+          Compress-Archive -Path $FolderName -DestinationPath DropStream.Windows-arm64.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          name: DropStream.Windows-arm64
+          path: DropStream.Windows-arm64.zip
+
   macos:
-    name: macOS
+    name: macOS (ARM64)
+    # macos-latest currently maps to an Apple Silicon (arm64) runner, so this build is native ARM64.
     runs-on: macos-latest
     needs:
       - validate

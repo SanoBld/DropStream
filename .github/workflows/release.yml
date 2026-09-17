@@ -76,6 +76,8 @@ jobs:
           body: |
             **DropStream — a fork of [Twitch Drops Miner by DevilXD](https://github.com/DevilXD/TwitchDropsMiner).**
 
+            Windows, macOS (Apple Silicon), and Linux (x86_64 + ARM64) builds are attached below.
+
             - Published: `${{steps.vars.outputs.date_now}}`
             - Source build run: ${{steps.run.outputs.id}}
             - Reference commit: ${{github.sha}}

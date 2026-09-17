@@ -1280,6 +1280,11 @@ class TrayIcon:
                 # bug fix: this used to run unconditionally and crash with
                 # AttributeError when show_inventory_tab is disabled (inv is None)
                 self._manager.inv.clear()
+            if hasattr(self._manager, "dashboard"):
+                # the Dashboard tab keeps its own references to the currently displayed
+                # campaign/box-art images (to keep them alive in Tk), so cache.trim()
+                # alone doesn't free them - clear those too
+                self._manager.dashboard.clear()
             self._manager._cache.trim()
             self._manager._inventory_dirty = True
             gc.collect()
@@ -1290,6 +1295,12 @@ class TrayIcon:
             self.icon.visible = False
         self._manager._root.deiconify()
         self._manager._minimized = False
+        if self._manager._twitch.settings.low_power_tray_mode and hasattr(
+            self._manager, "dashboard"
+        ):
+            # rebuild what clear() dropped on minimize; refresh_campaign() itself
+            # skipped rebuilding while minimized, so this is the first rebuild since
+            self._manager.dashboard.refresh_campaign(force=True)
 
     def notify(
         self, message: str, title: str | None = None, duration: float = 10
@@ -1655,6 +1666,15 @@ class DashboardTab:
             frozenset(d.id for d in drop.campaign.drops if d.is_claimed)
             if drop is not None else frozenset()
         )
+        if (
+            not force
+            and self._manager._minimized
+            and self._twitch.settings.low_power_tray_mode
+        ):
+            # stay cleared (see clear()) while minimized in eco mode; rebuilding now
+            # would just re-decode images nobody can see. TrayIcon.restore() forces
+            # a rebuild once the window (and this tab, if visible) is shown again.
+            return
         state = (drop_id, claimed_ids)
         if not force and state == getattr(self, "_last_campaign_state", None):
             return
@@ -1716,6 +1736,17 @@ class DashboardTab:
                 justify="center", wraplength=140,
                 style="green.TLabel" if campaign_drop.is_claimed else "TLabel",
             ).grid(column=0, row=1, pady=(4, 0))
+
+    def clear(self) -> None:
+        # mirrors InventoryOverview.clear(): drops the currently displayed campaign/
+        # box-art images from RAM during a low-power tray minimize. refresh_campaign()
+        # skips rebuilding while minimized, so this stays cleared until restored.
+        if self._campaign_items_frame is not None:
+            self._campaign_items_frame.destroy()
+            self._campaign_items_frame = None
+        self._campaign_image_refs.clear()
+        self._campaign_no_data_label.grid(column=0, row=0)
+        self._last_campaign_state = None
 
     def apply_theme(self, bg: str, fg: str) -> None:
         # tk.Canvas isn't a ttk widget, so it doesn't pick up theme colors automatically
