@@ -876,6 +876,28 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   }
   .expand-arrow.open { transform: rotate(180deg); }
   .link-status.not-linked-hint { font-size: 11px; color: var(--dim); margin-left: 6px; }
+
+/* links use the accent color (purple) instead of the browser default blue */
+a, a:visited { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Light animations. Only opacity/transform are animated (GPU-composited, no layout work),
+   every animation runs once and stops (no infinite loops, no JS timers or rAF), so there is
+   no measurable CPU/RAM/battery cost. Disabled entirely for users who prefer reduced motion. */
+@keyframes ds-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes ds-fade { from { opacity: 0; } to { opacity: 1; } }
+.tab-panel.active > .card { animation: ds-rise .28s ease-out both; }
+.tab-panel.active > .card:nth-child(2) { animation-delay: .04s; }
+.tab-panel.active > .card:nth-child(3) { animation-delay: .08s; }
+.tab-panel.active > .card:nth-child(4) { animation-delay: .12s; }
+.tab-panel.active > .card:nth-child(n+5) { animation-delay: .16s; }
+.faq-item[open] .faq-a { animation: ds-fade .25s ease-out; }
+.tab-btn, .theme-switch button, .stats-filter button, a { transition: color .15s, background-color .15s, border-color .15s; }
+.card { transition: border-color .2s; }
+.card:hover { border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
@@ -3502,7 +3524,9 @@ function drawBarChart(canvasId, labels, values) {
   ctx.clearRect(0, 0, w, h);
   if (!labels.length) return;
   const max = Math.max(1, ...values);
-  const padBottom = 24, padTop = 10;
+  // padTop leaves room for the value label drawn above the tallest bar (11px font + gap),
+  // otherwise that label gets cut off at the top of the canvas
+  const padBottom = 24, padTop = 24;
   const barAreaH = h - padBottom - padTop;
   const barW = w / labels.length;
   const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#7c5cff";

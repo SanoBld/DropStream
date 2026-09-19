@@ -61,6 +61,31 @@ pause/resume mining and change the priority mode. In control mode you can set an
 none set, anyone with the link can control the app; with one set, they also need the password (viewing
 never requires it).
 
+#### Remote dashboard tabs
+
+**Dashboard**: the drop and campaign being mined right now, with progress bars, time remaining, the
+watched channel, running totals and a drops-per-game leaderboard.
+
+![Remote dashboard](screenshots/remote-dashboard.png)
+
+**Campaigns**: every campaign with its reward items and progress, searchable, sortable and filterable by
+account.
+
+![Remote campaigns](screenshots/remote-campaigns.png)
+
+**Statistics**: drops claimed and watch hours saved, over today, 7 days, 30 days, 3 months or since the
+beginning.
+
+![Remote statistics](screenshots/remote-stats.png)
+
+**Logs** (optional): the same lines as the desktop app's Output box, read-only.
+
+![Remote logs](screenshots/remote-logs.png)
+
+**Help**: fork info and version, how it works, and a questions and answers section.
+
+![Remote help](screenshots/remote-help.png)
+
 A few things worth knowing: the link itself is the only thing standing between a stranger and "just
 viewing" your instance, so treat it like a password, and use "Generate a new link" whenever you want to
 revoke one you shared before. By default it's only reachable on your own network; reaching it from
