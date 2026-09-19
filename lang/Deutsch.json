@@ -163,7 +163,9 @@
                 "priority_mode_info": "Spiele der Prioritätsliste werden immer zuerst in der von Ihnen festgelegten Reihenfolge versucht. \"Endet am frühesten\"/\"Geringe Verfügbarkeit zuerst\" bestimmt nur die Reihenfolge für alles andere, sobald nichts aus der Prioritätsliste verfügbar ist.",
                 "tray_notifications": "Taskleisten-Benachrichtigungen: ",
                 "low_power_tray_mode": "RAM/Akku sparen beim Minimieren: ",
-                "low_power_tray_mode_info": "Wenn die App in die Taskleiste minimiert ist, leert sie ihre zwischengespeicherten Bilder und prüft seltener auf Updates, um Speicher und Akku zu sparen. Der Nachteil: Das Öffnen des Inventar-Tabs danach kann sich kurz etwas langsamer anfühlen, da es neu geladen werden muss - währenddessen wird ein Ladebildschirm angezeigt."
+                "low_power_tray_mode_info": "Wenn die App in die Taskleiste minimiert ist, leert sie ihre zwischengespeicherten Bilder und prüft seltener auf Updates, um Speicher und Akku zu sparen. Der Nachteil: Das Öffnen des Inventar-Tabs danach kann sich kurz etwas langsamer anfühlen, da es neu geladen werden muss - währenddessen wird ein Ladebildschirm angezeigt.",
+                "show_inventory_tab": "Inventar-Tab anzeigen (Neustart erforderlich): ",
+                "show_inventory_tab_info": "Der Inventar-Tab kann hier ausgeblendet werden, falls du deine Drops lieber über die eigene Inventarseite des Web-Dashboards abrufen möchtest."
             },
             "game_name": "Spiel",
             "priority": "Priorität",
@@ -284,7 +286,9 @@
             "public_link_unavailable": "Öffentliche IP konnte gerade nicht ermittelt werden.",
             "viewers_none": "Niemand betrachtet gerade das Web-Dashboard.",
             "viewers_one": "1 Person betrachtet gerade das Web-Dashboard.",
-            "viewers_many": "{count} Personen betrachten gerade das Web-Dashboard."
+            "viewers_many": "{count} Personen betrachten gerade das Web-Dashboard.",
+            "show_viewers_label": "Zuschauerzahl auf der Seite anzeigen: ",
+            "show_logs_label": "Einen schreibgeschützten Protokoll-Tab auf der Seite anzeigen: "
         }
     }
 }

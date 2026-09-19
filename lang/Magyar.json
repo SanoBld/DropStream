@@ -162,7 +162,9 @@
                 "use_system_accent": "Rendszer kiemelő színének használata: ",
                 "priority_mode_info": "A prioritási lista játékai mindig előbb próbálkoznak, a beállított sorrendben. A \"Leghamarabb véget érő\"/\"Alacsony elérhetőség előbb\" csak a többi sorrendjét határozza meg, ha már semmi sincs elérhető a prioritási listáról.",
                 "low_power_tray_mode": "RAM/akkumulátor spórolása kicsinyítéskor: ",
-                "low_power_tray_mode_info": "Amíg az alkalmazás a tálcára van kicsinyítve, törli a gyorsítótárazott képeket, és ritkábban ellenőrzi a frissítéseket, hogy kevesebb memóriát és akkumulátort használjon. A hátránya: a Készlet fül ezután megnyitva egy pillanatra kicsit lassabbnak tűnhet, mivel újra be kell töltődnie - eközben egy betöltő képernyő jelenik meg."
+                "low_power_tray_mode_info": "Amíg az alkalmazás a tálcára van kicsinyítve, törli a gyorsítótárazott képeket, és ritkábban ellenőrzi a frissítéseket, hogy kevesebb memóriát és akkumulátort használjon. A hátránya: a Készlet fül ezután megnyitva egy pillanatra kicsit lassabbnak tűnhet, mivel újra be kell töltődnie - eközben egy betöltő képernyő jelenik meg.",
+                "show_inventory_tab": "Készlet fül megjelenítése (újraindítást igényel): ",
+                "show_inventory_tab_info": "A Készlet fül itt elrejthető, ha inkább a webes irányítópult saját Készlet oldaláról szeretnéd ellenőrizni a dropjaidat."
             },
             "advanced": {
                 "name": "Haladó",
@@ -283,7 +285,9 @@
             "public_link_unavailable": "Jelenleg nem sikerült megállapítani a nyilvános IP-t.",
             "viewers_none": "Jelenleg senki sem nézi a webes irányítópultot.",
             "viewers_one": "Jelenleg 1 fő nézi a webes irányítópultot.",
-            "viewers_many": "Jelenleg {count} fő nézi a webes irányítópultot."
+            "viewers_many": "Jelenleg {count} fő nézi a webes irányítópultot.",
+            "show_viewers_label": "Nézőszám megjelenítése az oldalon: ",
+            "show_logs_label": "Csak olvasható Naplók fül megjelenítése az oldalon: "
         }
     }
 }

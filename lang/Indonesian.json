@@ -163,7 +163,9 @@
                 "priority_mode": "Mode prioritas: ",
                 "priority_mode_info": "Game dalam daftar prioritas selalu dicoba lebih dulu, sesuai urutan yang Anda tetapkan. \"Berakhir tercepat\"/\"Ketersediaan rendah dulu\" hanya menentukan urutan untuk sisanya, setelah tidak ada lagi yang tersedia dari daftar prioritas.",
                 "low_power_tray_mode": "Hemat RAM/baterai saat diperkecil: ",
-                "low_power_tray_mode_info": "Saat diperkecil ke baki sistem, aplikasi menghapus gambar yang di-cache dan memeriksa pembaruan lebih jarang untuk menghemat memori dan baterai. Konsekuensinya: membuka tab Inventaris setelahnya bisa terasa sedikit lebih lambat sesaat, karena perlu dimuat ulang - layar pemuatan akan ditampilkan selama itu."
+                "low_power_tray_mode_info": "Saat diperkecil ke baki sistem, aplikasi menghapus gambar yang di-cache dan memeriksa pembaruan lebih jarang untuk menghemat memori dan baterai. Konsekuensinya: membuka tab Inventaris setelahnya bisa terasa sedikit lebih lambat sesaat, karena perlu dimuat ulang - layar pemuatan akan ditampilkan selama itu.",
+                "show_inventory_tab": "Tampilkan tab Inventaris (perlu memulai ulang): ",
+                "show_inventory_tab_info": "Tab Inventaris dapat disembunyikan di sini jika Anda lebih suka memeriksa drop dari halaman Inventaris milik dasbor web itu sendiri."
             },
             "game_name": "Nama game",
             "priority": "Prioritas",
@@ -284,7 +286,9 @@
             "public_link_unavailable": "Tidak dapat menentukan IP publik saat ini.",
             "viewers_none": "Tidak ada yang sedang melihat dasbor web.",
             "viewers_one": "1 orang sedang melihat dasbor web.",
-            "viewers_many": "{count} orang sedang melihat dasbor web."
+            "viewers_many": "{count} orang sedang melihat dasbor web.",
+            "show_viewers_label": "Tampilkan jumlah penonton di halaman: ",
+            "show_logs_label": "Tampilkan tab Log yang hanya bisa dibaca di halaman: "
         }
     }
 }

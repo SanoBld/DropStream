@@ -191,6 +191,14 @@ if __name__ == "__main__":
             logger.addHandler(handler)
         logging.getLogger("TwitchDrops.gql").setLevel(settings.debug_gql)
         logging.getLogger("TwitchDrops.websocket").setLevel(settings.debug_ws)
+        # always attach the in-memory ring buffer, regardless of the web_server_show_logs
+        # setting - that setting only gates whether the Remote dashboard is allowed to
+        # read from it, not whether it gets populated (so toggling it on works instantly,
+        # without missing the lines logged before it was turned on)
+        from logbuffer import BufferHandler
+        buffer_handler = BufferHandler()
+        buffer_handler.setFormatter(FILE_FORMATTER)
+        logger.addHandler(buffer_handler)
 
         exit_status = 0
         client = Twitch(settings)

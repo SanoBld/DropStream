@@ -1,22 +1,22 @@
 # DropStream
 
-> **DropStream is an unofficial, community-made update/fork of [Twitch Drops Miner (TDM), created by DevilXD](https://github.com/DevilXD/TwitchDropsMiner).**
-> The core drop-mining engine and the vast majority of the original design and codebase come directly from
-> DevilXD's project — full credit goes to them. This fork keeps that engine intact and adds a dashboard,
-> multi-account profiles, a scheduler, a remote web dashboard, and a redesigned theme system on top of it
-> (see below). If you find this fork useful, please consider
-> [supporting DevilXD, the original author](https://www.buymeacoffee.com/DevilXD), whose work this is built on.
+DropStream is an unofficial fork of [Twitch Drops Miner (TDM)](https://github.com/DevilXD/TwitchDropsMiner),
+created by DevilXD. It's built and maintained by [SanoBld](https://github.com/SanoBld). The drop-mining
+engine and most of the original design still come straight from DevilXD's project, and full credit goes to them for
+that part. On top of it, this fork adds a dashboard, multi-account profiles, a scheduler, a remote web
+dashboard, and a reworked theme system, described below. If DropStream is useful to you, consider
+[supporting DevilXD](https://www.buymeacoffee.com/DevilXD) too, since the mining engine underneath is
+their work.
 
-This application lets you AFK-mine timed Twitch drops, without having to worry about switching channels
-when the one you're watching goes offline, claiming the drops yourself, or even receiving the actual
-stream data. This saves you bandwidth and hassle.
+The app lets you AFK-mine timed Twitch drops without babysitting it: no switching channels by hand when
+the one you're watching goes offline, no clicking to claim drops, and no actual stream data being
+downloaded, which saves you bandwidth.
 
 ## How It Works
 
-Every few seconds, the application simulates watching a stream by requesting its metadata, which is enough
-to make progress on active drops. This approach avoids downloading any actual video or audio data. A
-persistent (sharded) websocket connection keeps every channel's status (ONLINE/OFFLINE) and live viewer
-count up to date in real time.
+Every few seconds, the app requests a stream's metadata instead of actually watching it, which is enough
+for Twitch to count progress toward a drop. No video or audio is ever downloaded. A persistent, sharded
+websocket connection also keeps every channel's status (online/offline) and live viewer count up to date.
 
 ## What DropStream adds on top of the original TDM
 
@@ -24,10 +24,10 @@ count up to date in real time.
 
 ![Dashboard](screenshots/dashboard.png)
 
-A dedicated overview tab: current pause/resume state, the drop and campaign currently being mined with
-its progress bar and time remaining, the full campaign artwork with every reward item, a "last 7 days"
-mining-activity chart, a "drops per game" breakdown chart, and running totals for drops claimed and watch
-hours saved.
+An overview tab: the current pause/resume state, the drop and campaign being mined right now with its
+progress bar and time remaining, the full campaign artwork with every reward item, a chart of mining
+activity over the last 7 days, a breakdown of drops per game, and running totals for drops claimed and
+watch hours saved.
 
 ### Games (priority & exclude lists)
 
@@ -52,44 +52,37 @@ live status/game/viewer count, current campaign and drop progress, and the raw a
 Its own **Distant/Remote** tab: turn on a small built-in web server and generate a private link (a random
 token embedded in the URL, e.g. `http://192.168.1.42:21000/8f3a.../`), with an "Open" button to launch it
 directly in your default browser. Anyone on the same network with that link gets a page mirroring most of
-the desktop app (current drop/campaign with reward art pulled straight from Twitch, a drops-per-game
-leaderboard, and the full campaign list).
+the desktop app, including the current drop and campaign with reward art pulled straight from Twitch, a
+small preview of the campaign's other drops, a drops-per-game leaderboard, the full campaign list (click a
+drop's thumbnail for its details), a read-only Logs tab if you turn it on, and a Help tab.
 
-You choose the **access mode**:
+You choose the **access mode**: **view only** by default, or **view and control**, which lets visitors also
+pause/resume mining and change the priority mode. In control mode you can set an optional password: with
+none set, anyone with the link can control the app; with one set, they also need the password (viewing
+never requires it).
 
-- **View only** (default): visitors can only watch progress.
-- **View and control**: visitors can also pause/resume mining and change the priority mode. You can set an
-  optional **control password** — without one, anyone with the link can control the app; with one, they
-  additionally need the password for control actions (viewing never requires it).
-
-A few things worth knowing:
-
-- The link is the only thing standing between a stranger and "just viewing" your instance — treat it like
-  a password. Use **Generate a new link** any time you want to revoke a previously shared one.
-- By default it's only reachable on your local network. Reaching it from the internet needs port
-  forwarding on your router (this exposes the link publicly, including to scanners) or a private
-  tunnel/VPN (Tailscale, WireGuard, etc.) instead.
-- The port (`21000` by default) can be changed if it conflicts with something else on your machine.
-- The dashboard shares the same event loop as the mining logic but is built to stay lightweight: requests
-  are rate-limited per visitor, the tracked-IP table is bounded, and reward/box-art images are never
-  proxied or cached by the app — the page links straight to Twitch's own CDN.
-- This dashboard is view/control only — it can never be used to log into your Twitch account or claim
-  drops directly; it only reflects and steers what the desktop app is already doing.
+A few things worth knowing: the link itself is the only thing standing between a stranger and "just
+viewing" your instance, so treat it like a password, and use "Generate a new link" whenever you want to
+revoke one you shared before. By default it's only reachable on your own network; reaching it from
+outside needs port forwarding on your router (which exposes the link publicly, scanners included) or a
+private tunnel/VPN like Tailscale or WireGuard. The port (`21000` by default) can be changed if it clashes
+with something else on your machine. It shares the same event loop as the mining logic but stays
+lightweight: requests are rate-limited per visitor, box-art images are never proxied or cached by the app
+itself (the page links straight to Twitch's CDN), and it can never log into your Twitch account or claim
+drops on its own, it only reflects and steers what the desktop app is already doing.
 
 ### Settings
 
 ![Settings](screenshots/settings.png)
 
-- **General**: language, autostart (with "start minimized to tray"), tray notifications, a
-  RAM/battery-saving mode once minimized, a Light/Dark/Auto theme (with an option to follow your OS accent
-  color), an optional inventory tab, and a proxy field.
-- **Accounts**: multi-account **profiles** — isolated settings/cookies/cache per account, with buttons to
-  create a profile, launch several accounts in parallel, switch the active profile, or delete one.
-- **Scheduler**: restrict mining to a daily time window (start/end), with a configurable action once all of
-  today's drops have been claimed.
-- **Reliability**: automatic restart after a crash, after a configurable delay.
-- **Advanced**: lower-level tuning options for troubleshooting (may affect stability — leave alone unless
-  you know what you're doing).
+**General** covers language, autostart (with "start minimized to tray"), tray notifications, a
+RAM/battery-saving mode once minimized, a Light/Dark/Auto theme (with an option to follow your OS accent
+color), an optional inventory tab, and a proxy field. **Accounts** adds multi-account profiles, each with isolated
+settings, cookies and cache per account, with buttons to create a profile, launch several accounts in
+parallel, switch the active one, or delete it. **Scheduler** restricts mining to a daily time window, with
+a configurable action once all of today's drops are claimed. **Reliability** can restart the app
+automatically after a crash, after a delay you choose. **Advanced** holds lower-level tuning options for
+troubleshooting; best left alone unless you know what you're doing, since they can affect stability.
 
 ### Help
 
@@ -110,7 +103,7 @@ when switching accounts).
 
 ## Features (inherited from the original engine)
 
-- Stream-less drop mining — no video/audio ever downloaded.
+- Stream-less drop mining, so no video or audio is ever downloaded.
 - Game priority and exclusion lists, to focus on what you want, in the order you want, and ignore the rest.
 - Sharded websocket connections, tracking up to `199` channels at the same time.
 - Automatic drop-campaign discovery based on your linked accounts (you still need to
@@ -118,12 +111,12 @@ when switching accounts).
 - Stream tag and drop-campaign validation, so you don't end up watching a stream that can't earn the drop.
 - Automatic channel switching, when the current channel goes offline or a higher-priority game's stream
   comes online.
-- Login session saved to a cookies file — no need to log in every run.
+- Login session saved to a cookies file, so you don't need to log in every run.
 - Mining starts automatically as new campaigns appear and stops once all available drops are mined.
 
 ## Usage
 
-1. Download and unzip [the latest release](../../releases) — it's recommended to keep it in the folder it
+1. Download and unzip [the latest release](../../releases). It's recommended to keep it in the folder it
    comes in.
 2. Run it and log in / connect the miner to your Twitch account using the in-app login form.
 3. After logging in, the app fetches every campaign and game you can mine drops for. Add the games you
@@ -136,7 +129,7 @@ when switching accounts).
 ## Small window / compact layout
 
 The main window can be resized noticeably smaller than before. Instead of clipping a tab's content once it
-no longer fits, every tab scrolls vertically — a scrollbar appears automatically only when needed, and the
+no longer fits, every tab now scrolls vertically. A scrollbar appears automatically only when needed, and the
 mouse wheel scrolls the content under the cursor. The tab bar itself also supports the mouse wheel (while
 hovering the row of tab labels) and Ctrl+PageUp / Ctrl+PageDown from anywhere.
 
@@ -150,10 +143,10 @@ hovering the row of tab labels) and Ctrl+PageUp / Ctrl+PageDown from anywhere.
 
 > [!CAUTION]
 > Persistent cookies are stored in `cookies.jar`, from which login information is restored on every run.
-> Keep that file safe — whoever has it can access your Twitch account without knowing your password.
+> Keep that file safe: whoever has it can access your Twitch account without knowing your password.
 
 > [!IMPORTANT]
-> Logging in successfully may trigger a "New Login" notification email from Twitch. This is expected — you
+> Logging in successfully may trigger a "New Login" notification email from Twitch. This is expected, and you
 > can verify it comes from your own IP. The detected browser will show as "Chrome", since that's what the
 > miner presents itself as to Twitch's servers.
 
@@ -169,7 +162,7 @@ hovering the row of tab labels) and Ctrl+PageUp / Ctrl+PageDown from anywhere.
 
 - The app is packaged with PyInstaller into a portable `EXE`. Some antivirus engines (including Windows
   Defender) may flag it as a trojan, because PyInstaller has historically been abused to package malicious
-  code by others — these reports can be safely ignored. If you don't trust the executable, install Python
+  code by others, so these reports can be safely ignored. If you don't trust the executable, install Python
   yourself and run from source instead.
 - The executable uses `%TEMP%` for temporary runtime files; persistent data is stored next to the
   executable.
@@ -181,7 +174,7 @@ hovering the row of tab labels) and Ctrl+PageUp / Ctrl+PageDown from anywhere.
 
 ### Linux build
 
-- Distributed as both an [AppImage](https://appimage.org/) and a PyInstaller portable build — if unsure,
+- Distributed as both an [AppImage](https://appimage.org/) and a PyInstaller portable build. If unsure,
   use the AppImage.
 - Both are built for `x86_64` **and `aarch64` (ARM64)**.
 - Requires `glibc>=2.35` and a working display server.
@@ -227,6 +220,8 @@ built on:
 </div>
 
 ## Credits
+
+[@SanoBld](https://github.com/SanoBld) - Creator and maintainer of the DropStream fork.
 
 @guihkx - For the CI script, CI maintenance, and everything related to Linux builds.
 @kWAYTV - For the implementation of the dark mode theme.

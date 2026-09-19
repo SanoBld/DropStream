@@ -162,7 +162,9 @@
                 "use_system_accent": "Bruk systemets aksentfarge: ",
                 "priority_mode_info": "Spill på prioritetslisten forsøkes alltid først, i rekkefølgen du har angitt. \"Avsluttes snarest\"/\"Lav tilgjengelighet først\" bestemmer bare rekkefølgen for alt annet, når ingenting fra prioritetslisten lenger er tilgjengelig.",
                 "low_power_tray_mode": "Spar RAM/batteri ved minimering: ",
-                "low_power_tray_mode_info": "Når appen er minimert til systemstatusfeltet, tømmer den bufrede bilder og sjekker sjeldnere etter oppdateringer for å spare minne og batteri. Ulempen: å åpne Beholdning-fanen etterpå kan føles litt tregere et øyeblikk, siden den må lastes på nytt - en lasteskjerm vises i mellomtiden."
+                "low_power_tray_mode_info": "Når appen er minimert til systemstatusfeltet, tømmer den bufrede bilder og sjekker sjeldnere etter oppdateringer for å spare minne og batteri. Ulempen: å åpne Beholdning-fanen etterpå kan føles litt tregere et øyeblikk, siden den må lastes på nytt - en lasteskjerm vises i mellomtiden.",
+                "show_inventory_tab": "Vis Beholdning-fanen (krever omstart): ",
+                "show_inventory_tab_info": "Beholdning-fanen kan skjules her hvis du heller vil sjekke droppene dine fra nettdashbordets egen Beholdning-side."
             },
             "advanced": {
                 "name": "Avansert",
@@ -283,7 +285,9 @@
             "public_link_unavailable": "Kunne ikke fastslå en offentlig IP akkurat nå.",
             "viewers_none": "Ingen ser for øyeblikket på webdashbordet.",
             "viewers_one": "1 person ser for øyeblikket på webdashbordet.",
-            "viewers_many": "{count} personer ser for øyeblikket på webdashbordet."
+            "viewers_many": "{count} personer ser for øyeblikket på webdashbordet.",
+            "show_viewers_label": "Vis antall seere på siden: ",
+            "show_logs_label": "Vis en skrivebeskyttet Logs-fane på siden: "
         }
     }
 }

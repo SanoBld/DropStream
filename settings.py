@@ -45,6 +45,7 @@ class SettingsFile(TypedDict):
     web_server_allow_control: bool  # False = visitors can only view; True = they can also act
     web_server_password: str  # optional extra check gating control actions; empty = no password
     web_server_show_viewers: bool  # show live viewer count on the dashboard page itself
+    web_server_show_logs: bool  # expose a read-only Logs tab with recent app log lines
     show_inventory_tab: bool  # show the desktop Inventory tab; can be hidden, use the web dashboard instead
     low_power_tray_mode: bool  # aggressively trim RAM/CPU usage while minimized to the tray
     # if a critical task dies even after its built-in retries, optionally relaunch the app
@@ -82,6 +83,7 @@ default_settings: SettingsFile = {
     "web_server_allow_control": False,
     "web_server_password": "",
     "web_server_show_viewers": False,
+    "web_server_show_logs": False,
     "show_inventory_tab": True,
     "low_power_tray_mode": False,
     "auto_restart_enabled": False,
@@ -127,6 +129,7 @@ class Settings:
     web_server_allow_control: bool
     web_server_password: str
     web_server_show_viewers: bool
+    web_server_show_logs: bool
     show_inventory_tab: bool
     low_power_tray_mode: bool
     auto_restart_enabled: bool

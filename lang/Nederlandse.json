@@ -164,7 +164,9 @@
                 "priority_mode_info": "Games op de prioriteitslijst worden altijd eerst geprobeerd, in de door jou ingestelde volgorde. \"Eindigt het snelst\"/\"Lage beschikbaarheid eerst\" bepalen alleen de volgorde voor de rest, zodra er niets meer beschikbaar is van de prioriteitslijst.",
                 "tray_notifications": "Systeemvakmeldingen: ",
                 "low_power_tray_mode": "RAM/batterij besparen bij minimaliseren: ",
-                "low_power_tray_mode_info": "Wanneer de app geminimaliseerd is naar het systeemvak, wist deze de gecachte afbeeldingen en controleert minder vaak op updates om geheugen en batterij te sparen. Het nadeel: het tabblad Inventaris hierna openen kan even wat trager aanvoelen, omdat het opnieuw moet laden - er wordt dan een laadscherm getoond."
+                "low_power_tray_mode_info": "Wanneer de app geminimaliseerd is naar het systeemvak, wist deze de gecachte afbeeldingen en controleert minder vaak op updates om geheugen en batterij te sparen. Het nadeel: het tabblad Inventaris hierna openen kan even wat trager aanvoelen, omdat het opnieuw moet laden - er wordt dan een laadscherm getoond.",
+                "show_inventory_tab": "Tabblad Inventaris tonen (herstart vereist): ",
+                "show_inventory_tab_info": "Het tabblad Inventaris kan hier worden verborgen als je je drops liever bekijkt via de eigen Inventaris-pagina van het webdashboard."
             },
             "game_name": "Spel",
             "priority": "Prioriteit",
@@ -285,7 +287,9 @@
             "public_link_unavailable": "Kon momenteel geen openbaar IP-adres vaststellen.",
             "viewers_none": "Niemand bekijkt momenteel het webdashboard.",
             "viewers_one": "1 persoon bekijkt momenteel het webdashboard.",
-            "viewers_many": "{count} personen bekijken momenteel het webdashboard."
+            "viewers_many": "{count} personen bekijken momenteel het webdashboard.",
+            "show_viewers_label": "Kijkersaantal op de pagina tonen: ",
+            "show_logs_label": "Toon een alleen-lezen tabblad Logs op de pagina: "
         }
     }
 }

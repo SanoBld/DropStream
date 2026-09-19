@@ -162,7 +162,9 @@
                 "use_system_accent": "Użyj koloru akcentu systemu: ",
                 "priority_mode_info": "Gry z listy priorytetów są zawsze próbowane jako pierwsze, w ustalonej przez Ciebie kolejności. \"Kończy się najwcześniej\"/\"Najpierw niska dostępność\" określają tylko kolejność dla reszty, gdy nic z listy priorytetów nie jest już dostępne.",
                 "low_power_tray_mode": "Oszczędzaj RAM/baterię po zminimalizowaniu: ",
-                "low_power_tray_mode_info": "Gdy aplikacja jest zminimalizowana do zasobnika systemowego, czyści zapisane w pamięci podręcznej obrazy i rzadziej sprawdza aktualizacje, aby oszczędzać pamięć i baterię. Kompromis: otwarcie karty Ekwipunek później może chwilę wydawać się wolniejsze, ponieważ musi się ponownie załadować - w tym czasie wyświetlany jest ekran ładowania."
+                "low_power_tray_mode_info": "Gdy aplikacja jest zminimalizowana do zasobnika systemowego, czyści zapisane w pamięci podręcznej obrazy i rzadziej sprawdza aktualizacje, aby oszczędzać pamięć i baterię. Kompromis: otwarcie karty Ekwipunek później może chwilę wydawać się wolniejsze, ponieważ musi się ponownie załadować - w tym czasie wyświetlany jest ekran ładowania.",
+                "show_inventory_tab": "Pokaż zakładkę Ekwipunek (wymaga restartu): ",
+                "show_inventory_tab_info": "Zakładkę Ekwipunek można tutaj ukryć, jeśli wolisz sprawdzać swoje dropy z własnej strony Ekwipunku w panelu internetowym."
             },
             "advanced": {
                 "name": "Zaawansowane",
@@ -287,7 +289,9 @@
             "public_link_unavailable": "Nie można teraz ustalić publicznego adresu IP.",
             "viewers_none": "Nikt obecnie nie przegląda panelu internetowego.",
             "viewers_one": "1 osoba obecnie przegląda panel internetowy.",
-            "viewers_many": "{count} osób obecnie przegląda panel internetowy."
+            "viewers_many": "{count} osób obecnie przegląda panel internetowy.",
+            "show_viewers_label": "Pokaż liczbę widzów na stronie: ",
+            "show_logs_label": "Pokaż tylko do odczytu zakładkę Dzienniki na stronie: "
         }
     }
 }

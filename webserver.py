@@ -14,6 +14,7 @@ from aiohttp import web
 
 from constants import PriorityMode, State
 from utils import resource_path
+from logbuffer import buffer as log_buffer
 
 if TYPE_CHECKING:
     from twitch import Twitch
@@ -132,6 +133,10 @@ class WebDashboard:
             web.get(f"/{token}/api/state", self._handle_state),
             web.get(f"/{token}/api/campaigns", self._handle_campaigns),
             web.get(f"/{token}/api/stats", self._handle_stats),
+            # always registered (unlike the control routes below), since it's gated by
+            # the web_server_show_logs setting checked live inside the handler instead -
+            # so toggling that setting takes effect immediately, without a server restart
+            web.get(f"/{token}/api/logs", self._handle_logs),
         ]
         if settings.web_server_allow_control:
             routes += [
@@ -236,6 +241,15 @@ class WebDashboard:
                     "image_url": reward_image,
                     "progress": round(drop.progress, 4),
                     "claimed": drop.is_claimed,
+                    # detail fields, used by the drop-detail popup opened by clicking
+                    # a thumbnail on the Campaigns tab - kept separate from the fields
+                    # above so the always-sent summary payload stays small
+                    "benefits": [
+                        {"name": b.name, "image_url": b.image_url} for b in drop.benefits
+                    ],
+                    "required_minutes": drop.required_minutes,
+                    "current_minutes": drop.current_minutes,
+                    "remaining_minutes": drop.remaining_minutes,
                 })
                 if len(drops) >= 12:
                     break
@@ -270,6 +284,27 @@ class WebDashboard:
         if drop is not None:
             campaign = drop.campaign
             reward_image = drop.benefits[0].image_url if drop.benefits else None
+            # small preview of the campaign's other drops, shown next to the current one
+            # on the Dashboard tab so visitors can see what's coming up without switching
+            # to the Campaigns tab; capped since a campaign can have many drops
+            other_drops = []
+            for other in campaign.drops:
+                if other.id == drop.id:
+                    continue
+                other_drops.append({
+                    "rewards": other.rewards_text(),
+                    "image_url": other.benefits[0].image_url if other.benefits else None,
+                    "claimed": other.is_claimed,
+                    "progress": round(other.progress, 4),
+                    "benefits": [
+                        {"name": b.name, "image_url": b.image_url} for b in other.benefits
+                    ],
+                    "required_minutes": other.required_minutes,
+                    "current_minutes": other.current_minutes,
+                    "remaining_minutes": other.remaining_minutes,
+                })
+                if len(other_drops) >= 8:
+                    break
             current_drop = {
                 "game": campaign.game.name,
                 "game_image": campaign.image_url,
@@ -282,6 +317,7 @@ class WebDashboard:
                 "total_drops": campaign.total_drops,
                 "drop_remaining_minutes": drop.remaining_minutes,
                 "campaign_remaining_minutes": campaign.remaining_minutes,
+                "other_drops": other_drops,
             }
         watching = twitch.watching_channel.get_with_default(None)
         watching_channel: dict[str, Any] | None = None
@@ -316,6 +352,7 @@ class WebDashboard:
         return {
             "app": {"name": "DropStream", "version": self._version()},
             "control_enabled": settings.web_server_allow_control,
+            "logs_enabled": settings.web_server_show_logs,
             "show_viewers": settings.web_server_show_viewers,
             "viewer_count": self._viewer_count() if settings.web_server_show_viewers else None,
             "password_required": bool(
@@ -395,6 +432,11 @@ class WebDashboard:
         if range_key not in ("day", "week", "month", "3months", "all"):
             range_key = "week"
         return web.json_response(self._twitch.stats.stats_for_range(range_key))
+
+    async def _handle_logs(self, request: web.Request) -> web.Response:
+        if not self._twitch.settings.web_server_show_logs:
+            return web.json_response({"error": "logs are disabled"}, status=403)
+        return web.json_response({"lines": log_buffer.get_lines(limit=500)})
 
     async def _handle_pause(self, request: web.Request) -> web.Response:
         if not self._password_ok(request):
@@ -725,6 +767,39 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     background: var(--green); color: #08240f; font-size: 10px; display: flex;
     align-items: center; justify-content: center; font-weight: bold;
   }
+  .drop-thumb { cursor: pointer; }
+  .other-drops-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .other-drop-thumb {
+    position: relative; width: 28px; height: 28px; cursor: pointer; flex-shrink: 0;
+  }
+  .other-drop-thumb img {
+    width: 28px; height: 28px; border-radius: 6px; object-fit: cover; background: var(--input-bg);
+    display: block;
+  }
+  .other-drop-thumb.claimed img { opacity: .45; }
+  .logs-box {
+    background: var(--card2); border-radius: 8px; padding: 10px; font-family: monospace;
+    font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+    max-height: 65vh; overflow-y: auto; margin: 0;
+  }
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex;
+    align-items: center; justify-content: center; z-index: 50; padding: 16px;
+  }
+  .modal {
+    position: relative; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; max-width: 360px; width: 100%; text-align: center;
+  }
+  .modal-close {
+    position: absolute; top: 8px; right: 8px; width: 26px; height: 26px;
+  }
+  .modal img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; background: var(--input-bg); }
+  .drop-modal-benefits {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; justify-content: center;
+  }
+  .drop-modal-benefits img {
+    width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: var(--input-bg);
+  }
   .edit-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
   .edit-item {
     display: flex; align-items: center; gap: 8px; background: var(--card2); border-radius: 6px;
@@ -797,6 +872,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <button class="tab-btn" data-tab="campaigns" data-i18n="tab_campaigns"></button>
     <button class="tab-btn" data-tab="stats" data-i18n="tab_stats"></button>
     <button class="tab-btn" data-tab="control" id="control-tab-btn" data-i18n="tab_control"></button>
+    <button class="tab-btn" data-tab="logs" id="logs-tab-btn" data-i18n="tab_logs" style="display:none"></button>
+    <button class="tab-btn" data-tab="help" data-i18n="tab_help"></button>
   </div>
 
   <div class="tab-panel active" id="tab-dashboard">
@@ -835,6 +912,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div class="time-chip" id="drop-remaining"></div>
         <div class="time-chip" id="campaign-remaining"></div>
       </div>
+      <div class="other-drops-row" id="other-drops-row"></div>
     </div>
 
     <div class="card" id="channel-card" style="display:none">
@@ -962,6 +1040,50 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     </div>
   </div>
 
+  <div class="tab-panel" id="tab-logs">
+    <div class="card">
+      <div class="label" data-i18n="logs_title"></div>
+      <div class="muted" data-i18n="logs_hint" style="margin-bottom:8px"></div>
+      <pre id="logs-box" class="logs-box"></pre>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-help">
+    <div class="card">
+      <div class="label" data-i18n="help_about_title"></div>
+      <div class="muted" style="margin-top:6px">
+        <span data-i18n="help_about_body"></span>
+        <a href="https://github.com/DevilXD/TwitchDropsMiner" target="_blank" rel="noopener">DevilXD/TwitchDropsMiner</a>
+      </div>
+      <div class="muted" style="margin-top:10px" data-i18n="help_version_label"></div>
+      <div class="value" id="help-version"></div>
+    </div>
+    <div class="card">
+      <div class="label" data-i18n="help_how_title"></div>
+      <div class="muted" style="margin-top:6px" data-i18n="help_how_body"></div>
+    </div>
+    <div class="card">
+      <div class="label" data-i18n="help_links_title"></div>
+      <div class="muted" style="margin-top:6px">
+        <a href="https://www.twitch.tv/drops/inventory" target="_blank" rel="noopener" data-i18n="help_link_inventory"></a><br>
+        <a href="https://www.twitch.tv/drops/campaigns" target="_blank" rel="noopener" data-i18n="help_link_campaigns"></a><br>
+        <a href="https://github.com/SanoBld/DropStream" target="_blank" rel="noopener" data-i18n="help_link_repo"></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="drop-modal-overlay" style="display:none">
+    <div class="modal">
+      <button class="icon-btn modal-close" id="drop-modal-close">×</button>
+      <img id="drop-modal-image" src="" alt="">
+      <div class="value" id="drop-modal-title" style="margin-top:8px"></div>
+      <div class="muted" id="drop-modal-status" style="margin-top:4px"></div>
+      <div class="bar" style="margin-top:10px"><div id="drop-modal-bar" style="width:0%"></div></div>
+      <div class="muted" id="drop-modal-minutes" style="margin-top:4px"></div>
+      <div id="drop-modal-benefits" class="drop-modal-benefits"></div>
+    </div>
+  </div>
+
   <datalist id="game-options"></datalist>
 
   <div class="err" id="error-box" data-i18n="connection_lost"></div>
@@ -1022,6 +1144,19 @@ const I18N = {
     "tab_campaigns": "Campaigns",
     "tab_stats": "Stats",
     "tab_control": "Control",
+    "tab_logs": "Logs",
+    "logs_title": "Application logs",
+    "logs_hint": "Read-only, live view of this instance's recent log output.",
+    "tab_help": "Help",
+    "help_about_title": "About DropStream",
+    "help_about_body": "DropStream is an unofficial fork of Twitch Drops Miner, built by SanoBld. The drop-mining engine itself comes from the original project:",
+    "help_version_label": "Version",
+    "help_how_title": "How it works",
+    "help_how_body": "Every few seconds, the app requests a stream's metadata instead of actually watching it, which is enough for Twitch to count progress toward a drop. This dashboard just mirrors and, if you're given control access, steers what the desktop app is already doing - it can't log into your account or claim drops on its own.",
+    "help_links_title": "Useful links",
+    "help_link_inventory": "View your Twitch inventory",
+    "help_link_campaigns": "View and manage linked campaigns",
+    "help_link_repo": "DropStream on GitHub",
     "theme_light": "Light",
     "theme_dark": "Dark",
     "theme_auto": "Auto",
@@ -1105,6 +1240,19 @@ const I18N = {
     "tab_campaigns": "Campagnes",
     "tab_stats": "Statistiques",
     "tab_control": "Contrôle",
+    "tab_logs": "Journaux",
+    "logs_title": "Journaux de l'application",
+    "logs_hint": "Vue en lecture seule des dernières lignes de log de cette instance.",
+    "tab_help": "Aide",
+    "help_about_title": "À propos de DropStream",
+    "help_about_body": "DropStream est un fork non officiel de Twitch Drops Miner, réalisé par SanoBld. Le moteur de minage des drops lui-même vient du projet d'origine :",
+    "help_version_label": "Version",
+    "help_how_title": "Comment ça fonctionne",
+    "help_how_body": "Toutes les quelques secondes, l'application récupère les métadonnées d'un flux au lieu de le regarder réellement, ce qui suffit à Twitch pour faire progresser un drop. Ce tableau de bord se contente de refléter, et si on vous donne l'accès contrôle, de piloter ce que l'application de bureau fait déjà - il ne peut ni se connecter à votre compte ni réclamer de drops de lui-même.",
+    "help_links_title": "Liens utiles",
+    "help_link_inventory": "Voir votre inventaire Twitch",
+    "help_link_campaigns": "Voir et gérer les campagnes liées",
+    "help_link_repo": "DropStream sur GitHub",
     "theme_light": "Clair",
     "theme_dark": "Sombre",
     "theme_auto": "Auto",
@@ -2801,8 +2949,32 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     if (btn.dataset.tab === "stats") {
       loadStats(statsRange);
     }
+    if (btn.dataset.tab === "logs") {
+      loadLogs();
+    }
   });
 });
+
+let logsPollTimer = null;
+async function loadLogs() {
+  try {
+    const res = await fetch(base + "/api/logs");
+    if (!res.ok) return;
+    const data = await res.json();
+    const box = document.getElementById("logs-box");
+    const wasScrolledDown = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
+    box.textContent = (data.lines || []).join("\n");
+    if (wasScrolledDown) box.scrollTop = box.scrollHeight;
+  } catch (e) {
+    // logs are non-critical; ignore transient fetch errors
+  }
+}
+// keep the log view live while its tab is open, without polling it in the background
+setInterval(() => {
+  if (document.getElementById("logs-tab-btn").classList.contains("active")) {
+    loadLogs();
+  }
+}, 5000);
 
 function setStatsRangeButtons() {
   document.querySelectorAll("#stats-filter button").forEach(b => {
@@ -3083,6 +3255,7 @@ function renderCampaigns(campaigns) {
       const thumb = document.createElement("div");
       thumb.className = "drop-thumb" + (d.claimed ? " claimed" : "");
       thumb.title = d.rewards + (d.claimed ? " (" + t("claimed") + ")" : " " + pct(d.progress));
+      thumb.addEventListener("click", () => openDropModal(d));
       const dimg = document.createElement("img");
       dimg.src = d.image_url || "";
       dimg.alt = "";
@@ -3105,6 +3278,57 @@ function renderCampaigns(campaigns) {
     list.appendChild(card);
   }
 }
+
+function renderOtherDrops(otherDrops) {
+  const row = document.getElementById("other-drops-row");
+  row.innerHTML = "";
+  for (const d of otherDrops) {
+    const thumb = document.createElement("div");
+    thumb.className = "other-drop-thumb" + (d.claimed ? " claimed" : "");
+    thumb.title = d.rewards + (d.claimed ? " (" + t("claimed") + ")" : " " + pct(d.progress));
+    const img = document.createElement("img");
+    img.src = d.image_url || "";
+    img.alt = "";
+    thumb.appendChild(img);
+    thumb.addEventListener("click", () => openDropModal(d));
+    row.appendChild(thumb);
+  }
+}
+
+function openDropModal(d) {
+  document.getElementById("drop-modal-image").src = d.image_url || "";
+  document.getElementById("drop-modal-title").textContent = d.rewards;
+  const claimed = d.claimed;
+  document.getElementById("drop-modal-status").textContent = claimed
+    ? t("claimed") : pct(d.progress) + (d.remaining_minutes != null ? " - " + fmtMinutes(d.remaining_minutes) : "");
+  document.getElementById("drop-modal-bar").style.width = pct(d.progress);
+  const minutesEl = document.getElementById("drop-modal-minutes");
+  if (d.required_minutes != null) {
+    minutesEl.textContent = (d.current_minutes || 0) + " / " + d.required_minutes + " min";
+    minutesEl.style.display = "";
+  } else {
+    minutesEl.style.display = "none";
+  }
+  const benefitsEl = document.getElementById("drop-modal-benefits");
+  benefitsEl.innerHTML = "";
+  for (const b of (d.benefits || [])) {
+    const img = document.createElement("img");
+    img.src = b.image_url || "";
+    img.alt = b.name || "";
+    img.title = b.name || "";
+    benefitsEl.appendChild(img);
+  }
+  document.getElementById("drop-modal-overlay").style.display = "flex";
+}
+
+document.getElementById("drop-modal-close").addEventListener("click", () => {
+  document.getElementById("drop-modal-overlay").style.display = "none";
+});
+document.getElementById("drop-modal-overlay").addEventListener("click", (e) => {
+  if (e.target.id === "drop-modal-overlay") {
+    document.getElementById("drop-modal-overlay").style.display = "none";
+  }
+});
 
 function renderEditList(listEl, emptyEl, games, kind, controlEnabled) {
   listEl.innerHTML = "";
@@ -3223,6 +3447,17 @@ async function refresh() {
       document.querySelector('.tab-btn[data-tab="dashboard"]').classList.add("active");
       document.getElementById("tab-dashboard").classList.add("active");
     }
+    const logsTabBtn = document.getElementById("logs-tab-btn");
+    logsTabBtn.style.display = s.logs_enabled ? "" : "none";
+    if (!s.logs_enabled && logsTabBtn.classList.contains("active")) {
+      logsTabBtn.classList.remove("active");
+      document.getElementById("tab-logs").classList.remove("active");
+      document.querySelector('.tab-btn[data-tab="dashboard"]').classList.add("active");
+      document.getElementById("tab-dashboard").classList.add("active");
+    }
+    if (s.app && s.app.version) {
+      document.getElementById("help-version").textContent = "DropStream v" + s.app.version;
+    }
 
     const dot = document.getElementById("status-dot");
     const text = document.getElementById("status-text");
@@ -3264,6 +3499,7 @@ async function refresh() {
         cr ? t("campaign_remaining") + ": <b>" + cr + "</b> " + t("remaining") : "";
       const pctInt = Math.round(s.current_drop.drop_progress * 100);
       document.title = pctInt + "% - " + s.current_drop.rewards + " - DropStream";
+      renderOtherDrops(s.current_drop.other_drops || []);
     } else {
       dropCard.style.display = "none";
       document.title = "DropStream";

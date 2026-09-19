@@ -163,7 +163,9 @@
                 "priority_mode": "Prioritetstilstand: ",
                 "priority_mode_info": "Spil på prioritetslisten forsøges altid først, i den rækkefølge du har angivet. \"Slutter snarest\"/\"Lav tilgængelighed først\" bestemmer kun rækkefølgen for alt andet, når intet fra prioritetslisten er tilgængeligt.",
                 "low_power_tray_mode": "Spar RAM/batteri ved minimering: ",
-                "low_power_tray_mode_info": "Når appen er minimeret til proceslinjen, rydder den sine cachelagrede billeder og tjekker sjældnere for opdateringer for at spare hukommelse og batteri. Bagsiden: at åbne fanen Beholdning bagefter kan føles lidt langsommere et øjeblik, fordi den skal genindlæses - der vises en indlæsningsskærm imens."
+                "low_power_tray_mode_info": "Når appen er minimeret til proceslinjen, rydder den sine cachelagrede billeder og tjekker sjældnere for opdateringer for at spare hukommelse og batteri. Bagsiden: at åbne fanen Beholdning bagefter kan føles lidt langsommere et øjeblik, fordi den skal genindlæses - der vises en indlæsningsskærm imens.",
+                "show_inventory_tab": "Vis fanen Beholdning (kræver genstart): ",
+                "show_inventory_tab_info": "Fanen Beholdning kan skjules her, hvis du hellere vil tjekke dine drops fra webdashboardets egen Beholdning-side."
             },
             "game_name": "Spilnavn",
             "priority": "Prioritet",
@@ -284,7 +286,9 @@
             "public_link_unavailable": "Kunne ikke finde en offentlig IP lige nu.",
             "viewers_none": "Ingen ser i øjeblikket webpanelet.",
             "viewers_one": "1 person ser i øjeblikket webpanelet.",
-            "viewers_many": "{count} personer ser i øjeblikket webpanelet."
+            "viewers_many": "{count} personer ser i øjeblikket webpanelet.",
+            "show_viewers_label": "Vis antal seere på siden: ",
+            "show_logs_label": "Vis en skrivebeskyttet Logs-fane på siden: "
         }
     }
 }

@@ -163,7 +163,9 @@
                 "priority_mode": "Modalità priorità: ",
                 "priority_mode_info": "I giochi nella lista priorità vengono sempre provati per primi, nell'ordine impostato. \"In scadenza prima\"/\"Bassa disponibilità prima\" determinano solo l'ordine per il resto, una volta che nulla dalla lista priorità è più disponibile.",
                 "low_power_tray_mode": "Risparmia RAM/batteria da ridotto: ",
-                "low_power_tray_mode_info": "Quando è ridotta a icona, l'app svuota le immagini in cache e controlla gli aggiornamenti meno spesso per usare meno memoria e batteria. Il compromesso: aprire la scheda Inventario subito dopo può sembrare un po' più lento per un attimo, dato che deve ricaricarsi - durante questo tempo viene mostrata una schermata di caricamento."
+                "low_power_tray_mode_info": "Quando è ridotta a icona, l'app svuota le immagini in cache e controlla gli aggiornamenti meno spesso per usare meno memoria e batteria. Il compromesso: aprire la scheda Inventario subito dopo può sembrare un po' più lento per un attimo, dato che deve ricaricarsi - durante questo tempo viene mostrata una schermata di caricamento.",
+                "show_inventory_tab": "Mostra la scheda Inventario (richiede il riavvio): ",
+                "show_inventory_tab_info": "La scheda Inventario può essere nascosta qui se preferisci controllare i tuoi drop dalla pagina Inventario della dashboard web."
             },
             "game_name": "Nome del gioco",
             "priority": "Priorità",
@@ -284,7 +286,9 @@
             "public_link_unavailable": "Impossibile determinare un IP pubblico in questo momento.",
             "viewers_none": "Nessuno sta attualmente visualizzando la dashboard web.",
             "viewers_one": "1 persona sta attualmente visualizzando la dashboard web.",
-            "viewers_many": "{count} persone stanno attualmente visualizzando la dashboard web."
+            "viewers_many": "{count} persone stanno attualmente visualizzando la dashboard web.",
+            "show_viewers_label": "Mostra il numero di spettatori sulla pagina: ",
+            "show_logs_label": "Mostra una scheda Log di sola lettura sulla pagina: "
         }
     }
 }
