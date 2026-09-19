@@ -911,6 +911,12 @@ class ConsoleOutput:
         stamp = datetime.now().strftime("%X")
         if '\n' in message:
             message = message.replace('\n', f"\n{stamp}: ")
+        try:
+            from logbuffer import console as _console
+            for _line in f"{stamp}: {message}".split("\n"):
+                _console.append(_line)
+        except Exception:
+            pass
         self._text.config(state="normal")
         self._text.insert("end", f"{stamp}: {message}\n")
         line_count = int(self._text.index("end-1c").split(".")[0])

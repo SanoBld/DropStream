@@ -32,6 +32,10 @@ class LogBuffer:
 # Single shared instance for the whole process.
 buffer = LogBuffer()
 
+# Lines exactly as shown in the desktop app's Output box (timestamp included); this is what
+# the Remote dashboard's Logs tab shows.
+console = LogBuffer(1000)
+
 
 class BufferHandler(logging.Handler):
     """A logging.Handler that appends formatted records to the shared LogBuffer."""

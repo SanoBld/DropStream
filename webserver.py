@@ -14,7 +14,7 @@ from aiohttp import web
 
 from constants import PriorityMode, State
 from utils import resource_path
-from logbuffer import buffer as log_buffer
+from logbuffer import console as log_buffer
 
 if TYPE_CHECKING:
     from twitch import Twitch
@@ -637,6 +637,10 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <meta name="theme-color" id="theme-color-meta" content="#9147ff">
 <title>DropStream</title>
 <style>
+.faq-item { border-top: 1px solid var(--border, #2a2a30); padding: 10px 0; }
+.faq-item:first-of-type { margin-top: 8px; }
+.faq-item summary { cursor: pointer; font-weight: 600; }
+.faq-a { margin-top: 6px; line-height: 1.5; }
   :root {
     --bg: #0e0e10; --card: #18181b; --card2: #202024; --border: #2f2f35; --fg: #efeff1;
     --dim: #adadb8; --accent: #9147ff; --green: #2ecc71; --amber: #e0a800; --red: #e05252;
@@ -1096,6 +1100,41 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <div class="muted" style="margin-top:6px" data-i18n="help_how_body"></div>
     </div>
     <div class="card">
+      <div class="label" data-i18n="faq_title"></div>
+      <details class="faq-item">
+        <summary data-i18n="faq_q1"></summary>
+        <div class="muted faq-a" data-i18n="faq_a1"></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq_q2"></summary>
+        <div class="muted faq-a" data-i18n="faq_a2"></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq_q3"></summary>
+        <div class="muted faq-a" data-i18n="faq_a3"></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq_q4"></summary>
+        <div class="muted faq-a" data-i18n="faq_a4"></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq_q5"></summary>
+        <div class="muted faq-a" data-i18n="faq_a5"></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq_q6"></summary>
+        <div class="muted faq-a" data-i18n="faq_a6"></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq_q7"></summary>
+        <div class="muted faq-a" data-i18n="faq_a7"></div>
+      </details>
+      <details class="faq-item">
+        <summary data-i18n="faq_q8"></summary>
+        <div class="muted faq-a" data-i18n="faq_a8"></div>
+      </details>
+    </div>
+    <div class="card">
       <div class="label" data-i18n="help_links_title"></div>
       <div class="muted" style="margin-top:6px">
         <a href="https://www.twitch.tv/drops/inventory" target="_blank" rel="noopener" data-i18n="help_link_inventory"></a><br>
@@ -1125,6 +1164,23 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <script>
 const I18N = {
   "en": {
+    "faq_title": "Questions & answers",
+    "faq_q1": "Does DropStream actually watch streams?",
+    "faq_a1": "No. It only asks Twitch for a stream's metadata every few seconds, which is enough for Twitch to count progress toward a drop. No video or audio is downloaded, so it barely uses any bandwidth.",
+    "faq_q2": "Why is my progress stuck or wrong?",
+    "faq_a2": "Most likely the same Twitch account is watching a stream somewhere else, in a browser for example. Twitch handles drop progress on its side, so this confuses the miner. Avoid watching other streams on that account while it mines.",
+    "faq_q3": "What can I do from this page?",
+    "faq_a3": "In view-only mode you can follow the current drop, the campaigns, your stats and the logs. In control mode you can also pause or resume, set a pause timer, and edit the priority and exclude lists. This page can't log in to your account or claim drops on its own, it only mirrors and steers the desktop app.",
+    "faq_q4": "How do I choose which games get mined?",
+    "faq_a4": "Add games to the priority list, pick a priority mode, then press Reload so the app applies the changes. With any mode other than priority list only, the miner also takes other available campaigns. Games in the exclude list are ignored.",
+    "faq_q5": "A game I want doesn't show up. Why?",
+    "faq_a5": "Your Twitch account has to be linked to that game on Twitch's campaigns page. Once it's linked, press Reload and the campaign can be picked up.",
+    "faq_q6": "Is the link private? Can I use it away from home?",
+    "faq_a6": "Anyone with the link can see your instance, so treat it like a password. If you shared it by mistake, generate a new one in the desktop app. By default it only works on your local network. To reach it from outside you need port forwarding or a VPN like Tailscale or WireGuard.",
+    "faq_q7": "Is the remaining time exact?",
+    "faq_a7": "No, it's an approximation. It counts down minute by minute and resets when the app gets the real value from Twitch. It has no effect on how fast you mine.",
+    "faq_q8": "What are the logs?",
+    "faq_a8": "The same lines you see in the Output box of the desktop app, in read-only mode.",
     "subtitle": "Remote dashboard for this instance.",
     "mode_view": "View only",
     "mode_control": "View & control",
@@ -1221,6 +1277,23 @@ const I18N = {
     "mine_unlinked_hint": "Also mine drops when Twitch reports the game account as not linked."
   },
   "fr": {
+    "faq_title": "Questions et réponses",
+    "faq_q1": "DropStream regarde-t-il vraiment les streams ?",
+    "faq_a1": "Non. Il demande seulement à Twitch les métadonnées d'un stream toutes les quelques secondes, ce qui suffit pour que Twitch fasse avancer un drop. Aucune vidéo ni aucun son n'est téléchargé, donc la consommation de bande passante est minime.",
+    "faq_q2": "Pourquoi ma progression est bloquée ou fausse ?",
+    "faq_a2": "Le plus souvent, le même compte Twitch regarde un stream ailleurs, dans un navigateur par exemple. Twitch gère la progression des drops de son côté, et ça perturbe le mineur. Évitez de regarder d'autres streams avec ce compte pendant le minage.",
+    "faq_q3": "Que puis-je faire depuis cette page ?",
+    "faq_a3": "En mode lecture seule, vous suivez le drop en cours, les campagnes, vos stats et les journaux. En mode contrôle, vous pouvez aussi mettre en pause ou reprendre, régler un minuteur de pause et modifier les listes de priorité et d'exclusion. Cette page ne peut ni se connecter à votre compte ni réclamer de drops seule, elle reflète et pilote l'application de bureau.",
+    "faq_q4": "Comment choisir les jeux à miner ?",
+    "faq_a4": "Ajoutez des jeux à la liste de priorité, choisissez un mode de priorité, puis appuyez sur Recharger pour que l'application applique les changements. Avec un mode autre que la liste de priorité seule, le mineur prend aussi les autres campagnes disponibles. Les jeux de la liste d'exclusion sont ignorés.",
+    "faq_q5": "Un jeu que je veux n'apparaît pas. Pourquoi ?",
+    "faq_a5": "Votre compte Twitch doit être lié à ce jeu sur la page des campagnes de Twitch. Une fois lié, appuyez sur Recharger et la campagne pourra être prise en compte.",
+    "faq_q6": "Le lien est-il privé ? Puis-je l'utiliser hors de chez moi ?",
+    "faq_a6": "Toute personne qui a le lien peut voir votre instance, traitez-le donc comme un mot de passe. Si vous l'avez partagé par erreur, générez-en un nouveau dans l'application de bureau. Par défaut, il ne fonctionne que sur votre réseau local. Pour y accéder de l'extérieur, il faut une redirection de port ou un VPN comme Tailscale ou WireGuard.",
+    "faq_q7": "Le temps restant est-il exact ?",
+    "faq_a7": "Non, c'est une approximation. Il décompte minute par minute et se recale quand l'application récupère la vraie valeur chez Twitch. Ça n'a aucun effet sur la vitesse de minage.",
+    "faq_q8": "Que sont les journaux ?",
+    "faq_a8": "Les mêmes lignes que dans la zone Sortie de l'application de bureau, en lecture seule.",
     "subtitle": "Tableau de bord distant pour cette instance.",
     "mode_view": "Consultation uniquement",
     "mode_control": "Consultation et contrôle",
@@ -1317,6 +1390,23 @@ const I18N = {
     "mine_unlinked_hint": "Miner aussi les drops quand Twitch indique que le compte du jeu n'est pas lié."
   },
   "de": {
+    "faq_title": "Fragen und Antworten",
+    "faq_q1": "Schaut DropStream wirklich Streams an?",
+    "faq_a1": "Nein. Es fragt nur alle paar Sekunden die Metadaten eines Streams bei Twitch ab, und das reicht Twitch, um den Fortschritt eines Drops zu zählen. Es werden weder Video noch Audio geladen, der Datenverbrauch ist also minimal.",
+    "faq_q2": "Warum hängt mein Fortschritt oder ist falsch?",
+    "faq_a2": "Meistens schaut dasselbe Twitch-Konto woanders einen Stream, zum Beispiel im Browser. Twitch verwaltet den Drop-Fortschritt auf seiner Seite, und das bringt den Miner durcheinander. Schau mit diesem Konto keine anderen Streams, solange es minet.",
+    "faq_q3": "Was kann ich auf dieser Seite tun?",
+    "faq_a3": "Im Nur-Ansicht-Modus siehst du den aktuellen Drop, die Kampagnen, deine Statistiken und die Protokolle. Im Steuerungsmodus kannst du außerdem pausieren oder fortsetzen, einen Pausen-Timer setzen und die Prioritäts- und Ausschlusslisten bearbeiten. Die Seite kann sich nicht selbst in dein Konto einloggen oder Drops einlösen, sie spiegelt und steuert nur die Desktop-App.",
+    "faq_q4": "Wie wähle ich, welche Spiele gemint werden?",
+    "faq_a4": "Füge Spiele zur Prioritätsliste hinzu, wähle einen Prioritätsmodus und drücke dann auf Neu laden, damit die App die Änderungen übernimmt. Bei jedem Modus außer nur Prioritätsliste nimmt der Miner auch andere verfügbare Kampagnen. Spiele auf der Ausschlussliste werden ignoriert.",
+    "faq_q5": "Ein gewünschtes Spiel taucht nicht auf. Warum?",
+    "faq_a5": "Dein Twitch-Konto muss auf der Kampagnenseite von Twitch mit diesem Spiel verknüpft sein. Danach auf Neu laden drücken, dann kann die Kampagne berücksichtigt werden.",
+    "faq_q6": "Ist der Link privat? Kann ich ihn unterwegs nutzen?",
+    "faq_a6": "Jeder mit dem Link kann deine Instanz sehen, behandle ihn also wie ein Passwort. Wenn du ihn versehentlich geteilt hast, erzeuge in der Desktop-App einen neuen. Standardmäßig funktioniert er nur im lokalen Netzwerk. Von außen brauchst du Portweiterleitung oder ein VPN wie Tailscale oder WireGuard.",
+    "faq_q7": "Ist die verbleibende Zeit genau?",
+    "faq_a7": "Nein, sie ist eine Schätzung. Sie zählt Minute für Minute herunter und wird angepasst, sobald die App den echten Wert von Twitch bekommt. Auf die Mining-Geschwindigkeit hat sie keinen Einfluss.",
+    "faq_q8": "Was sind die Protokolle?",
+    "faq_a8": "Dieselben Zeilen wie im Ausgabe-Feld der Desktop-App, nur zum Lesen.",
     "subtitle": "Fernsteuerungs-Dashboard für diese Instanz.",
     "mode_view": "Nur ansehen",
     "mode_control": "Ansehen & steuern",
@@ -1400,6 +1490,23 @@ const I18N = {
     "stats_no_data": "Keine Daten für diesen Zeitraum."
   },
   "es": {
+    "faq_title": "Preguntas y respuestas",
+    "faq_q1": "¿DropStream ve los streams de verdad?",
+    "faq_a1": "No. Solo le pide a Twitch los metadatos de un stream cada pocos segundos, y eso basta para que Twitch cuente el progreso de un drop. No se descarga vídeo ni audio, así que casi no gasta ancho de banda.",
+    "faq_q2": "¿Por qué mi progreso está bloqueado o es incorrecto?",
+    "faq_a2": "Lo más probable es que la misma cuenta de Twitch esté viendo un stream en otro sitio, por ejemplo en el navegador. Twitch gestiona el progreso de los drops por su lado y eso confunde al minero. Evita ver otros streams con esa cuenta mientras mina.",
+    "faq_q3": "¿Qué puedo hacer desde esta página?",
+    "faq_a3": "En modo solo lectura puedes seguir el drop actual, las campañas, tus estadísticas y los registros. En modo control también puedes pausar o reanudar, poner un temporizador de pausa y editar las listas de prioridad y exclusión. Esta página no puede iniciar sesión en tu cuenta ni reclamar drops por sí sola, solo refleja y dirige la aplicación de escritorio.",
+    "faq_q4": "¿Cómo elijo qué juegos se minan?",
+    "faq_a4": "Añade juegos a la lista de prioridad, elige un modo de prioridad y pulsa Recargar para que la aplicación aplique los cambios. Con cualquier modo distinto de solo lista de prioridad, el minero también toma otras campañas disponibles. Los juegos de la lista de exclusión se ignoran.",
+    "faq_q5": "Un juego que quiero no aparece. ¿Por qué?",
+    "faq_a5": "Tu cuenta de Twitch debe estar vinculada a ese juego en la página de campañas de Twitch. Cuando lo esté, pulsa Recargar y la campaña podrá tomarse en cuenta.",
+    "faq_q6": "¿El enlace es privado? ¿Puedo usarlo fuera de casa?",
+    "faq_a6": "Cualquiera con el enlace puede ver tu instancia, así que trátalo como una contraseña. Si lo compartiste por error, genera uno nuevo en la aplicación de escritorio. Por defecto solo funciona en tu red local. Para entrar desde fuera necesitas redirección de puertos o una VPN como Tailscale o WireGuard.",
+    "faq_q7": "¿El tiempo restante es exacto?",
+    "faq_a7": "No, es una aproximación. Cuenta hacia atrás minuto a minuto y se reajusta cuando la aplicación recibe el valor real de Twitch. No afecta a la velocidad de minado.",
+    "faq_q8": "¿Qué son los registros?",
+    "faq_a8": "Las mismas líneas que ves en el cuadro Salida de la aplicación de escritorio, en modo solo lectura.",
     "subtitle": "Panel remoto para esta instancia.",
     "mode_view": "Solo ver",
     "mode_control": "Ver y controlar",
@@ -1483,6 +1590,23 @@ const I18N = {
     "stats_no_data": "Sin datos para este período."
   },
   "it": {
+    "faq_title": "Domande e risposte",
+    "faq_q1": "DropStream guarda davvero gli stream?",
+    "faq_a1": "No. Chiede a Twitch solo i metadati di uno stream ogni pochi secondi, e a Twitch basta per contare l'avanzamento di un drop. Non viene scaricato né video né audio, quindi usa pochissima banda.",
+    "faq_q2": "Perché il mio avanzamento è fermo o sbagliato?",
+    "faq_a2": "Molto probabilmente lo stesso account Twitch sta guardando uno stream altrove, ad esempio nel browser. Twitch gestisce l'avanzamento dei drop dal suo lato e questo manda in confusione il miner. Evita di guardare altri stream con quell'account mentre mina.",
+    "faq_q3": "Cosa posso fare da questa pagina?",
+    "faq_a3": "In modalità sola visualizzazione puoi seguire il drop corrente, le campagne, le statistiche e i log. In modalità controllo puoi anche mettere in pausa o riprendere, impostare un timer di pausa e modificare le liste di priorità ed esclusione. La pagina non può accedere al tuo account né riscattare drop da sola, rispecchia e guida solo l'app desktop.",
+    "faq_q4": "Come scelgo quali giochi minare?",
+    "faq_a4": "Aggiungi giochi alla lista di priorità, scegli una modalità di priorità e premi Ricarica perché l'app applichi le modifiche. Con qualsiasi modalità diversa da solo lista di priorità, il miner prende anche le altre campagne disponibili. I giochi nella lista di esclusione vengono ignorati.",
+    "faq_q5": "Un gioco che voglio non compare. Perché?",
+    "faq_a5": "Il tuo account Twitch deve essere collegato a quel gioco nella pagina delle campagne di Twitch. Una volta collegato, premi Ricarica e la campagna potrà essere presa in considerazione.",
+    "faq_q6": "Il link è privato? Posso usarlo fuori casa?",
+    "faq_a6": "Chiunque abbia il link può vedere la tua istanza, quindi trattalo come una password. Se l'hai condiviso per errore, generane uno nuovo nell'app desktop. Di default funziona solo sulla rete locale. Da fuori servono il port forwarding o una VPN come Tailscale o WireGuard.",
+    "faq_q7": "Il tempo rimanente è esatto?",
+    "faq_a7": "No, è un'approssimazione. Scala minuto per minuto e si riallinea quando l'app riceve il valore reale da Twitch. Non influisce sulla velocità di mining.",
+    "faq_q8": "Cosa sono i log?",
+    "faq_a8": "Le stesse righe che vedi nella casella Output dell'app desktop, in sola lettura.",
     "subtitle": "Pannello remoto per questa istanza.",
     "mode_view": "Solo visualizzazione",
     "mode_control": "Visualizzazione e controllo",
@@ -1566,6 +1690,23 @@ const I18N = {
     "stats_no_data": "Nessun dato per questo periodo."
   },
   "pt": {
+    "faq_title": "Perguntas e respostas",
+    "faq_q1": "O DropStream assiste mesmo às transmissões?",
+    "faq_a1": "Não. Ele só pede à Twitch os metadados de uma transmissão a cada poucos segundos, e isso basta para a Twitch contar o progresso de um drop. Nenhum vídeo ou áudio é baixado, então quase não gasta banda.",
+    "faq_q2": "Por que meu progresso está travado ou errado?",
+    "faq_a2": "Provavelmente a mesma conta da Twitch está assistindo a uma transmissão em outro lugar, no navegador por exemplo. A Twitch controla o progresso dos drops do lado dela e isso confunde o minerador. Evite assistir a outras transmissões com essa conta enquanto ele minera.",
+    "faq_q3": "O que posso fazer nesta página?",
+    "faq_a3": "No modo somente leitura você acompanha o drop atual, as campanhas, as estatísticas e os logs. No modo controle também pode pausar ou retomar, definir um temporizador de pausa e editar as listas de prioridade e exclusão. A página não consegue entrar na sua conta nem resgatar drops sozinha, apenas espelha e conduz o aplicativo de desktop.",
+    "faq_q4": "Como escolho quais jogos são minerados?",
+    "faq_a4": "Adicione jogos à lista de prioridade, escolha um modo de prioridade e pressione Recarregar para o aplicativo aplicar as mudanças. Com qualquer modo diferente de somente lista de prioridade, o minerador também pega outras campanhas disponíveis. Jogos da lista de exclusão são ignorados.",
+    "faq_q5": "Um jogo que eu quero não aparece. Por quê?",
+    "faq_a5": "Sua conta da Twitch precisa estar vinculada a esse jogo na página de campanhas da Twitch. Depois de vincular, pressione Recarregar e a campanha poderá ser considerada.",
+    "faq_q6": "O link é privado? Posso usar fora de casa?",
+    "faq_a6": "Qualquer pessoa com o link pode ver sua instância, então trate-o como uma senha. Se compartilhou por engano, gere um novo no aplicativo de desktop. Por padrão só funciona na sua rede local. Para acessar de fora é preciso redirecionar portas ou usar uma VPN como Tailscale ou WireGuard.",
+    "faq_q7": "O tempo restante é exato?",
+    "faq_a7": "Não, é uma aproximação. Ele conta minuto a minuto e se ajusta quando o aplicativo recebe o valor real da Twitch. Não interfere na velocidade da mineração.",
+    "faq_q8": "O que são os logs?",
+    "faq_a8": "As mesmas linhas da caixa Saída do aplicativo de desktop, em modo somente leitura.",
     "subtitle": "Painel remoto para esta instância.",
     "mode_view": "Apenas visualizar",
     "mode_control": "Visualizar e controlar",
@@ -1649,6 +1790,23 @@ const I18N = {
     "stats_no_data": "Sem dados para este período."
   },
   "nl": {
+    "faq_title": "Vragen en antwoorden",
+    "faq_q1": "Kijkt DropStream echt naar streams?",
+    "faq_a1": "Nee. Het vraagt om de paar seconden alleen de metadata van een stream op bij Twitch, en dat is genoeg voor Twitch om de voortgang van een drop bij te houden. Er wordt geen video of audio gedownload, dus het gebruikt nauwelijks bandbreedte.",
+    "faq_q2": "Waarom staat mijn voortgang stil of klopt hij niet?",
+    "faq_a2": "Waarschijnlijk kijkt hetzelfde Twitch-account ergens anders naar een stream, bijvoorbeeld in een browser. Twitch beheert de drop-voortgang aan zijn kant en dat brengt de miner in de war. Kijk met dat account geen andere streams terwijl het mined.",
+    "faq_q3": "Wat kan ik op deze pagina doen?",
+    "faq_a3": "In de weergavemodus volg je de huidige drop, de campagnes, je statistieken en de logs. In de besturingsmodus kun je ook pauzeren of hervatten, een pauzetimer instellen en de prioriteits- en uitsluitlijsten aanpassen. Deze pagina kan niet zelf inloggen op je account of drops claimen, ze spiegelt en stuurt alleen de desktopapp aan.",
+    "faq_q4": "Hoe kies ik welke games gemined worden?",
+    "faq_a4": "Voeg games toe aan de prioriteitslijst, kies een prioriteitsmodus en druk op Herladen zodat de app de wijzigingen toepast. Bij elke modus behalve alleen prioriteitslijst pakt de miner ook andere beschikbare campagnes. Games op de uitsluitlijst worden genegeerd.",
+    "faq_q5": "Een game die ik wil verschijnt niet. Waarom?",
+    "faq_a5": "Je Twitch-account moet aan die game gekoppeld zijn op de campagnepagina van Twitch. Druk daarna op Herladen, dan kan de campagne worden opgepakt.",
+    "faq_q6": "Is de link privé? Kan ik hem buitenshuis gebruiken?",
+    "faq_a6": "Iedereen met de link kan je instantie zien, behandel hem dus als een wachtwoord. Heb je hem per ongeluk gedeeld, maak dan in de desktopapp een nieuwe aan. Standaard werkt hij alleen op je lokale netwerk. Van buitenaf heb je port forwarding of een VPN zoals Tailscale of WireGuard nodig.",
+    "faq_q7": "Is de resterende tijd exact?",
+    "faq_a7": "Nee, het is een schatting. Hij telt per minuut af en wordt bijgesteld zodra de app de echte waarde van Twitch krijgt. Het heeft geen invloed op hoe snel je mined.",
+    "faq_q8": "Wat zijn de logs?",
+    "faq_a8": "Dezelfde regels als in het vak Uitvoer van de desktopapp, alleen-lezen.",
     "subtitle": "Extern dashboard voor deze instantie.",
     "mode_view": "Alleen bekijken",
     "mode_control": "Bekijken & besturen",
@@ -1732,6 +1890,23 @@ const I18N = {
     "stats_no_data": "Geen gegevens voor deze periode."
   },
   "da": {
+    "faq_title": "Spørgsmål og svar",
+    "faq_q1": "Ser DropStream faktisk streams?",
+    "faq_a1": "Nej. Det beder kun Twitch om en streams metadata hvert par sekunder, og det er nok til, at Twitch tæller fremgangen mod et drop. Der hentes hverken video eller lyd, så det bruger næsten ingen båndbredde.",
+    "faq_q2": "Hvorfor sidder min fremgang fast eller er forkert?",
+    "faq_a2": "Sandsynligvis ser den samme Twitch-konto en stream et andet sted, for eksempel i en browser. Twitch styrer drop-fremgangen hos sig selv, og det forvirrer mineren. Undgå at se andre streams med den konto, mens den miner.",
+    "faq_q3": "Hvad kan jeg gøre på denne side?",
+    "faq_a3": "I visningstilstand kan du følge det aktuelle drop, kampagnerne, dine statistikker og loggene. I kontroltilstand kan du også sætte på pause eller genoptage, indstille en pausetimer og redigere prioritets- og udelukkelseslisterne. Siden kan ikke selv logge ind på din konto eller indløse drops, den spejler og styrer kun skrivebordsappen.",
+    "faq_q4": "Hvordan vælger jeg, hvilke spil der mines?",
+    "faq_a4": "Tilføj spil til prioritetslisten, vælg en prioritetstilstand og tryk på Genindlæs, så appen anvender ændringerne. Med en anden tilstand end kun prioritetsliste tager mineren også andre tilgængelige kampagner. Spil på udelukkelseslisten ignoreres.",
+    "faq_q5": "Et spil, jeg vil have, dukker ikke op. Hvorfor?",
+    "faq_a5": "Din Twitch-konto skal være forbundet til spillet på Twitchs kampagneside. Når den er det, så tryk på Genindlæs, og kampagnen kan blive taget med.",
+    "faq_q6": "Er linket privat? Kan jeg bruge det uden for hjemmet?",
+    "faq_a6": "Alle med linket kan se din instans, så behandl det som en adgangskode. Har du delt det ved en fejl, så lav et nyt i skrivebordsappen. Som standard virker det kun på dit lokale netværk. Udefra skal du bruge port forwarding eller et VPN som Tailscale eller WireGuard.",
+    "faq_q7": "Er den resterende tid nøjagtig?",
+    "faq_a7": "Nej, den er et estimat. Den tæller ned minut for minut og justeres, når appen får den rigtige værdi fra Twitch. Den påvirker ikke, hvor hurtigt du miner.",
+    "faq_q8": "Hvad er loggene?",
+    "faq_a8": "De samme linjer som i feltet Output i skrivebordsappen, skrivebeskyttet.",
     "subtitle": "Fjernpanel for denne instans.",
     "mode_view": "Kun visning",
     "mode_control": "Visning & styring",
@@ -1815,6 +1990,23 @@ const I18N = {
     "stats_no_data": "Ingen data for denne periode."
   },
   "no": {
+    "faq_title": "Spørsmål og svar",
+    "faq_q1": "Ser DropStream faktisk på strømmer?",
+    "faq_a1": "Nei. Det ber bare Twitch om en strøms metadata hvert par sekunder, og det er nok til at Twitch teller fremgangen mot en drop. Ingen video eller lyd lastes ned, så det bruker nesten ingen båndbredde.",
+    "faq_q2": "Hvorfor står fremgangen min fast eller er feil?",
+    "faq_a2": "Mest sannsynlig ser den samme Twitch-kontoen på en strøm et annet sted, for eksempel i en nettleser. Twitch styrer drop-fremgangen hos seg selv, og det forvirrer mineren. Unngå å se andre strømmer med den kontoen mens den miner.",
+    "faq_q3": "Hva kan jeg gjøre på denne siden?",
+    "faq_a3": "I visningsmodus kan du følge den aktuelle dropen, kampanjene, statistikken din og loggene. I kontrollmodus kan du også pause eller fortsette, stille inn en pausetimer og redigere prioritets- og utelukkelseslistene. Siden kan ikke logge inn på kontoen din eller hente drops selv, den speiler og styrer bare skrivebordsappen.",
+    "faq_q4": "Hvordan velger jeg hvilke spill som mines?",
+    "faq_a4": "Legg spill til i prioritetslisten, velg en prioritetsmodus og trykk Last på nytt så appen bruker endringene. Med en annen modus enn bare prioritetsliste tar mineren også andre tilgjengelige kampanjer. Spill på utelukkelseslisten blir ignorert.",
+    "faq_q5": "Et spill jeg vil ha dukker ikke opp. Hvorfor?",
+    "faq_a5": "Twitch-kontoen din må være koblet til spillet på Twitchs kampanjeside. Når den er det, trykk Last på nytt, så kan kampanjen tas med.",
+    "faq_q6": "Er lenken privat? Kan jeg bruke den borte fra hjemmet?",
+    "faq_a6": "Alle med lenken kan se instansen din, så behandle den som et passord. Har du delt den ved en feil, lag en ny i skrivebordsappen. Som standard fungerer den bare på det lokale nettverket. Utenfra trenger du port forwarding eller et VPN som Tailscale eller WireGuard.",
+    "faq_q7": "Er gjenstående tid nøyaktig?",
+    "faq_a7": "Nei, det er et anslag. Den teller ned minutt for minutt og justeres når appen får den ekte verdien fra Twitch. Den påvirker ikke hvor fort du miner.",
+    "faq_q8": "Hva er loggene?",
+    "faq_a8": "De samme linjene som i Utdata-feltet i skrivebordsappen, skrivebeskyttet.",
     "subtitle": "Fjernpanel for denne forekomsten.",
     "mode_view": "Kun visning",
     "mode_control": "Visning & styring",
@@ -1898,6 +2090,23 @@ const I18N = {
     "stats_no_data": "Ingen data for denne perioden."
   },
   "pl": {
+    "faq_title": "Pytania i odpowiedzi",
+    "faq_q1": "Czy DropStream naprawdę ogląda transmisje?",
+    "faq_a1": "Nie. Co kilka sekund prosi Twitcha tylko o metadane transmisji, a to wystarcza, żeby Twitch zaliczał postęp dropa. Nie pobiera wideo ani dźwięku, więc prawie nie zużywa łącza.",
+    "faq_q2": "Dlaczego mój postęp stoi lub jest błędny?",
+    "faq_a2": "Najpewniej to samo konto Twitch ogląda gdzieś indziej transmisję, na przykład w przeglądarce. Twitch liczy postęp dropów po swojej stronie i to myli koparkę. Nie oglądaj innych transmisji na tym koncie, gdy działa kopanie.",
+    "faq_q3": "Co mogę zrobić na tej stronie?",
+    "faq_a3": "W trybie tylko do odczytu śledzisz bieżący drop, kampanie, statystyki i logi. W trybie sterowania możesz też wstrzymać lub wznowić, ustawić minutnik pauzy i edytować listy priorytetów i wykluczeń. Strona sama nie zaloguje się na Twoje konto ani nie odbierze dropów, tylko odzwierciedla i steruje aplikacją na komputerze.",
+    "faq_q4": "Jak wybrać, które gry są kopane?",
+    "faq_a4": "Dodaj gry do listy priorytetów, wybierz tryb priorytetu i naciśnij Odśwież, żeby aplikacja zastosowała zmiany. W każdym trybie innym niż tylko lista priorytetów koparka bierze też inne dostępne kampanie. Gry z listy wykluczeń są pomijane.",
+    "faq_q5": "Gra, której chcę, się nie pojawia. Dlaczego?",
+    "faq_a5": "Twoje konto Twitch musi być połączone z tą grą na stronie kampanii Twitcha. Gdy już będzie, naciśnij Odśwież, a kampania będzie mogła zostać uwzględniona.",
+    "faq_q6": "Czy link jest prywatny? Czy mogę go używać poza domem?",
+    "faq_a6": "Każdy, kto ma link, widzi Twoją instancję, więc traktuj go jak hasło. Jeśli udostępniłeś go przez pomyłkę, wygeneruj nowy w aplikacji na komputerze. Domyślnie działa tylko w sieci lokalnej. Z zewnątrz potrzebujesz przekierowania portów lub VPN, takiego jak Tailscale czy WireGuard.",
+    "faq_q7": "Czy pozostały czas jest dokładny?",
+    "faq_a7": "Nie, to przybliżenie. Odlicza minuta po minucie i koryguje się, gdy aplikacja dostanie prawdziwą wartość od Twitcha. Nie wpływa na szybkość kopania.",
+    "faq_q8": "Czym są logi?",
+    "faq_a8": "Tymi samymi wierszami, które widać w polu Wyjście aplikacji na komputerze, tylko do odczytu.",
     "subtitle": "Zdalny panel dla tej instancji.",
     "mode_view": "Tylko podgląd",
     "mode_control": "Podgląd i sterowanie",
@@ -1981,6 +2190,23 @@ const I18N = {
     "stats_no_data": "Brak danych dla tego okresu."
   },
   "cs": {
+    "faq_title": "Otázky a odpovědi",
+    "faq_q1": "Opravdu DropStream sleduje streamy?",
+    "faq_a1": "Ne. Jen každých pár sekund požádá Twitch o metadata streamu, a to Twitchi stačí k započítání postupu dropu. Nestahuje se video ani zvuk, takže skoro nespotřebovává data.",
+    "faq_q2": "Proč můj postup stojí nebo je špatně?",
+    "faq_a2": "Nejspíš stejný účet Twitch sleduje stream jinde, třeba v prohlížeči. Twitch řeší postup dropů u sebe a miner tím zmate. Na tomto účtu nesleduj jiné streamy, dokud těží.",
+    "faq_q3": "Co můžu dělat na této stránce?",
+    "faq_a3": "V režimu jen pro čtení sleduješ aktuální drop, kampaně, statistiky a logy. V režimu ovládání můžeš také pozastavit nebo pokračovat, nastavit časovač pauzy a upravovat seznamy priorit a vyloučených her. Stránka se sama nepřihlásí k tvému účtu ani nevyzvedne dropy, jen zrcadlí a řídí desktopovou aplikaci.",
+    "faq_q4": "Jak vybrat, které hry se těží?",
+    "faq_a4": "Přidej hry do seznamu priorit, vyber režim priority a stiskni Znovu načíst, aby aplikace změny použila. V jiném režimu než jen seznam priorit bere miner i další dostupné kampaně. Hry ze seznamu vyloučených se ignorují.",
+    "faq_q5": "Hra, kterou chci, se nezobrazuje. Proč?",
+    "faq_a5": "Tvůj účet Twitch musí být s touto hrou propojený na stránce kampaní Twitche. Po propojení stiskni Znovu načíst a kampaň bude možné zahrnout.",
+    "faq_q6": "Je odkaz soukromý? Můžu ho použít mimo domov?",
+    "faq_a6": "Kdokoli s odkazem uvidí tvoji instanci, takže s ním zacházej jako s heslem. Pokud jsi ho sdílel omylem, vygeneruj v desktopové aplikaci nový. Ve výchozím stavu funguje jen v místní síti. Zvenku potřebuješ přesměrování portů nebo VPN, například Tailscale či WireGuard.",
+    "faq_q7": "Je zbývající čas přesný?",
+    "faq_a7": "Ne, je to odhad. Odpočítává po minutách a srovná se, když aplikace získá skutečnou hodnotu od Twitche. Na rychlost těžení nemá vliv.",
+    "faq_q8": "Co jsou logy?",
+    "faq_a8": "Stejné řádky jako v poli Výstup v desktopové aplikaci, jen pro čtení.",
     "subtitle": "Vzdálený panel pro tuto instanci.",
     "mode_view": "Pouze zobrazení",
     "mode_control": "Zobrazení a ovládání",
@@ -2064,6 +2290,23 @@ const I18N = {
     "stats_no_data": "Pro toto období nejsou k dispozici žádná data."
   },
   "ro": {
+    "faq_title": "Întrebări și răspunsuri",
+    "faq_q1": "DropStream se uită într-adevăr la stream-uri?",
+    "faq_a1": "Nu. Cere doar metadatele unui stream de la Twitch la câteva secunde, iar asta îi ajunge lui Twitch ca să numere progresul unui drop. Nu se descarcă video sau audio, deci consumă aproape deloc bandă.",
+    "faq_q2": "De ce e progresul blocat sau greșit?",
+    "faq_a2": "Cel mai probabil același cont Twitch se uită la un stream în altă parte, de exemplu în browser. Twitch gestionează progresul drop-urilor la el și asta încurcă minerul. Evită să te uiți la alte stream-uri cu acel cont cât timp minează.",
+    "faq_q3": "Ce pot face din această pagină?",
+    "faq_a3": "În modul doar vizualizare urmărești drop-ul curent, campaniile, statisticile și jurnalele. În modul control poți și să pui pe pauză sau să reiei, să setezi un cronometru de pauză și să editezi listele de prioritate și de excludere. Pagina nu se poate autentifica în contul tău și nici nu poate revendica drop-uri singură, doar reflectă și dirijează aplicația de desktop.",
+    "faq_q4": "Cum aleg ce jocuri se minează?",
+    "faq_a4": "Adaugă jocuri în lista de prioritate, alege un mod de prioritate și apasă Reîncarcă ca aplicația să aplice modificările. Cu orice mod în afară de doar lista de prioritate, minerul ia și alte campanii disponibile. Jocurile din lista de excludere sunt ignorate.",
+    "faq_q5": "Un joc pe care îl vreau nu apare. De ce?",
+    "faq_a5": "Contul tău Twitch trebuie să fie legat de acel joc pe pagina de campanii Twitch. După ce e legat, apasă Reîncarcă și campania poate fi luată în calcul.",
+    "faq_q6": "Este linkul privat? Îl pot folosi în afara casei?",
+    "faq_a6": "Oricine are linkul îți poate vedea instanța, așa că tratează-l ca pe o parolă. Dacă l-ai partajat din greșeală, generează unul nou în aplicația de desktop. Implicit funcționează doar în rețeaua locală. Din exterior ai nevoie de redirecționare de porturi sau de un VPN precum Tailscale ori WireGuard.",
+    "faq_q7": "Este timpul rămas exact?",
+    "faq_a7": "Nu, este o aproximare. Numără invers minut cu minut și se resetează când aplicația primește valoarea reală de la Twitch. Nu influențează viteza de minare.",
+    "faq_q8": "Ce sunt jurnalele?",
+    "faq_a8": "Aceleași rânduri ca în caseta Ieșire din aplicația de desktop, doar pentru citire.",
     "subtitle": "Panou de la distanță pentru această instanță.",
     "mode_view": "Doar vizualizare",
     "mode_control": "Vizualizare și control",
@@ -2147,6 +2390,23 @@ const I18N = {
     "stats_no_data": "Nu există date pentru această perioadă."
   },
   "hu": {
+    "faq_title": "Kérdések és válaszok",
+    "faq_q1": "Tényleg nézi a streameket a DropStream?",
+    "faq_a1": "Nem. Néhány másodpercenként csak a stream metaadatait kéri le a Twitchtől, és ez elég ahhoz, hogy a Twitch számolja a drop haladását. Nem tölt le videót vagy hangot, ezért alig használ sávszélességet.",
+    "faq_q2": "Miért áll vagy hibás a haladásom?",
+    "faq_a2": "Valószínűleg ugyanaz a Twitch-fiók néz máshol streamet, például böngészőben. A Twitch a saját oldalán kezeli a dropok haladását, és ez összezavarja a bányászt. Ne nézz más streamet azzal a fiókkal, amíg bányászik.",
+    "faq_q3": "Mit tehetek ezen az oldalon?",
+    "faq_a3": "Csak megtekintés módban követheted az aktuális dropot, a kampányokat, a statisztikákat és a naplókat. Vezérlő módban szüneteltethetsz vagy folytathatsz, beállíthatsz szünet-időzítőt, és szerkesztheted a prioritási és kizárási listát. Az oldal nem tud magától belépni a fiókodba vagy dropot átvenni, csak tükrözi és irányítja az asztali alkalmazást.",
+    "faq_q4": "Hogyan választom ki, mely játékokat bányássza?",
+    "faq_a4": "Adj játékokat a prioritási listához, válassz prioritási módot, majd nyomd meg az Újratöltés gombot, hogy az alkalmazás alkalmazza a változásokat. A csak prioritási lista módtól eltérő módban a bányász más elérhető kampányokat is felvesz. A kizárási listán lévő játékokat figyelmen kívül hagyja.",
+    "faq_q5": "Egy játék, amit szeretnék, nem jelenik meg. Miért?",
+    "faq_a5": "A Twitch-fiókodat össze kell kötni az adott játékkal a Twitch kampányoldalán. Utána nyomd meg az Újratöltés gombot, és a kampány figyelembe vehető.",
+    "faq_q6": "Privát a link? Használhatom otthonon kívül?",
+    "faq_a6": "Bárki, aki ismeri a linket, látja a példányodat, ezért kezeld jelszóként. Ha véletlenül megosztottad, generálj újat az asztali alkalmazásban. Alapértelmezetten csak a helyi hálózaton működik. Kívülről porttovábbítás vagy VPN kell hozzá, például Tailscale vagy WireGuard.",
+    "faq_q7": "Pontos a hátralévő idő?",
+    "faq_a7": "Nem, csak becslés. Percenként számol vissza, és újraigazodik, amikor az alkalmazás megkapja a valódi értéket a Twitchtől. A bányászat sebességére nincs hatással.",
+    "faq_q8": "Mik a naplók?",
+    "faq_a8": "Ugyanazok a sorok, mint az asztali alkalmazás Kimenet mezőjében, csak olvasásra.",
     "subtitle": "Távoli irányítópult ehhez a példányhoz.",
     "mode_view": "Csak megtekintés",
     "mode_control": "Megtekintés és vezérlés",
@@ -2230,6 +2490,23 @@ const I18N = {
     "stats_no_data": "Nincs adat erre az időszakra."
   },
   "tr": {
+    "faq_title": "Sorular ve cevaplar",
+    "faq_q1": "DropStream gerçekten yayınları izliyor mu?",
+    "faq_a1": "Hayır. Birkaç saniyede bir Twitch'ten yalnızca yayının meta verilerini ister ve Twitch'in drop ilerlemesini saymasına bu yeter. Video ya da ses indirilmez, bu yüzden neredeyse hiç bant genişliği harcamaz.",
+    "faq_q2": "İlerlemem neden takılı kaldı ya da yanlış?",
+    "faq_a2": "Büyük ihtimalle aynı Twitch hesabı başka bir yerde, örneğin tarayıcıda yayın izliyor. Twitch drop ilerlemesini kendi tarafında yönetiyor ve bu madenciyi şaşırtıyor. Madencilik sürerken o hesapla başka yayın izlemekten kaçının.",
+    "faq_q3": "Bu sayfada neler yapabilirim?",
+    "faq_a3": "Yalnızca görüntüleme modunda mevcut drop'u, kampanyaları, istatistikleri ve günlükleri takip edebilirsiniz. Kontrol modunda ayrıca duraklatıp devam ettirebilir, duraklatma zamanlayıcısı kurabilir, öncelik ve hariç tutma listelerini düzenleyebilirsiniz. Sayfa kendi başına hesabınıza giremez ya da drop alamaz, yalnızca masaüstü uygulamayı yansıtır ve yönlendirir.",
+    "faq_q4": "Hangi oyunların kazılacağını nasıl seçerim?",
+    "faq_a4": "Oyunları öncelik listesine ekleyin, bir öncelik modu seçin ve uygulamanın değişiklikleri uygulaması için Yeniden yükle'ye basın. Yalnızca öncelik listesi dışındaki her modda madenci diğer uygun kampanyaları da alır. Hariç tutma listesindeki oyunlar yok sayılır.",
+    "faq_q5": "İstediğim bir oyun görünmüyor. Neden?",
+    "faq_a5": "Twitch hesabınızın Twitch'in kampanyalar sayfasında o oyuna bağlı olması gerekir. Bağladıktan sonra Yeniden yükle'ye basın, kampanya değerlendirilebilir.",
+    "faq_q6": "Bağlantı özel mi? Evin dışında kullanabilir miyim?",
+    "faq_a6": "Bağlantıya sahip herkes örneğinizi görebilir, bu yüzden onu bir parola gibi düşünün. Yanlışlıkla paylaştıysanız masaüstü uygulamada yenisini oluşturun. Varsayılan olarak yalnızca yerel ağınızda çalışır. Dışarıdan erişmek için port yönlendirme ya da Tailscale veya WireGuard gibi bir VPN gerekir.",
+    "faq_q7": "Kalan süre kesin mi?",
+    "faq_a7": "Hayır, bir tahmindir. Dakika dakika geri sayar ve uygulama Twitch'ten gerçek değeri alınca kendini düzeltir. Madencilik hızını etkilemez.",
+    "faq_q8": "Günlükler nedir?",
+    "faq_a8": "Masaüstü uygulamadaki Çıktı kutusunda gördüğünüz satırların aynısı, yalnızca okunabilir.",
     "subtitle": "Bu örnek için uzaktan panel.",
     "mode_view": "Yalnızca görüntüleme",
     "mode_control": "Görüntüleme ve kontrol",
@@ -2313,6 +2590,23 @@ const I18N = {
     "stats_no_data": "Bu dönem için veri yok."
   },
   "ru": {
+    "faq_title": "Вопросы и ответы",
+    "faq_q1": "DropStream правда смотрит стримы?",
+    "faq_a1": "Нет. Он лишь раз в несколько секунд запрашивает у Twitch метаданные стрима, и этого Twitch достаточно, чтобы засчитывать прогресс дропа. Видео и звук не скачиваются, поэтому трафика почти не тратится.",
+    "faq_q2": "Почему прогресс застрял или неверный?",
+    "faq_a2": "Скорее всего, тот же аккаунт Twitch смотрит стрим в другом месте, например в браузере. Twitch считает прогресс дропов у себя, и это сбивает майнер. Не смотри другие стримы с этого аккаунта, пока идёт майнинг.",
+    "faq_q3": "Что можно делать на этой странице?",
+    "faq_a3": "В режиме просмотра ты следишь за текущим дропом, кампаниями, статистикой и журналами. В режиме управления можно ещё ставить на паузу и возобновлять, задавать таймер паузы и редактировать списки приоритета и исключений. Сама страница не может войти в твой аккаунт или забрать дропы, она только отражает и управляет настольным приложением.",
+    "faq_q4": "Как выбрать, какие игры майнить?",
+    "faq_a4": "Добавь игры в список приоритета, выбери режим приоритета и нажми Перезагрузить, чтобы приложение применило изменения. В любом режиме, кроме только списка приоритета, майнер берёт и другие доступные кампании. Игры из списка исключений игнорируются.",
+    "faq_q5": "Нужная мне игра не появляется. Почему?",
+    "faq_a5": "Твой аккаунт Twitch должен быть привязан к этой игре на странице кампаний Twitch. После привязки нажми Перезагрузить, и кампанию можно будет учесть.",
+    "faq_q6": "Ссылка приватная? Можно пользоваться ею вне дома?",
+    "faq_a6": "Любой, у кого есть ссылка, видит твой экземпляр, поэтому относись к ней как к паролю. Если поделился ею случайно, создай новую в настольном приложении. По умолчанию она работает только в локальной сети. Снаружи нужен проброс портов или VPN вроде Tailscale или WireGuard.",
+    "faq_q7": "Оставшееся время точное?",
+    "faq_a7": "Нет, это приблизительная оценка. Оно отсчитывает по минуте и подстраивается, когда приложение получает реальное значение от Twitch. На скорость майнинга это не влияет.",
+    "faq_q8": "Что такое журналы?",
+    "faq_a8": "Те же строки, что в поле Вывод настольного приложения, только для чтения.",
     "subtitle": "Панель удалённого доступа для этого экземпляра.",
     "mode_view": "Только просмотр",
     "mode_control": "Просмотр и управление",
@@ -2396,6 +2690,23 @@ const I18N = {
     "stats_no_data": "Нет данных за этот период."
   },
   "uk": {
+    "faq_title": "Питання та відповіді",
+    "faq_q1": "DropStream справді дивиться стріми?",
+    "faq_a1": "Ні. Він лише раз на кілька секунд запитує в Twitch метадані стріму, і цього Twitch достатньо, щоб зараховувати прогрес дропу. Відео й звук не завантажуються, тож трафіку майже не витрачається.",
+    "faq_q2": "Чому прогрес застряг або хибний?",
+    "faq_a2": "Найімовірніше, той самий акаунт Twitch дивиться стрім деінде, наприклад у браузері. Twitch рахує прогрес дропів у себе, і це збиває майнер. Не дивись інші стріми з цього акаунта, поки триває майнінг.",
+    "faq_q3": "Що можна робити на цій сторінці?",
+    "faq_a3": "У режимі перегляду ти стежиш за поточним дропом, кампаніями, статистикою та журналами. У режимі керування можна ще ставити на паузу й відновлювати, задавати таймер паузи та редагувати списки пріоритету й винятків. Сама сторінка не може увійти до твого акаунта чи забрати дропи, вона лише відображає та керує настільним застосунком.",
+    "faq_q4": "Як вибрати, які ігри майнити?",
+    "faq_a4": "Додай ігри до списку пріоритету, вибери режим пріоритету й натисни Перезавантажити, щоб застосунок застосував зміни. У будь-якому режимі, крім лише списку пріоритету, майнер бере й інші доступні кампанії. Ігри зі списку винятків ігноруються.",
+    "faq_q5": "Потрібна мені гра не з'являється. Чому?",
+    "faq_a5": "Твій акаунт Twitch має бути прив'язаний до цієї гри на сторінці кампаній Twitch. Після прив'язки натисни Перезавантажити, і кампанію можна буде врахувати.",
+    "faq_q6": "Посилання приватне? Чи можна користуватися ним поза домом?",
+    "faq_a6": "Будь-хто з посиланням бачить твій екземпляр, тому стався до нього як до пароля. Якщо поділився ним випадково, створи нове в настільному застосунку. За замовчуванням воно працює лише в локальній мережі. Ззовні потрібне перенаправлення портів або VPN на кшталт Tailscale чи WireGuard.",
+    "faq_q7": "Час, що залишився, точний?",
+    "faq_a7": "Ні, це наближена оцінка. Він відлічує хвилину за хвилиною й підлаштовується, коли застосунок отримує реальне значення від Twitch. На швидкість майнінгу це не впливає.",
+    "faq_q8": "Що таке журнали?",
+    "faq_a8": "Ті самі рядки, що в полі Вивід настільного застосунку, лише для читання.",
     "subtitle": "Панель віддаленого доступу для цього екземпляра.",
     "mode_view": "Лише перегляд",
     "mode_control": "Перегляд і керування",
@@ -2479,6 +2790,23 @@ const I18N = {
     "stats_no_data": "Немає даних за цей період."
   },
   "ar": {
+    "faq_title": "أسئلة وأجوبة",
+    "faq_q1": "هل يشاهد DropStream البثوث فعلًا؟",
+    "faq_a1": "لا. هو يطلب من Twitch البيانات الوصفية للبث كل بضع ثوانٍ فقط، وهذا يكفي لتحتسب Twitch تقدّم الدروب. لا يُحمَّل أي فيديو أو صوت، لذلك يستهلك القليل جدًا من الإنترنت.",
+    "faq_q2": "لماذا تقدّمي متوقف أو غير صحيح؟",
+    "faq_a2": "على الأرجح أن حساب Twitch نفسه يشاهد بثًا في مكان آخر، في المتصفح مثلًا. تدير Twitch تقدّم الدروب من جهتها، وهذا يربك المُعدِّن. تجنّب مشاهدة بثوث أخرى بهذا الحساب أثناء التعدين.",
+    "faq_q3": "ماذا أستطيع أن أفعل من هذه الصفحة؟",
+    "faq_a3": "في وضع العرض فقط يمكنك متابعة الدروب الحالي والحملات والإحصاءات والسجلات. وفي وضع التحكم يمكنك أيضًا الإيقاف المؤقت أو الاستئناف وضبط مؤقت للإيقاف وتعديل قائمتَي الأولوية والاستبعاد. الصفحة لا تستطيع تسجيل الدخول إلى حسابك أو استلام الدروبات بنفسها، فهي تعكس تطبيق سطح المكتب وتوجّهه فقط.",
+    "faq_q4": "كيف أختار الألعاب التي يتم تعدينها؟",
+    "faq_a4": "أضف ألعابًا إلى قائمة الأولوية، واختر وضع الأولوية، ثم اضغط إعادة التحميل ليطبّق التطبيق التغييرات. مع أي وضع غير قائمة الأولوية فقط، يأخذ المُعدِّن حملات أخرى متاحة أيضًا. الألعاب في قائمة الاستبعاد يتم تجاهلها.",
+    "faq_q5": "لعبة أريدها لا تظهر. لماذا؟",
+    "faq_a5": "يجب أن يكون حساب Twitch مرتبطًا بتلك اللعبة في صفحة الحملات على Twitch. بعد الربط اضغط إعادة التحميل، وعندها يمكن أخذ الحملة في الاعتبار.",
+    "faq_q6": "هل الرابط خاص؟ وهل أستطيع استخدامه خارج المنزل؟",
+    "faq_a6": "أي شخص لديه الرابط يستطيع رؤية نسختك، لذا تعامل معه كما تتعامل مع كلمة مرور. إذا شاركته بالخطأ فأنشئ رابطًا جديدًا من تطبيق سطح المكتب. افتراضيًا يعمل على شبكتك المحلية فقط. وللوصول من الخارج تحتاج إلى إعادة توجيه المنافذ أو VPN مثل Tailscale أو WireGuard.",
+    "faq_q7": "هل الوقت المتبقي دقيق؟",
+    "faq_a7": "لا، هو تقدير تقريبي. يعدّ تنازليًا دقيقة بدقيقة ويُعاد ضبطه عندما يحصل التطبيق على القيمة الحقيقية من Twitch. ولا يؤثر في سرعة التعدين.",
+    "faq_q8": "ما هي السجلات؟",
+    "faq_a8": "هي نفس الأسطر الظاهرة في مربع المخرجات في تطبيق سطح المكتب، للقراءة فقط.",
     "subtitle": "لوحة تحكم عن بُعد لهذا التطبيق.",
     "mode_view": "عرض فقط",
     "mode_control": "عرض وتحكم",
@@ -2562,6 +2890,23 @@ const I18N = {
     "stats_no_data": "لا توجد بيانات لهذه الفترة."
   },
   "ja": {
+    "faq_title": "よくある質問",
+    "faq_q1": "DropStreamは本当に配信を視聴しているのですか？",
+    "faq_a1": "いいえ。数秒ごとにTwitchへ配信のメタデータを問い合わせるだけで、それだけでTwitchはドロップの進行を数えてくれます。映像も音声もダウンロードしないので、通信量はほとんどかかりません。",
+    "faq_q2": "進行が止まる、または表示がおかしいのはなぜですか？",
+    "faq_a2": "多くの場合、同じTwitchアカウントがブラウザなど別の場所で配信を見ているためです。ドロップの進行はTwitch側で管理されているので、マイナーが混乱します。マイニング中は、そのアカウントで他の配信を見ないでください。",
+    "faq_q3": "このページでは何ができますか？",
+    "faq_a3": "閲覧専用モードでは、現在のドロップ、キャンペーン、統計、ログを確認できます。操作モードでは、一時停止と再開、一時停止タイマーの設定、優先リストと除外リストの編集もできます。このページ自体はアカウントにログインしたりドロップを受け取ったりできず、デスクトップアプリの状態を映して操作するだけです。",
+    "faq_q4": "マイニングするゲームはどう選びますか？",
+    "faq_a4": "優先リストにゲームを追加し、優先モードを選んで、再読み込みを押すとアプリに反映されます。優先リストのみ以外のモードでは、他の受け取れるキャンペーンも対象になります。除外リストのゲームは無視されます。",
+    "faq_q5": "欲しいゲームが表示されないのはなぜですか？",
+    "faq_a5": "Twitchのキャンペーンページで、そのゲームとTwitchアカウントを連携しておく必要があります。連携したら再読み込みを押すと、キャンペーンが対象になります。",
+    "faq_q6": "リンクは非公開ですか？外出先でも使えますか？",
+    "faq_a6": "リンクを知っている人は誰でもあなたのインスタンスを見られるので、パスワードのように扱ってください。誤って共有した場合は、デスクトップアプリで新しいリンクを作成してください。初期設定ではローカルネットワーク内でのみ動作します。外部からはポート転送か、TailscaleやWireGuardのようなVPNが必要です。",
+    "faq_q7": "残り時間は正確ですか？",
+    "faq_a7": "いいえ、目安です。1分ずつカウントダウンし、アプリがTwitchから実際の値を取得すると補正されます。マイニングの速度には影響しません。",
+    "faq_q8": "ログとは何ですか？",
+    "faq_a8": "デスクトップアプリの出力欄に表示されているものと同じ行を、読み取り専用で表示します。",
     "subtitle": "このインスタンスのリモートダッシュボード。",
     "mode_view": "閲覧のみ",
     "mode_control": "閲覧と操作",
@@ -2645,6 +2990,23 @@ const I18N = {
     "stats_no_data": "この期間のデータはありません。"
   },
   "zh-CN": {
+    "faq_title": "常见问题",
+    "faq_q1": "DropStream 真的在观看直播吗？",
+    "faq_a1": "没有。它只是每隔几秒向 Twitch 请求一次直播的元数据，这就足以让 Twitch 计算掉宝进度。不会下载任何视频或音频，所以几乎不占用流量。",
+    "faq_q2": "为什么我的进度卡住了或不对？",
+    "faq_a2": "很可能是同一个 Twitch 账号在别处观看直播，比如在浏览器里。Twitch 在自己那边管理掉宝进度，这会让挖矿程序混乱。挖矿期间请避免用该账号观看其他直播。",
+    "faq_q3": "我在这个页面上能做什么？",
+    "faq_a3": "在仅查看模式下，你可以查看当前掉宝、活动、统计数据和日志。在控制模式下，还可以暂停或继续、设置暂停计时器，并编辑优先列表和排除列表。这个页面本身不能登录你的账号，也不能自己领取掉宝，它只是映射并操控桌面应用。",
+    "faq_q4": "如何选择要挖哪些游戏？",
+    "faq_a4": "把游戏加入优先列表，选择优先模式，然后点击重新加载，应用就会应用这些更改。在仅优先列表之外的任何模式下，程序也会接取其他可用的活动。排除列表中的游戏会被忽略。",
+    "faq_q5": "我想要的游戏没有出现，为什么？",
+    "faq_a5": "你的 Twitch 账号需要在 Twitch 的活动页面上与该游戏关联。关联后点击重新加载，该活动就可以被纳入。",
+    "faq_q6": "链接是私密的吗？出门在外能用吗？",
+    "faq_a6": "任何拿到链接的人都能看到你的实例，所以请像对待密码一样对待它。如果误分享了，可以在桌面应用里生成一个新的。默认只能在本地网络中使用。要从外部访问，需要端口转发，或使用 Tailscale、WireGuard 之类的 VPN。",
+    "faq_q7": "剩余时间准确吗？",
+    "faq_a7": "不准确，只是估算。它按分钟倒数，并在应用从 Twitch 获取到真实值时校正。这不会影响挖矿速度。",
+    "faq_q8": "日志是什么？",
+    "faq_a8": "就是桌面应用输出框里显示的那些行，以只读方式呈现。",
     "subtitle": "此实例的远程控制面板。",
     "mode_view": "仅查看",
     "mode_control": "查看并控制",
@@ -2728,6 +3090,23 @@ const I18N = {
     "stats_no_data": "该时间段没有数据。"
   },
   "zh-TW": {
+    "faq_title": "常見問題",
+    "faq_q1": "DropStream 真的在觀看直播嗎？",
+    "faq_a1": "沒有。它只是每隔幾秒向 Twitch 請求一次直播的中繼資料，這就足以讓 Twitch 計算掉寶進度。不會下載任何影片或音訊，所以幾乎不佔用流量。",
+    "faq_q2": "為什麼我的進度卡住了或不對？",
+    "faq_a2": "很可能是同一個 Twitch 帳號在別處觀看直播，例如在瀏覽器裡。Twitch 在自己那邊管理掉寶進度，這會讓挖礦程式混亂。挖礦期間請避免用該帳號觀看其他直播。",
+    "faq_q3": "我在這個頁面上能做什麼？",
+    "faq_a3": "在僅檢視模式下，你可以查看目前的掉寶、活動、統計資料和記錄。在控制模式下，還可以暫停或繼續、設定暫停計時器，並編輯優先清單和排除清單。這個頁面本身不能登入你的帳號，也不能自己領取掉寶，它只是映射並操控桌面應用程式。",
+    "faq_q4": "如何選擇要挖哪些遊戲？",
+    "faq_a4": "把遊戲加入優先清單，選擇優先模式，然後按重新載入，應用程式就會套用這些變更。在僅優先清單以外的任何模式下，程式也會接取其他可用的活動。排除清單中的遊戲會被忽略。",
+    "faq_q5": "我想要的遊戲沒有出現，為什麼？",
+    "faq_a5": "你的 Twitch 帳號需要在 Twitch 的活動頁面上與該遊戲連結。連結後按重新載入，該活動就可以被納入。",
+    "faq_q6": "連結是私密的嗎？出門在外能用嗎？",
+    "faq_a6": "任何拿到連結的人都能看到你的實例，所以請像對待密碼一樣對待它。如果誤分享了，可以在桌面應用程式裡產生新的。預設只能在區域網路中使用。要從外部存取，需要連接埠轉發，或使用 Tailscale、WireGuard 之類的 VPN。",
+    "faq_q7": "剩餘時間準確嗎？",
+    "faq_a7": "不準確，只是估算。它按分鐘倒數，並在應用程式從 Twitch 取得真實值時校正。這不會影響挖礦速度。",
+    "faq_q8": "記錄是什麼？",
+    "faq_a8": "就是桌面應用程式輸出框裡顯示的那些行，以唯讀方式呈現。",
     "subtitle": "此實例的遠端控制面板。",
     "mode_view": "僅檢視",
     "mode_control": "檢視並控制",
@@ -2811,6 +3190,23 @@ const I18N = {
     "stats_no_data": "此期間沒有資料。"
   },
   "id": {
+    "faq_title": "Tanya jawab",
+    "faq_q1": "Apakah DropStream benar-benar menonton stream?",
+    "faq_a1": "Tidak. Aplikasi ini hanya meminta metadata stream ke Twitch setiap beberapa detik, dan itu cukup bagi Twitch untuk menghitung progres drop. Tidak ada video atau audio yang diunduh, jadi hampir tidak memakai kuota.",
+    "faq_q2": "Kenapa progres saya macet atau salah?",
+    "faq_a2": "Kemungkinan besar akun Twitch yang sama sedang menonton stream di tempat lain, misalnya di browser. Twitch mengatur progres drop di sisinya, dan itu membingungkan miner. Hindari menonton stream lain dengan akun itu saat sedang menambang.",
+    "faq_q3": "Apa yang bisa saya lakukan di halaman ini?",
+    "faq_a3": "Di mode hanya lihat, kamu bisa memantau drop saat ini, kampanye, statistik, dan log. Di mode kontrol, kamu juga bisa menjeda atau melanjutkan, mengatur timer jeda, dan mengedit daftar prioritas serta pengecualian. Halaman ini tidak bisa masuk ke akunmu atau mengklaim drop sendiri, hanya mencerminkan dan mengarahkan aplikasi desktop.",
+    "faq_q4": "Bagaimana cara memilih game yang ditambang?",
+    "faq_a4": "Tambahkan game ke daftar prioritas, pilih mode prioritas, lalu tekan Muat ulang agar aplikasi menerapkan perubahan. Dengan mode apa pun selain hanya daftar prioritas, miner juga mengambil kampanye lain yang tersedia. Game di daftar pengecualian diabaikan.",
+    "faq_q5": "Game yang saya mau tidak muncul. Kenapa?",
+    "faq_a5": "Akun Twitch kamu harus tertaut ke game itu di halaman kampanye Twitch. Setelah tertaut, tekan Muat ulang dan kampanyenya bisa diproses.",
+    "faq_q6": "Apakah tautannya privat? Bisakah dipakai di luar rumah?",
+    "faq_a6": "Siapa pun yang punya tautan bisa melihat instansmu, jadi perlakukan seperti kata sandi. Jika terlanjur terbagikan, buat yang baru di aplikasi desktop. Secara bawaan hanya berfungsi di jaringan lokal. Untuk akses dari luar dibutuhkan port forwarding atau VPN seperti Tailscale atau WireGuard.",
+    "faq_q7": "Apakah sisa waktunya akurat?",
+    "faq_a7": "Tidak, hanya perkiraan. Hitungan mundurnya per menit dan disesuaikan ketika aplikasi mendapat nilai asli dari Twitch. Tidak memengaruhi kecepatan menambang.",
+    "faq_q8": "Apa itu log?",
+    "faq_a8": "Baris yang sama seperti di kotak Output pada aplikasi desktop, hanya bisa dibaca.",
     "subtitle": "Dasbor jarak jauh untuk instans ini.",
     "mode_view": "Hanya lihat",
     "mode_control": "Lihat dan kendalikan",
