@@ -2996,7 +2996,7 @@ async function loadLogs() {
     const data = await res.json();
     const box = document.getElementById("logs-box");
     const wasScrolledDown = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
-    box.textContent = (data.lines || []).join("\n");
+    box.textContent = (data.lines || []).join("\\n");
     if (wasScrolledDown) box.scrollTop = box.scrollHeight;
   } catch (e) {
     // logs are non-critical; ignore transient fetch errors
