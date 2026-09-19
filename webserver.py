@@ -399,7 +399,15 @@ class WebDashboard:
     # -- handlers --
 
     async def _handle_index(self, request: web.Request) -> web.Response:
-        return web.Response(text=DASHBOARD_HTML, content_type="text/html")
+        # no-store: this page changes with every DropStream update, and browsers (mobile
+        # ones especially) are eager to cache a plain HTML GET with no cache headers -
+        # without this, visitors can keep seeing an old, broken version of the page after
+        # an update until they clear their cache, even though the server is fully up to date
+        return web.Response(
+            text=DASHBOARD_HTML,
+            content_type="text/html",
+            headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
+        )
 
     # icon shown in the browser tab; reuses the same status-coded .ico files as the
     # desktop tray icon, so the tab tells you what's happening at a glance too
@@ -432,16 +440,31 @@ class WebDashboard:
 
     async def _handle_state(self, request: web.Request) -> web.Response:
         self._touch_viewer(request)
-        return web.json_response(self._state_dict())
+        try:
+            return web.json_response(self._state_dict())
+        except Exception as exc:
+            # surface the real error instead of aiohttp's generic HTML 500 page, which
+            # the frontend's res.json() can't parse and would otherwise fail silently,
+            # leaving the whole dashboard stuck on its last (or default) values forever
+            logger.exception("Failed to build the remote dashboard's state")
+            return web.json_response({"error": f"{type(exc).__name__}: {exc}"}, status=500)
 
     async def _handle_campaigns(self, request: web.Request) -> web.Response:
-        return web.json_response({"campaigns": self._campaigns_list()})
+        try:
+            return web.json_response({"campaigns": self._campaigns_list()})
+        except Exception as exc:
+            logger.exception("Failed to build the remote dashboard's campaigns list")
+            return web.json_response({"error": f"{type(exc).__name__}: {exc}"}, status=500)
 
     async def _handle_stats(self, request: web.Request) -> web.Response:
         range_key = request.query.get("range", "week")
         if range_key not in ("day", "week", "month", "3months", "all"):
             range_key = "week"
-        return web.json_response(self._twitch.stats.stats_for_range(range_key))
+        try:
+            return web.json_response(self._twitch.stats.stats_for_range(range_key))
+        except Exception as exc:
+            logger.exception("Failed to build the remote dashboard's stats")
+            return web.json_response({"error": f"{type(exc).__name__}: {exc}"}, status=500)
 
     async def _handle_logs(self, request: web.Request) -> web.Response:
         if not getattr(self._twitch.settings, "web_server_show_logs", False):
