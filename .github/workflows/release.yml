@@ -1,87 +1,90 @@
 name: Release
 
-# Publishing is intentionally kept separate from the Build workflow: Build only produces
-# artifacts on every push/PR, this workflow is triggered manually and actually publishes them.
+# Publishing is intentionally kept separate from the Build workflow: Build produces artifacts on
+# every push/PR (versioned <last release>.<commits since>, e.g. 4.3), while this workflow is run
+# manually, picks the next release number automatically (v1, v2, v3, ...), builds everything with
+# that version embedded, and publishes it.
 on:
   workflow_dispatch:
     inputs:
-      run_id:
-        description: "Build workflow run ID to publish artifacts from (leave empty to use the latest successful run on master)"
-        required: false
-        type: string
-      tag:
-        description: "Release tag to publish/update"
-        required: false
-        default: "dev-build"
-        type: string
       prerelease:
         description: "Mark as a pre-release"
         required: false
-        default: true
+        default: false
         type: boolean
 
+# never run two releases at once, they would race for the same version number
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
 jobs:
+  next-version:
+    name: Pick next version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.next.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # all tags are needed to find the latest release number
+
+      - name: Compute next release number
+        id: next
+        run: |
+          # only plain "v<number>" tags count as releases (v1, v2, ...); dev-build and others are ignored
+          LAST=$(git tag --list 'v[0-9]*' | grep -E '^v[0-9]+$' | sed 's/^v//' | sort -n | tail -1 || true)
+          NEXT=$(( ${LAST:-0} + 1 ))
+          echo "Next release: v${NEXT}"
+          echo "version=${NEXT}" >> "${GITHUB_OUTPUT}"
+
+  build:
+    name: Build
+    needs:
+      - next-version
+    uses: ./.github/workflows/ci.yml
+    with:
+      version: ${{ needs.next-version.outputs.version }}
+
   publish:
     name: Publish release
     runs-on: ubuntu-latest
+    needs:
+      - next-version
+      - build
     permissions:
       contents: write
-      actions: read
 
     steps:
-      - name: Resolve source run ID
-        id: run
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          if [ -n "${{ github.event.inputs.run_id }}" ]; then
-            RUN_ID="${{ github.event.inputs.run_id }}"
-          else
-            RUN_ID=$(gh run list --workflow=ci.yml --branch="${{ github.event.repository.default_branch }}" --status=success --limit=1 --json databaseId --jq '.[0].databaseId' --repo "${GITHUB_REPOSITORY}")
-          fi
-          if [ -z "$RUN_ID" ]; then
-            echo "::error::Could not find a successful Build run on branch '${{ github.event.repository.default_branch }}' (and no run_id was given)."
-            exit 1
-          fi
-          echo "id=${RUN_ID}" >> "${GITHUB_OUTPUT}"
-
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          run-id: ${{ steps.run.outputs.id }}
-          github-token: ${{ github.token }}
 
       - name: Set up variables
         id: vars
         run: echo "date_now=$(date --rfc-3339=seconds)" >> "${GITHUB_OUTPUT}"
 
-      - name: Delete the existing release (if present)
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          TAG="${{ github.event.inputs.tag }}"
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release delete "$TAG" --cleanup-tag --yes --repo "$GITHUB_REPOSITORY"
-          else
-            echo "No $TAG release; skipping delete"
-          fi
-
       - name: Publish release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
           artifactErrorsFailBuild: true
           artifacts: artifacts/*/*
           body: |
-            **DropStream — a fork of [Twitch Drops Miner by DevilXD](https://github.com/DevilXD/TwitchDropsMiner).**
+            **DropStream, a fork of [Twitch Drops Miner by DevilXD](https://github.com/DevilXD/TwitchDropsMiner).**
 
             Windows, macOS (Apple Silicon), and Linux (x86_64 + ARM64) builds are attached below.
 
             - Published: `${{steps.vars.outputs.date_now}}`
-            - Source build run: ${{steps.run.outputs.id}}
             - Reference commit: ${{github.sha}}
-          name: DropStream — ${{ github.event.inputs.tag }}
-          prerelease: ${{ github.event.inputs.prerelease }}
-          removeArtifacts: true
-          tag: ${{ github.event.inputs.tag }}
+          commit: ${{ github.sha }}
+          generateReleaseNotes: true
+          makeLatest: true
+          name: DropStream v${{ needs.next-version.outputs.version }}
+          prerelease: ${{ inputs.prerelease }}
+          tag: v${{ needs.next-version.outputs.version }}

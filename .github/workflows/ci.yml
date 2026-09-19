@@ -3,10 +3,17 @@ name: Build
 on:
   push:
   pull_request:
+  # called by release.yml, which passes the release version (e.g. 4)
+  workflow_call:
+    inputs:
+      version:
+        description: "Version to embed in the build (e.g. 4). Leave empty to compute it automatically."
+        required: false
+        type: string
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to embed in the build (e.g. 1.0.0). Leave empty to keep the current version.py value."
+        description: "Version to embed in the build (e.g. 4 or 4.2). Leave empty to compute it automatically."
         required: false
         type: string
 
@@ -15,9 +22,52 @@ env:
   USE_UPX: false
 
 jobs:
+  # Computes the version every other job embeds into version.py:
+  #  - release build (called from release.yml, or a manual run with a version): used as given, e.g. "4"
+  #  - any other push / PR: "<last published release>.<commits since it>", e.g. "4.3"
+  #    (or "0.<commit count>" while no release has been published yet)
+  version:
+    name: Compute version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.calc.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history and all tags, needed to count commits since the last release
+
+      - name: Compute version
+        id: calc
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ -n "${INPUT_VERSION}" ]; then
+            VERSION="${INPUT_VERSION#v}"
+          else
+            LAST=$(git tag --list 'v[0-9]*' | grep -E '^v[0-9]+$' | sed 's/^v//' | sort -n | tail -1 || true)
+            if [ -n "${LAST}" ]; then
+              COUNT=$(git rev-list --count "v${LAST}..HEAD")
+              BASE="${LAST}"
+            else
+              COUNT=$(git rev-list --count HEAD)
+              BASE="0"
+            fi
+            if [ "${COUNT}" -gt 0 ]; then
+              VERSION="${BASE}.${COUNT}"
+            else
+              VERSION="${BASE}"
+            fi
+          fi
+          echo "Version: ${VERSION}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
   validate:
     name: Validate
     runs-on: ubuntu-latest
+    needs:
+      - version
 
     steps:
       - name: Checkout code
@@ -28,9 +78,11 @@ jobs:
         with:
           python-version: ${{env.PYTHON_VERSION}}
 
-      - name: Set version (if provided)
-        if: ${{ github.event.inputs.version != '' }}
-        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
+      - name: Set version
+        shell: bash
+        env:
+          APP_VERSION: ${{ needs.version.outputs.version }}
+        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
 
       - name: Validate language files
         run: |
@@ -52,26 +104,17 @@ jobs:
     name: Windows
     runs-on: windows-latest
     needs:
+      - version
       - validate
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set version (if provided)
-        if: ${{ github.event.inputs.version != '' }}
+      - name: Set version
         shell: bash
-        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
-
-      - name: Set up variables
-        id: vars
-        run: |
-          Add-Content $env:GITHUB_OUTPUT "sha_short=$(git rev-parse --short HEAD)"
-
-      - name: Append git revision to project version
-        run: |
-          (Get-Content version.py) `
-          -Replace '^__version__\s*=\s*"[^"]+', "`$0.${{steps.vars.outputs.sha_short}}" |`
-          Out-File version.py
+        env:
+          APP_VERSION: ${{ needs.version.outputs.version }}
+        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
 
       # Ensure Python version
       - name: Set up Python
@@ -137,26 +180,17 @@ jobs:
     name: Windows (ARM64)
     runs-on: windows-11-arm
     needs:
+      - version
       - validate
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set version (if provided)
-        if: ${{ github.event.inputs.version != '' }}
+      - name: Set version
         shell: bash
-        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
-
-      - name: Set up variables
-        id: vars
-        run: |
-          Add-Content $env:GITHUB_OUTPUT "sha_short=$(git rev-parse --short HEAD)"
-
-      - name: Append git revision to project version
-        run: |
-          (Get-Content version.py) `
-          -Replace '^__version__\s*=\s*"[^"]+', "`$0.${{steps.vars.outputs.sha_short}}" |`
-          Out-File version.py
+        env:
+          APP_VERSION: ${{ needs.version.outputs.version }}
+        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -198,24 +232,17 @@ jobs:
     # macos-latest currently maps to an Apple Silicon (arm64) runner, so this build is native ARM64.
     runs-on: macos-latest
     needs:
+      - version
       - validate
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set version (if provided)
-        if: ${{ github.event.inputs.version != '' }}
+      - name: Set version
         shell: bash
-        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
-
-      - name: Set up variables
-        id: vars
-        run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
-
-      - name: Append git revision to project version
-        run: |
-          sed -i '' -E "s/^(__version__\s*=\s*\"[^\"]+)/\1.${{steps.vars.outputs.sha_short}}/" version.py
+        env:
+          APP_VERSION: ${{ needs.version.outputs.version }}
+        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -262,24 +289,17 @@ jobs:
             runner: ubuntu-22.04-arm
     runs-on: ${{matrix.runner}}
     needs:
+      - version
       - validate
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set version (if provided)
-        if: ${{ github.event.inputs.version != '' }}
+      - name: Set version
         shell: bash
-        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
-
-      - name: Set up variables
-        id: vars
-        run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
-
-      - name: Append git revision to project version
-        run: |
-          sed -ri "s/^__version__\s*=\s*\"[^\"]+/\0.${{steps.vars.outputs.sha_short}}/" version.py
+        env:
+          APP_VERSION: ${{ needs.version.outputs.version }}
+        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
 
       # Ensure Python version
       - name: Set up Python
@@ -348,25 +368,22 @@ jobs:
             runner: ubuntu-22.04-arm
     runs-on: ${{matrix.runner}}
     needs:
+      - version
       - validate
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set version (if provided)
-        if: ${{ github.event.inputs.version != '' }}
+      - name: Set version
         shell: bash
-        run: echo "__version__ = \"${{ github.event.inputs.version }}\"" > version.py
+        env:
+          APP_VERSION: ${{ needs.version.outputs.version }}
+        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
 
       - name: Set up variables
         id: vars
         run: |
           echo "app_version=$(python3 -c 'from version import __version__ as v; print(v)')" >> "${GITHUB_OUTPUT}"
-          echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
-
-      - name: Append git revision to project version
-        run: |
-          sed -ri "s/^__version__\s*=\s*\"[^\"]+/\0.${{steps.vars.outputs.sha_short}}/" version.py
 
       - name: Install system dependencies
         run: |
@@ -385,7 +402,7 @@ jobs:
         env:
           ARCH: ${{matrix.arch}}
           ARCH_APT: ${{matrix.arch == 'x86_64' && 'amd64' || 'arm64'}}
-          APP_VERSION: ${{steps.vars.outputs.app_version}}.${{steps.vars.outputs.sha_short}}
+          APP_VERSION: ${{steps.vars.outputs.app_version}}
           PYTHON_VERSION: ${{env.PYTHON_VERSION}}
         run: |
           appimage-builder --recipe appimage/AppImageBuilder.yml

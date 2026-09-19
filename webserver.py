@@ -3400,13 +3400,13 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     if (btn.dataset.tab === "stats") {
       loadStats(statsRange);
     }
-    if (btn.dataset.tab === "logs") {
-      loadLogs();
-    }
+    // starts log polling when the Logs tab opens, stops it when any other tab is opened
+    syncLogsPolling();
   });
 });
 
 let logsPollTimer = null;
+let lastLogsText = null;
 async function loadLogs() {
   try {
     const res = await fetch(base + "/api/logs");
@@ -3414,18 +3414,28 @@ async function loadLogs() {
     const data = await res.json();
     const box = document.getElementById("logs-box");
     const wasScrolledDown = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
-    box.textContent = (data.lines || []).join("\\n");
+    const text = (data.lines || []).join("\\n");
+    if (text === lastLogsText) return;  // nothing new, don't touch the DOM
+    lastLogsText = text;
+    box.textContent = text;
     if (wasScrolledDown) box.scrollTop = box.scrollHeight;
   } catch (e) {
     // logs are non-critical; ignore transient fetch errors
   }
 }
-// keep the log view live while its tab is open, without polling it in the background
-setInterval(() => {
-  if (document.getElementById("logs-tab-btn").classList.contains("active")) {
+// Keep the log view live only while its tab is open and the page is visible. The timer is
+// fully stopped otherwise (instead of ticking and checking), so an idle or backgrounded
+// page doesn't wake the CPU every few seconds.
+function syncLogsPolling() {
+  const want = !document.hidden && document.getElementById("logs-tab-btn").classList.contains("active");
+  if (want && !logsPollTimer) {
     loadLogs();
+    logsPollTimer = setInterval(loadLogs, 5000);
+  } else if (!want && logsPollTimer) {
+    clearInterval(logsPollTimer);
+    logsPollTimer = null;
   }
-}, 5000);
+}
 
 function setStatsRangeButtons() {
   document.querySelectorAll("#stats-filter button").forEach(b => {
@@ -3510,6 +3520,17 @@ async function post(path, body) {
   return res;
 }
 
+// Skip DOM rebuilds when the data hasn't changed since the last render. The page polls every
+// few seconds, and rebuilding lists (with images) each time means needless layout work, image
+// re-decoding and garbage collection, which costs CPU/battery on the viewing device.
+const _renderSigs = new Map();
+function renderChanged(key, data) {
+  const sig = JSON.stringify([currentLang, data]);
+  if (_renderSigs.get(key) === sig) return false;
+  _renderSigs.set(key, sig);
+  return true;
+}
+
 function drawBarChart(canvasId, labels, values) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
@@ -3555,6 +3576,7 @@ function drawBarChart(canvasId, labels, values) {
 function renderRankList(perGame, listId = "rank-list") {
   const list = document.getElementById(listId);
   if (!list) return;
+  if (!renderChanged("rank:" + listId, perGame)) return;
   list.innerHTML = "";
   perGame.forEach((entry, i) => {
     const li = document.createElement("li");
@@ -3584,6 +3606,7 @@ function renderRankList(perGame, listId = "rank-list") {
 function renderCampaigns(campaigns) {
   const list = document.getElementById("campaign-list");
   const empty = document.getElementById("no-campaigns");
+  if (!renderChanged("campaigns", campaigns)) return;
   list.innerHTML = "";
   if (!campaigns.length) {
     empty.style.display = "block";
@@ -3734,6 +3757,7 @@ function renderCampaigns(campaigns) {
 
 function renderOtherDrops(otherDrops) {
   const row = document.getElementById("other-drops-row");
+  if (!renderChanged("other-drops", otherDrops)) return;
   row.innerHTML = "";
   for (const d of otherDrops) {
     const thumb = document.createElement("div");
@@ -3784,6 +3808,7 @@ document.getElementById("drop-modal-overlay").addEventListener("click", (e) => {
 });
 
 function renderEditList(listEl, emptyEl, games, kind, controlEnabled) {
+  if (!renderChanged("edit:" + kind, [games, !!controlEnabled])) return;
   listEl.innerHTML = "";
   if (!games.length) {
     emptyEl.style.display = "block";
@@ -3907,6 +3932,7 @@ async function refresh() {
       document.getElementById("tab-logs").classList.remove("active");
       document.querySelector('.tab-btn[data-tab="dashboard"]').classList.add("active");
       document.getElementById("tab-dashboard").classList.add("active");
+      syncLogsPolling();
     }
     if (s.app && s.app.version) {
       document.getElementById("help-version").textContent = "DropStream v" + s.app.version;
@@ -3994,11 +4020,13 @@ async function refresh() {
     );
 
     const options = document.getElementById("game-options");
+    if (renderChanged("game-options", s.available_games || [])) {
     options.innerHTML = "";
     for (const game of (s.available_games || [])) {
       const opt = document.createElement("option");
       opt.value = game;
       options.appendChild(opt);
+    }
     }
   } catch (e) {
     document.getElementById("error-box").style.display = "block";
@@ -4065,11 +4093,13 @@ document.addEventListener("visibilitychange", () => {
     clearInterval(campaignsTimer);
     refreshTimer = null;
     campaignsTimer = null;
+    syncLogsPolling();
   } else if (!refreshTimer) {
     refresh();
     refreshCampaigns();
     refreshTimer = setInterval(refresh, 4000);
     campaignsTimer = setInterval(refreshCampaigns, 15000);
+    syncLogsPolling();
   }
 });
 </script>

@@ -219,6 +219,17 @@ hovering the row of tab labels) and Ctrl+PageUp / Ctrl+PageDown from anywhere.
 - Persistent files (`cookies.jar`, `settings.json`, `lock.file`, `cache/`) live inside the bundle, under
   `DropStream.app/Contents/MacOS` (right-click the app → "Show Package Contents" to access them).
 
+## Versioning
+
+Versions are handled automatically by the CI and shown in the app (About/Help tabs, `--version`) and in the
+Remote dashboard's Help tab.
+
+- **Publishing** (Actions > Release > Run workflow) picks the next whole number on its own: `v1`, `v2`, `v3`...
+  and builds and publishes every platform with it.
+- **Every other push** gets `v<last release>.<commits since it>`, e.g. `v4.1`, `v4.2`, `v4.3`, until the next
+  release resets the counter.
+- `version.py` is only a fallback for running from source; the CI overwrites it at build time.
+
 ## Advanced usage
 
 To run from the latest source, or build your own executable, see DevilXD's original wiki page (the build
