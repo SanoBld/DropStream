@@ -161,7 +161,9 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{env.PYTHON_VERSION}}
+          # windows-11-arm only ships native (arm64) Python builds from 3.11 onward;
+          # env.PYTHON_VERSION (3.10) has no arm64 Windows build and fails to install here
+          python-version: "3.11"
 
       - name: Install project dependencies
         run: |

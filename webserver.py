@@ -235,22 +235,27 @@ class WebDashboard:
                 continue
             drops = []
             for drop in campaign.drops:
-                reward_image = drop.benefits[0].image_url if drop.benefits else None
-                drops.append({
-                    "rewards": drop.rewards_text(),
-                    "image_url": reward_image,
-                    "progress": round(drop.progress, 4),
-                    "claimed": drop.is_claimed,
-                    # detail fields, used by the drop-detail popup opened by clicking
-                    # a thumbnail on the Campaigns tab - kept separate from the fields
-                    # above so the always-sent summary payload stays small
-                    "benefits": [
-                        {"name": b.name, "image_url": b.image_url} for b in drop.benefits
-                    ],
-                    "required_minutes": drop.required_minutes,
-                    "current_minutes": drop.current_minutes,
-                    "remaining_minutes": drop.remaining_minutes,
-                })
+                try:
+                    reward_image = drop.benefits[0].image_url if drop.benefits else None
+                    drops.append({
+                        "rewards": drop.rewards_text(),
+                        "image_url": reward_image,
+                        "progress": round(drop.progress, 4),
+                        "claimed": drop.is_claimed,
+                        # detail fields, used by the drop-detail popup opened by clicking
+                        # a thumbnail on the Campaigns tab - kept separate from the fields
+                        # above so the always-sent summary payload stays small
+                        "benefits": [
+                            {"name": b.name, "image_url": b.image_url} for b in drop.benefits
+                        ],
+                        "required_minutes": drop.required_minutes,
+                        "current_minutes": drop.current_minutes,
+                        "remaining_minutes": drop.remaining_minutes,
+                    })
+                except Exception:
+                    # one malformed drop shouldn't take down the whole /api/campaigns response
+                    logger.exception("Failed to build a campaign drop entry for the remote dashboard")
+                    continue
                 if len(drops) >= 12:
                     break
             acl = campaign.allowed_channels
@@ -291,18 +296,23 @@ class WebDashboard:
             for other in campaign.drops:
                 if other.id == drop.id:
                     continue
-                other_drops.append({
-                    "rewards": other.rewards_text(),
-                    "image_url": other.benefits[0].image_url if other.benefits else None,
-                    "claimed": other.is_claimed,
-                    "progress": round(other.progress, 4),
-                    "benefits": [
-                        {"name": b.name, "image_url": b.image_url} for b in other.benefits
-                    ],
-                    "required_minutes": other.required_minutes,
-                    "current_minutes": other.current_minutes,
-                    "remaining_minutes": other.remaining_minutes,
-                })
+                try:
+                    other_drops.append({
+                        "rewards": other.rewards_text(),
+                        "image_url": other.benefits[0].image_url if other.benefits else None,
+                        "claimed": other.is_claimed,
+                        "progress": round(other.progress, 4),
+                        "benefits": [
+                            {"name": b.name, "image_url": b.image_url} for b in other.benefits
+                        ],
+                        "required_minutes": other.required_minutes,
+                        "current_minutes": other.current_minutes,
+                        "remaining_minutes": other.remaining_minutes,
+                    })
+                except Exception:
+                    # one malformed drop shouldn't take down the whole dashboard state
+                    logger.exception("Failed to build other_drops entry for the remote dashboard")
+                    continue
                 if len(other_drops) >= 8:
                     break
             current_drop = {
@@ -352,7 +362,7 @@ class WebDashboard:
         return {
             "app": {"name": "DropStream", "version": self._version()},
             "control_enabled": settings.web_server_allow_control,
-            "logs_enabled": settings.web_server_show_logs,
+            "logs_enabled": getattr(settings, "web_server_show_logs", False),
             "show_viewers": settings.web_server_show_viewers,
             "viewer_count": self._viewer_count() if settings.web_server_show_viewers else None,
             "password_required": bool(
@@ -434,7 +444,7 @@ class WebDashboard:
         return web.json_response(self._twitch.stats.stats_for_range(range_key))
 
     async def _handle_logs(self, request: web.Request) -> web.Response:
-        if not self._twitch.settings.web_server_show_logs:
+        if not getattr(self._twitch.settings, "web_server_show_logs", False):
             return web.json_response({"error": "logs are disabled"}, status=403)
         return web.json_response({"lines": log_buffer.get_lines(limit=500)})
 
