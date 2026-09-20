@@ -360,7 +360,7 @@ class WebDashboard:
         ]
         available_games = sorted({c.game.name for c in twitch.inventory})
         return {
-            "app": {"name": "DropStream", "version": self._version()},
+            "app": {"name": "DropStream", "version": self._version(), "beta": self._is_beta()},
             "control_enabled": settings.web_server_allow_control,
             "logs_enabled": getattr(settings, "web_server_show_logs", False),
             "show_viewers": settings.web_server_show_viewers,
@@ -395,6 +395,12 @@ class WebDashboard:
     def _version() -> str:
         from version import __version__
         return __version__
+
+    @staticmethod
+    def _is_beta() -> bool:
+        # set to True by the CI for releases published with the "beta" option
+        import version
+        return bool(getattr(version, "__beta__", False))
 
     # -- handlers --
 
@@ -1186,6 +1192,7 @@ a:hover { text-decoration: underline; }
 <script>
 const I18N = {
   "en": {
+    "beta_tag": "beta",
     "faq_title": "Questions & answers",
     "faq_q1": "Does DropStream actually watch streams?",
     "faq_a1": "No. It only asks Twitch for a stream's metadata every few seconds, which is enough for Twitch to count progress toward a drop. No video or audio is downloaded, so it barely uses any bandwidth.",
@@ -1299,6 +1306,7 @@ const I18N = {
     "mine_unlinked_hint": "Also mine drops when Twitch reports the game account as not linked."
   },
   "fr": {
+    "beta_tag": "bêta",
     "faq_title": "Questions et réponses",
     "faq_q1": "DropStream regarde-t-il vraiment les streams ?",
     "faq_a1": "Non. Il demande seulement à Twitch les métadonnées d'un stream toutes les quelques secondes, ce qui suffit pour que Twitch fasse avancer un drop. Aucune vidéo ni aucun son n'est téléchargé, donc la consommation de bande passante est minime.",
@@ -1412,6 +1420,7 @@ const I18N = {
     "mine_unlinked_hint": "Miner aussi les drops quand Twitch indique que le compte du jeu n'est pas lié."
   },
   "de": {
+    "beta_tag": "Beta",
     "faq_title": "Fragen und Antworten",
     "faq_q1": "Schaut DropStream wirklich Streams an?",
     "faq_a1": "Nein. Es fragt nur alle paar Sekunden die Metadaten eines Streams bei Twitch ab, und das reicht Twitch, um den Fortschritt eines Drops zu zählen. Es werden weder Video noch Audio geladen, der Datenverbrauch ist also minimal.",
@@ -1512,6 +1521,7 @@ const I18N = {
     "stats_no_data": "Keine Daten für diesen Zeitraum."
   },
   "es": {
+    "beta_tag": "beta",
     "faq_title": "Preguntas y respuestas",
     "faq_q1": "¿DropStream ve los streams de verdad?",
     "faq_a1": "No. Solo le pide a Twitch los metadatos de un stream cada pocos segundos, y eso basta para que Twitch cuente el progreso de un drop. No se descarga vídeo ni audio, así que casi no gasta ancho de banda.",
@@ -1612,6 +1622,7 @@ const I18N = {
     "stats_no_data": "Sin datos para este período."
   },
   "it": {
+    "beta_tag": "beta",
     "faq_title": "Domande e risposte",
     "faq_q1": "DropStream guarda davvero gli stream?",
     "faq_a1": "No. Chiede a Twitch solo i metadati di uno stream ogni pochi secondi, e a Twitch basta per contare l'avanzamento di un drop. Non viene scaricato né video né audio, quindi usa pochissima banda.",
@@ -1712,6 +1723,7 @@ const I18N = {
     "stats_no_data": "Nessun dato per questo periodo."
   },
   "pt": {
+    "beta_tag": "beta",
     "faq_title": "Perguntas e respostas",
     "faq_q1": "O DropStream assiste mesmo às transmissões?",
     "faq_a1": "Não. Ele só pede à Twitch os metadados de uma transmissão a cada poucos segundos, e isso basta para a Twitch contar o progresso de um drop. Nenhum vídeo ou áudio é baixado, então quase não gasta banda.",
@@ -1812,6 +1824,7 @@ const I18N = {
     "stats_no_data": "Sem dados para este período."
   },
   "nl": {
+    "beta_tag": "bèta",
     "faq_title": "Vragen en antwoorden",
     "faq_q1": "Kijkt DropStream echt naar streams?",
     "faq_a1": "Nee. Het vraagt om de paar seconden alleen de metadata van een stream op bij Twitch, en dat is genoeg voor Twitch om de voortgang van een drop bij te houden. Er wordt geen video of audio gedownload, dus het gebruikt nauwelijks bandbreedte.",
@@ -1912,6 +1925,7 @@ const I18N = {
     "stats_no_data": "Geen gegevens voor deze periode."
   },
   "da": {
+    "beta_tag": "beta",
     "faq_title": "Spørgsmål og svar",
     "faq_q1": "Ser DropStream faktisk streams?",
     "faq_a1": "Nej. Det beder kun Twitch om en streams metadata hvert par sekunder, og det er nok til, at Twitch tæller fremgangen mod et drop. Der hentes hverken video eller lyd, så det bruger næsten ingen båndbredde.",
@@ -2012,6 +2026,7 @@ const I18N = {
     "stats_no_data": "Ingen data for denne periode."
   },
   "no": {
+    "beta_tag": "beta",
     "faq_title": "Spørsmål og svar",
     "faq_q1": "Ser DropStream faktisk på strømmer?",
     "faq_a1": "Nei. Det ber bare Twitch om en strøms metadata hvert par sekunder, og det er nok til at Twitch teller fremgangen mot en drop. Ingen video eller lyd lastes ned, så det bruker nesten ingen båndbredde.",
@@ -2112,6 +2127,7 @@ const I18N = {
     "stats_no_data": "Ingen data for denne perioden."
   },
   "pl": {
+    "beta_tag": "beta",
     "faq_title": "Pytania i odpowiedzi",
     "faq_q1": "Czy DropStream naprawdę ogląda transmisje?",
     "faq_a1": "Nie. Co kilka sekund prosi Twitcha tylko o metadane transmisji, a to wystarcza, żeby Twitch zaliczał postęp dropa. Nie pobiera wideo ani dźwięku, więc prawie nie zużywa łącza.",
@@ -2212,6 +2228,7 @@ const I18N = {
     "stats_no_data": "Brak danych dla tego okresu."
   },
   "cs": {
+    "beta_tag": "beta",
     "faq_title": "Otázky a odpovědi",
     "faq_q1": "Opravdu DropStream sleduje streamy?",
     "faq_a1": "Ne. Jen každých pár sekund požádá Twitch o metadata streamu, a to Twitchi stačí k započítání postupu dropu. Nestahuje se video ani zvuk, takže skoro nespotřebovává data.",
@@ -2312,6 +2329,7 @@ const I18N = {
     "stats_no_data": "Pro toto období nejsou k dispozici žádná data."
   },
   "ro": {
+    "beta_tag": "beta",
     "faq_title": "Întrebări și răspunsuri",
     "faq_q1": "DropStream se uită într-adevăr la stream-uri?",
     "faq_a1": "Nu. Cere doar metadatele unui stream de la Twitch la câteva secunde, iar asta îi ajunge lui Twitch ca să numere progresul unui drop. Nu se descarcă video sau audio, deci consumă aproape deloc bandă.",
@@ -2412,6 +2430,7 @@ const I18N = {
     "stats_no_data": "Nu există date pentru această perioadă."
   },
   "hu": {
+    "beta_tag": "béta",
     "faq_title": "Kérdések és válaszok",
     "faq_q1": "Tényleg nézi a streameket a DropStream?",
     "faq_a1": "Nem. Néhány másodpercenként csak a stream metaadatait kéri le a Twitchtől, és ez elég ahhoz, hogy a Twitch számolja a drop haladását. Nem tölt le videót vagy hangot, ezért alig használ sávszélességet.",
@@ -2512,6 +2531,7 @@ const I18N = {
     "stats_no_data": "Nincs adat erre az időszakra."
   },
   "tr": {
+    "beta_tag": "beta",
     "faq_title": "Sorular ve cevaplar",
     "faq_q1": "DropStream gerçekten yayınları izliyor mu?",
     "faq_a1": "Hayır. Birkaç saniyede bir Twitch'ten yalnızca yayının meta verilerini ister ve Twitch'in drop ilerlemesini saymasına bu yeter. Video ya da ses indirilmez, bu yüzden neredeyse hiç bant genişliği harcamaz.",
@@ -2612,6 +2632,7 @@ const I18N = {
     "stats_no_data": "Bu dönem için veri yok."
   },
   "ru": {
+    "beta_tag": "бета",
     "faq_title": "Вопросы и ответы",
     "faq_q1": "DropStream правда смотрит стримы?",
     "faq_a1": "Нет. Он лишь раз в несколько секунд запрашивает у Twitch метаданные стрима, и этого Twitch достаточно, чтобы засчитывать прогресс дропа. Видео и звук не скачиваются, поэтому трафика почти не тратится.",
@@ -2712,6 +2733,7 @@ const I18N = {
     "stats_no_data": "Нет данных за этот период."
   },
   "uk": {
+    "beta_tag": "бета",
     "faq_title": "Питання та відповіді",
     "faq_q1": "DropStream справді дивиться стріми?",
     "faq_a1": "Ні. Він лише раз на кілька секунд запитує в Twitch метадані стріму, і цього Twitch достатньо, щоб зараховувати прогрес дропу. Відео й звук не завантажуються, тож трафіку майже не витрачається.",
@@ -2812,6 +2834,7 @@ const I18N = {
     "stats_no_data": "Немає даних за цей період."
   },
   "ar": {
+    "beta_tag": "تجريبي",
     "faq_title": "أسئلة وأجوبة",
     "faq_q1": "هل يشاهد DropStream البثوث فعلًا؟",
     "faq_a1": "لا. هو يطلب من Twitch البيانات الوصفية للبث كل بضع ثوانٍ فقط، وهذا يكفي لتحتسب Twitch تقدّم الدروب. لا يُحمَّل أي فيديو أو صوت، لذلك يستهلك القليل جدًا من الإنترنت.",
@@ -2912,6 +2935,7 @@ const I18N = {
     "stats_no_data": "لا توجد بيانات لهذه الفترة."
   },
   "ja": {
+    "beta_tag": "ベータ",
     "faq_title": "よくある質問",
     "faq_q1": "DropStreamは本当に配信を視聴しているのですか？",
     "faq_a1": "いいえ。数秒ごとにTwitchへ配信のメタデータを問い合わせるだけで、それだけでTwitchはドロップの進行を数えてくれます。映像も音声もダウンロードしないので、通信量はほとんどかかりません。",
@@ -3012,6 +3036,7 @@ const I18N = {
     "stats_no_data": "この期間のデータはありません。"
   },
   "zh-CN": {
+    "beta_tag": "测试版",
     "faq_title": "常见问题",
     "faq_q1": "DropStream 真的在观看直播吗？",
     "faq_a1": "没有。它只是每隔几秒向 Twitch 请求一次直播的元数据，这就足以让 Twitch 计算掉宝进度。不会下载任何视频或音频，所以几乎不占用流量。",
@@ -3112,6 +3137,7 @@ const I18N = {
     "stats_no_data": "该时间段没有数据。"
   },
   "zh-TW": {
+    "beta_tag": "測試版",
     "faq_title": "常見問題",
     "faq_q1": "DropStream 真的在觀看直播嗎？",
     "faq_a1": "沒有。它只是每隔幾秒向 Twitch 請求一次直播的中繼資料，這就足以讓 Twitch 計算掉寶進度。不會下載任何影片或音訊，所以幾乎不佔用流量。",
@@ -3212,6 +3238,7 @@ const I18N = {
     "stats_no_data": "此期間沒有資料。"
   },
   "id": {
+    "beta_tag": "beta",
     "faq_title": "Tanya jawab",
     "faq_q1": "Apakah DropStream benar-benar menonton stream?",
     "faq_a1": "Tidak. Aplikasi ini hanya meminta metadata stream ke Twitch setiap beberapa detik, dan itu cukup bagi Twitch untuk menghitung progres drop. Tidak ada video atau audio yang diunduh, jadi hampir tidak memakai kuota.",
@@ -3935,7 +3962,8 @@ async function refresh() {
       syncLogsPolling();
     }
     if (s.app && s.app.version) {
-      document.getElementById("help-version").textContent = "DropStream v" + s.app.version;
+      document.getElementById("help-version").textContent =
+        "DropStream v" + s.app.version + (s.app.beta ? " (" + t("beta_tag") + ")" : "");
     }
 
     const dot = document.getElementById("status-dot");

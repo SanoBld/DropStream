@@ -7,8 +7,8 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      prerelease:
-        description: "Mark as a pre-release"
+      beta:
+        description: "Publish as a beta (marked as a pre-release on GitHub, never set as the latest release, and shown as beta in the app)"
         required: false
         default: false
         type: boolean
@@ -50,6 +50,7 @@ jobs:
     uses: ./.github/workflows/ci.yml
     with:
       version: ${{ needs.next-version.outputs.version }}
+      beta: ${{ inputs.beta }}
 
   publish:
     name: Publish release
@@ -78,13 +79,17 @@ jobs:
           body: |
             **DropStream, a fork of [Twitch Drops Miner by DevilXD](https://github.com/DevilXD/TwitchDropsMiner).**
 
+            ${{ inputs.beta && '**This is a beta build.**' || '' }}
+
             Windows, macOS (Apple Silicon), and Linux (x86_64 + ARM64) builds are attached below.
 
             - Published: `${{steps.vars.outputs.date_now}}`
             - Reference commit: ${{github.sha}}
           commit: ${{ github.sha }}
           generateReleaseNotes: true
-          makeLatest: true
-          name: DropStream v${{ needs.next-version.outputs.version }}
-          prerelease: ${{ inputs.prerelease }}
+          # every release keeps its own tag (v1, v2, ...): older releases are never touched or replaced
+          allowUpdates: false
+          makeLatest: ${{ inputs.beta && 'false' || 'true' }}
+          name: DropStream v${{ needs.next-version.outputs.version }}${{ inputs.beta && ' (beta)' || '' }}
+          prerelease: ${{ inputs.beta }}
           tag: v${{ needs.next-version.outputs.version }}

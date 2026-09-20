@@ -66,6 +66,7 @@ from scheduler import PowerAction, parse_hhmm
 import profiles as profiles_module
 from theme import PALETTES, resolve_theme, build_tab_icons
 from version import __version__
+import version as _version_module
 from logbuffer import console as _console_buffer
 if sys.platform == "win32":
     from registry import RegistryKey, ValueType, ValueNotFound
@@ -3220,7 +3221,7 @@ class HelpTab:
         ttk.Label(about, text="DropStream version: ", anchor="e").grid(
             column=0, row=0, sticky="nsew"
         )
-        ttk.Label(about, text=f"v{__version__}", anchor="w").grid(column=1, row=0, sticky="nsew")
+        ttk.Label(about, text=f"v{__version__}" + (" beta" if getattr(_version_module, "__beta__", False) else ""), anchor="w").grid(column=1, row=0, sticky="nsew")
         # About - based on
         ttk.Label(
             about, text="Based on: ", anchor="e"

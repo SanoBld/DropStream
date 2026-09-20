@@ -45,6 +45,7 @@ if __name__ == "__main__":
     from twitch import Twitch
     from settings import Settings
     from version import __version__
+    import version as _version_module
     from exceptions import CaptchaRequired
     from utils import lock_file, resource_path, set_root_icon
     from constants import LOGGING_LEVELS, SELF_PATH, FILE_FORMATTER, LOG_PATH, LOCK_PATH
@@ -127,7 +128,7 @@ if __name__ == "__main__":
         SELF_PATH.name,
         description="A program that allows you to mine timed drops on Twitch.",
     )
-    parser.add_argument("--version", action="version", version=f"v{__version__}")
+    parser.add_argument("--version", action="version", version=f"v{__version__}" + (" beta" if getattr(_version_module, "__beta__", False) else ""))
     parser.add_argument("-v", dest="_verbose", action="count", default=0)
     parser.add_argument("--tray", action="store_true")
     parser.add_argument("--log", action="store_true")

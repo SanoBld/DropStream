@@ -10,12 +10,22 @@ on:
         description: "Version to embed in the build (e.g. 4). Leave empty to compute it automatically."
         required: false
         type: string
+      beta:
+        description: "Mark this build as a beta (shown in the app)."
+        required: false
+        default: false
+        type: boolean
   workflow_dispatch:
     inputs:
       version:
         description: "Version to embed in the build (e.g. 4 or 4.2). Leave empty to compute it automatically."
         required: false
         type: string
+      beta:
+        description: "Mark this build as a beta (shown in the app)."
+        required: false
+        default: false
+        type: boolean
 
 env:
   PYTHON_VERSION: "3.10"
@@ -82,7 +92,10 @@ jobs:
         shell: bash
         env:
           APP_VERSION: ${{ needs.version.outputs.version }}
-        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
+          APP_BETA: ${{ inputs.beta && 'True' || 'False' }}
+        run: |
+          echo "__version__ = \"${APP_VERSION}\"" > version.py
+          echo "__beta__ = ${APP_BETA}" >> version.py
 
       - name: Validate language files
         run: |
@@ -114,7 +127,10 @@ jobs:
         shell: bash
         env:
           APP_VERSION: ${{ needs.version.outputs.version }}
-        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
+          APP_BETA: ${{ inputs.beta && 'True' || 'False' }}
+        run: |
+          echo "__version__ = \"${APP_VERSION}\"" > version.py
+          echo "__beta__ = ${APP_BETA}" >> version.py
 
       # Ensure Python version
       - name: Set up Python
@@ -190,7 +206,10 @@ jobs:
         shell: bash
         env:
           APP_VERSION: ${{ needs.version.outputs.version }}
-        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
+          APP_BETA: ${{ inputs.beta && 'True' || 'False' }}
+        run: |
+          echo "__version__ = \"${APP_VERSION}\"" > version.py
+          echo "__beta__ = ${APP_BETA}" >> version.py
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -242,7 +261,10 @@ jobs:
         shell: bash
         env:
           APP_VERSION: ${{ needs.version.outputs.version }}
-        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
+          APP_BETA: ${{ inputs.beta && 'True' || 'False' }}
+        run: |
+          echo "__version__ = \"${APP_VERSION}\"" > version.py
+          echo "__beta__ = ${APP_BETA}" >> version.py
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -299,7 +321,10 @@ jobs:
         shell: bash
         env:
           APP_VERSION: ${{ needs.version.outputs.version }}
-        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
+          APP_BETA: ${{ inputs.beta && 'True' || 'False' }}
+        run: |
+          echo "__version__ = \"${APP_VERSION}\"" > version.py
+          echo "__beta__ = ${APP_BETA}" >> version.py
 
       # Ensure Python version
       - name: Set up Python
@@ -378,7 +403,10 @@ jobs:
         shell: bash
         env:
           APP_VERSION: ${{ needs.version.outputs.version }}
-        run: echo "__version__ = \"${APP_VERSION}\"" > version.py
+          APP_BETA: ${{ inputs.beta && 'True' || 'False' }}
+        run: |
+          echo "__version__ = \"${APP_VERSION}\"" > version.py
+          echo "__beta__ = ${APP_BETA}" >> version.py
 
       - name: Set up variables
         id: vars

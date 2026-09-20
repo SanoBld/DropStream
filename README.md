@@ -226,6 +226,9 @@ Remote dashboard's Help tab.
 
 - **Publishing** (Actions > Release > Run workflow) picks the next whole number on its own: `v1`, `v2`, `v3`...
   and builds and publishes every platform with it.
+- Every release keeps its own tag, so older releases are never replaced or overwritten.
+- The Release workflow has a **beta** option: the release is marked as a pre-release on GitHub, is not set as
+  the latest release, and the app shows `beta` next to the version.
 - **Every other push** gets `v<last release>.<commits since it>`, e.g. `v4.1`, `v4.2`, `v4.3`, until the next
   release resets the counter.
 - `version.py` is only a fallback for running from source; the CI overwrites it at build time.
