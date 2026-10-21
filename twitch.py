@@ -1056,6 +1056,7 @@ class Twitch:
             last_sent: float = time()
             if not succeeded:
                 logger.log(CALL, f"Watch requested failed for channel: {channel.name}")
+                self.print(f"Envoi du visionnage refusé sur {channel.name}")
             # wait ~20 seconds for a progress update
             await asyncio.sleep(20)
             if self.gui.progress.minute_almost_done():
@@ -1089,6 +1090,7 @@ class Twitch:
                             f"{gql_drop.current_minutes}/{gql_drop.required_minutes})"
                         )
                         logger.log(CALL, f"Drop progress from GQL: {drop_text}")
+                        self.print(f"Progression CONFIRMÉE par Twitch (GQL) : {drop_text}")
                         handled = True
 
                 # Solution 2: If GQL fails, figure out which campaign we're most likely mining
@@ -1105,6 +1107,7 @@ class Twitch:
                                 f"{active_drop.current_minutes}/{active_drop.required_minutes})"
                             )
                         logger.log(CALL, f"Drop progress from active search: {drop_text}")
+                        self.print(f"Progression ESTIMÉE (Twitch ne confirme rien) : {drop_text}")
                         handled = True
                     else:
                         logger.log(CALL, "No active drop could be determined")
@@ -1490,6 +1493,7 @@ class Twitch:
         else:
             drop_text = "<Unknown>"
         logger.log(CALL, f"Drop update from websocket: {drop_text}")
+        self.print(f"Progression CONFIRMÉE par Twitch : {drop_text}")
         if drop is not None and drop.can_earn(self.watching_channel.get_with_default(None)):
             # the received payload is for the drop we expected
             if message["data"]["current_progress_min"] > drop.real_current_minutes:
