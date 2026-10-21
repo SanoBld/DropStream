@@ -504,3 +504,23 @@ class Game:
 
     def is_special(self) -> bool:
         return self.id in self.SPECIAL_GAME_IDS
+
+
+def set_background_mode(background: bool) -> None:
+    """Windows only, best effort: lower the process priority and release unused RAM while
+    the app is hidden in the tray. Never raises, and doesn't touch the mining logic."""
+    import sys
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        k32.GetCurrentProcess.restype = ctypes.c_void_p
+        handle = ctypes.c_void_p(k32.GetCurrentProcess())
+        # BELOW_NORMAL = 0x4000, NORMAL = 0x20
+        k32.SetPriorityClass(handle, 0x4000 if background else 0x20)
+        if background:
+            # drop pages that aren't in active use from the working set (Task Manager RAM)
+            ctypes.windll.psapi.EmptyWorkingSet(handle)
+    except Exception:
+        pass

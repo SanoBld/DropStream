@@ -48,7 +48,7 @@ if sys.platform == "darwin":
 from translate import _
 from cache import ImageCache
 from exceptions import MinerException, ExitRequest
-from utils import resource_path, set_root_icon, webopen, task_wrapper, Game, _T
+from utils import resource_path, set_root_icon, webopen, task_wrapper, set_background_mode, Game, _T
 from constants import (
     MAX_INT,
     SELF_PATH,
@@ -1300,6 +1300,7 @@ class TrayIcon:
             self._manager._cache.trim()
             self._manager._inventory_dirty = True
             gc.collect()
+            set_background_mode(True)
 
     def restore(self):
         if self.icon is not None:
@@ -1307,6 +1308,7 @@ class TrayIcon:
             self.icon.visible = False
         self._manager._root.deiconify()
         self._manager._minimized = False
+        set_background_mode(False)
         if self._manager._twitch.settings.low_power_tray_mode and hasattr(
             self._manager, "dashboard"
         ):
@@ -4106,7 +4108,7 @@ class GUIManager:
         # Cheap either way (a dict lookup unless the OS setting actually changed), but only
         # worth checking at all when a theme is actually set to "auto".
         theme = self._twitch.settings.theme
-        if theme.endswith("auto"):
+        if theme.endswith("auto") and not self._minimized:
             dark, _style = resolve_theme(theme)
             if dark != getattr(self, "_current_theme_dark", None):
                 self.apply_theme_choice(theme)
