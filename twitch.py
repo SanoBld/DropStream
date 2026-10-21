@@ -482,7 +482,7 @@ class Twitch:
         self._qgl_limiter = RateLimiter(capacity=5, window=1)
         # Client type, session and auth
         self._client_type: ClientInfo = (
-            getattr(ClientType, settings.login_client, None) or ClientType.ANDROID_APP
+            getattr(ClientType, settings.login_client, None) or ClientType.SMARTBOX
         )
         self._session: aiohttp.ClientSession | None = None
         self._auth_state: _AuthState = _AuthState(self)
@@ -1599,7 +1599,7 @@ class Twitch:
         # Use a flag to retry the request a single time, if a specific set of errors is encountered
         single_retry: bool = True
         # same for a rejected OAuth token: drop the session once and log in again
-        auth_retry: bool = True
+        auth_retries: int = 3
         for delay in backoff:
             async with self._qgl_limiter:
                 auth_state = await self.get_auth()
@@ -1660,10 +1660,16 @@ class Twitch:
                         raise GQLException(response_json['errors'])
                 # Other error handling
                 elif "error" in response_json:
-                    if auth_retry and "token is invalid" in str(response_json.get("message", "")):
-                        auth_retry = False
-                        logger.warning("GQL rejected the token, resetting the session")
+                    if auth_retries > 0 and "token is invalid" in str(response_json.get("message", "")):
+                        # this client's token is refused by GQL: reset the session and
+                        # log in again with the next known client
+                        auth_retries -= 1
+                        order = [ClientType.SMARTBOX, ClientType.MOBILE_WEB, ClientType.ANDROID_APP]
+                        idx = next((i for i, c in enumerate(order) if c is self._client_type), -1)
+                        nxt = order[(idx + 1) % len(order)]
+                        logger.warning(f"GQL rejected the token, retrying with another client")
                         auth_state.invalidate(delete_cookies=True)
+                        self.set_client_type(nxt)
                         force_retry = True
                         break
                     raise GQLException(
