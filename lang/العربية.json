@@ -31,7 +31,7 @@
         "captcha": ".يرجى المحاولة مجدداَ بعد مرور 12 ساعة \n .CAPTCHA تم رفض محاولة تسجيل الدخول الخاصة بك من قبل",
         "site_down": "...ثانية {seconds} معطل  ، إعادة المحاولة خلال Twitch",
         "no_connection": "...ثانية {seconds} إعادة المحاولة خلال ، Twitch لا يمكن الإتصال بـ ({url})",
-        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
+        "login_rejected": "رفض Twitch طلب تسجيل الدخول ({reason}). إعادة المحاولة خلال {seconds} ثانية..."
     },
     "gui": {
         "output": "الإخراج",

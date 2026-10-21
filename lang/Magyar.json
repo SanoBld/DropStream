@@ -31,7 +31,7 @@
         "captcha": "A bejelentkezési kísérletet a CAPTCHA elutasította.\nPróbáld újra legalább 12 óra múlva.",
         "site_down": "A Twitch nem elérhető, újrapróbálkozás {seconds} másodperc múlva...",
         "no_connection": "Nem sikerült csatlakozni a Twitchhez, újrapróbálkozás {seconds} másodperc múlva... ({url})",
-        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
+        "login_rejected": "A Twitch elutasította a bejelentkezési kérést ({reason}). Újrapróbálkozás {seconds} másodperc múlva..."
     },
     "gui": {
         "output": "Kimenet",

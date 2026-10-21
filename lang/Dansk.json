@@ -31,7 +31,7 @@
         "captcha": "Dit loginforsøg blev afvist af CAPTCHA.\nPrøv venligst igen om 12+ timer",
         "site_down": "Twitch er nede, prøver igen om {seconds} sekunder...",
         "no_connection": "Kan ikke oprette forbindelse til Twitch, prøver igen om {seconds} sekunder... ({url})",
-        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
+        "login_rejected": "Twitch afviste loginanmodningen ({reason}). Prøver igen om {seconds} sekunder..."
     },
     "gui": {
         "output": "Resultat",

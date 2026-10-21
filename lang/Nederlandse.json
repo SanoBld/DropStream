@@ -31,7 +31,7 @@
         "captcha": "De inlogpoging is geweigerd door CAPTCHA.\nProbeer het over minimaal 12 uur opnieuw.",
         "site_down": "Twitch is niet beschikbaar. Probeer het over {seconds} seconden opnieuw...",
         "no_connection": "Kan geen verbinding maken met Twitch. Probeer het over {seconds} seconden opnieuw... ({url})",
-        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
+        "login_rejected": "Twitch heeft het inlogverzoek geweigerd ({reason}). Opnieuw proberen over {seconds} seconden..."
     },
     "gui": {
         "output": "Protocol",

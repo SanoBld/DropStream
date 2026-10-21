@@ -31,7 +31,7 @@
         "captcha": "Ваша спроба входу була відхилена через капчу.\nБудь ласка, спробуйте ще раз через 12 або більше годин.",
         "site_down": "Twitch не працює, спроба через {seconds} секунд...",
         "no_connection": "Не вдається з'єднатися з Twitch, повторна спроба через {seconds} секунд... ({url})",
-        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
+        "login_rejected": "Twitch відхилив запит на вхід ({reason}). Повторна спроба через {seconds} с..."
     },
     "gui": {
         "output": "Вивід",
