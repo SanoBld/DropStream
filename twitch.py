@@ -1598,6 +1598,8 @@ class Twitch:
         backoff = ExponentialBackoff(maximum=60)
         # Use a flag to retry the request a single time, if a specific set of errors is encountered
         single_retry: bool = True
+        # same for a rejected OAuth token: drop the session once and log in again
+        auth_retry: bool = True
         for delay in backoff:
             async with self._qgl_limiter:
                 auth_state = await self.get_auth()
@@ -1658,6 +1660,12 @@ class Twitch:
                         raise GQLException(response_json['errors'])
                 # Other error handling
                 elif "error" in response_json:
+                    if auth_retry and "token is invalid" in str(response_json.get("message", "")):
+                        auth_retry = False
+                        logger.warning("GQL rejected the token, resetting the session")
+                        auth_state.invalidate(delete_cookies=True)
+                        force_retry = True
+                        break
                     raise GQLException(
                         f"{response_json['error']}: {response_json['message']}"
                     )
