@@ -1199,6 +1199,8 @@ class Twitch:
 
     def _note_progress(self, drop_text: str) -> None:
         # real progress: reset the warnings, and confirm once (again after a stall)
+        if getattr(self, "_stall_warned", False):
+            self.gui.tray.change_icon("active")  # back to green: progress resumed
         self._stall_warned = False
         self._est_warned = False
         if not getattr(self, "_progress_confirmed", False):
@@ -1216,6 +1218,7 @@ class Twitch:
         if minutes >= 5:
             self._stall_warned = True
             self._progress_confirmed = False
+            self.gui.tray.change_icon("maint")  # orange: Twitch doesn't credit the watch time
             self.print(
                 _("error", "progress_stalled").format(minutes=minutes, channel=channel.name)
             )
