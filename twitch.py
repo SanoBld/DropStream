@@ -1599,7 +1599,7 @@ class Twitch:
         # Use a flag to retry the request a single time, if a specific set of errors is encountered
         single_retry: bool = True
         # same for a rejected OAuth token: drop the session once and log in again
-        auth_retries: int = 3
+        auth_retries: int = 1
         for delay in backoff:
             async with self._qgl_limiter:
                 auth_state = await self.get_auth()
@@ -1660,18 +1660,32 @@ class Twitch:
                         raise GQLException(response_json['errors'])
                 # Other error handling
                 elif "error" in response_json:
-                    if auth_retries > 0 and "token is invalid" in str(response_json.get("message", "")):
-                        # this client's token is refused by GQL: reset the session and
-                        # log in again with the next known client
-                        auth_retries -= 1
-                        order = [ClientType.SMARTBOX, ClientType.MOBILE_WEB, ClientType.ANDROID_APP]
-                        idx = next((i for i, c in enumerate(order) if c is self._client_type), -1)
-                        nxt = order[(idx + 1) % len(order)]
-                        logger.warning(f"GQL rejected the token, retrying with another client")
-                        auth_state.invalidate(delete_cookies=True)
-                        self.set_client_type(nxt)
-                        force_retry = True
-                        break
+                    if "token is invalid" in str(response_json.get("message", "")):
+                        # find out whether the token itself is dead, or only refused by GQL
+                        async with self.request(
+                            "GET", "https://id.twitch.tv/oauth2/validate",
+                            headers={"Authorization": f"OAuth {auth_state.access_token}"},
+                        ) as vresp:
+                            vstatus = vresp.status
+                            try:
+                                vinfo = await vresp.json(content_type=None)
+                            except Exception:
+                                vinfo = None
+                        ci = self._client_type
+                        logger.warning(
+                            f"GQL refused the token: client={ci.CLIENT_ID}, "
+                            f"validate=HTTP {vstatus}, info={vinfo}"
+                        )
+                        if vstatus == 401 and auth_retries > 0:
+                            # the token is really dead: log in again, once
+                            auth_retries -= 1
+                            auth_state.invalidate(delete_cookies=True)
+                            force_retry = True
+                            break
+                        self.print(
+                            f"GQL refused the token (client {ci.CLIENT_ID[:6]}..., "
+                            f"validate: HTTP {vstatus}). Session kept."
+                        )
                     raise GQLException(
                         f"{response_json['error']}: {response_json['message']}"
                     )
