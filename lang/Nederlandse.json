@@ -31,7 +31,11 @@
         "captcha": "De inlogpoging is geweigerd door CAPTCHA.\nProbeer het over minimaal 12 uur opnieuw.",
         "site_down": "Twitch is niet beschikbaar. Probeer het over {seconds} seconden opnieuw...",
         "no_connection": "Kan geen verbinding maken met Twitch. Probeer het over {seconds} seconden opnieuw... ({url})",
-        "login_rejected": "Twitch heeft het inlogverzoek geweigerd ({reason}). Opnieuw proberen over {seconds} seconden..."
+        "login_rejected": "Twitch heeft het inlogverzoek geweigerd ({reason}). Opnieuw proberen over {seconds} seconden...",
+        "progress_confirmed": "Twitch bevestigt de drop-voortgang: {drop}",
+        "progress_stalled": "Al {minutes} min geen drop-voortgang: Twitch lijkt de kijktijd op {channel} niet te tellen.",
+        "progress_estimated": "Voortgang lokaal geschat, Twitch bevestigt niets ({channel}).",
+        "watch_refused": "Twitch heeft het kijksignaal op {channel} geweigerd."
     },
     "gui": {
         "output": "Protocol",

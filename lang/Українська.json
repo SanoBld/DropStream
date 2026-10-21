@@ -31,7 +31,11 @@
         "captcha": "Ваша спроба входу була відхилена через капчу.\nБудь ласка, спробуйте ще раз через 12 або більше годин.",
         "site_down": "Twitch не працює, спроба через {seconds} секунд...",
         "no_connection": "Не вдається з'єднатися з Twitch, повторна спроба через {seconds} секунд... ({url})",
-        "login_rejected": "Twitch відхилив запит на вхід ({reason}). Повторна спроба через {seconds} с..."
+        "login_rejected": "Twitch відхилив запит на вхід ({reason}). Повторна спроба через {seconds} с...",
+        "progress_confirmed": "Twitch підтверджує прогрес дропу: {drop}",
+        "progress_stalled": "Немає прогресу дропу вже {minutes} хв: схоже, Twitch не зараховує час перегляду на {channel}.",
+        "progress_estimated": "Прогрес оцінено локально, Twitch нічого не підтверджує ({channel}).",
+        "watch_refused": "Twitch відхилив сигнал перегляду на {channel}."
     },
     "gui": {
         "output": "Вивід",

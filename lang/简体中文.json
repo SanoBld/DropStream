@@ -31,7 +31,11 @@
         "captcha": "由于验证码验证失败，您的登录请求已被Twitch拒绝，请在12小时后重试。",
         "site_down": "无法连接到Twitch，将在{seconds}秒后重试...",
         "no_connection": "无法连接到Twitch，将在{seconds}秒后重试，请确保您已经登录到当前网络。若您的网络无法直连Twitch，请在教程指导下开启VPN及添加代理。({url})",
-        "login_rejected": "Twitch 拒绝了登录请求（{reason}）。将在 {seconds} 秒后重试..."
+        "login_rejected": "Twitch 拒绝了登录请求（{reason}）。将在 {seconds} 秒后重试...",
+        "progress_confirmed": "Twitch 已确认掉落进度：{drop}",
+        "progress_stalled": "已有 {minutes} 分钟没有掉落进度：Twitch 似乎没有计入 {channel} 的观看时间。",
+        "progress_estimated": "进度为本地估算，Twitch 未确认任何内容（{channel}）。",
+        "watch_refused": "Twitch 拒绝了 {channel} 的观看信号。"
     },
     "gui": {
         "output": "运行日志",

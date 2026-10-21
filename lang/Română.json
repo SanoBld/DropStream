@@ -31,7 +31,11 @@
         "captcha": "Conexiunea a fost respinsă de CAPTCHA. Vă rugăm să încercați din nou în aprox. 12 ore.",
         "site_down": "Twitch nu este disponibil. Vă rugăm să încercați din nou în {seconds} secunde...",
         "no_connection": "Nu se poate conecta la Twitch. Vă rugăm să încercați din nou în {seconds} secunde... ({url})",
-        "login_rejected": "Twitch a refuzat cererea de autentificare ({reason}). Reîncerc în {seconds} secunde..."
+        "login_rejected": "Twitch a refuzat cererea de autentificare ({reason}). Reîncerc în {seconds} secunde...",
+        "progress_confirmed": "Twitch confirmă progresul drop-ului: {drop}",
+        "progress_stalled": "Niciun progres al drop-ului de {minutes} min: Twitch pare să nu numere timpul de vizionare pe {channel}.",
+        "progress_estimated": "Progres estimat local, Twitch nu confirmă nimic ({channel}).",
+        "watch_refused": "Twitch a refuzat semnalul de vizionare pe {channel}."
     },
     "gui": {
         "output": "Ieșire",

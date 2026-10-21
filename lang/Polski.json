@@ -31,7 +31,11 @@
         "captcha": "Próba logowania została odrzucona przez CAPTCHA.\nProszę spróbować ponownie za co najmniej 12 godzin.",
         "site_down": "Strona Twitcha jest obecnie niedostępna. Ponów próbę za {seconds} s....",
         "no_connection": "Nie można połączyć się z Twitchem. Ponów próbę za {seconds} s.... ({url})",
-        "login_rejected": "Twitch odrzucił żądanie logowania ({reason}). Ponowna próba za {seconds} s..."
+        "login_rejected": "Twitch odrzucił żądanie logowania ({reason}). Ponowna próba za {seconds} s...",
+        "progress_confirmed": "Twitch potwierdza postęp dropu: {drop}",
+        "progress_stalled": "Brak postępu dropu od {minutes} min: Twitch chyba nie zalicza czasu oglądania na {channel}.",
+        "progress_estimated": "Postęp oszacowany lokalnie, Twitch niczego nie potwierdza ({channel}).",
+        "watch_refused": "Twitch odrzucił sygnał oglądania na {channel}."
     },
     "gui": {
         "output": "Dziennik zdarzeń",

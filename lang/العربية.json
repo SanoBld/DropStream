@@ -31,7 +31,11 @@
         "captcha": ".يرجى المحاولة مجدداَ بعد مرور 12 ساعة \n .CAPTCHA تم رفض محاولة تسجيل الدخول الخاصة بك من قبل",
         "site_down": "...ثانية {seconds} معطل  ، إعادة المحاولة خلال Twitch",
         "no_connection": "...ثانية {seconds} إعادة المحاولة خلال ، Twitch لا يمكن الإتصال بـ ({url})",
-        "login_rejected": "رفض Twitch طلب تسجيل الدخول ({reason}). إعادة المحاولة خلال {seconds} ثانية..."
+        "login_rejected": "رفض Twitch طلب تسجيل الدخول ({reason}). إعادة المحاولة خلال {seconds} ثانية...",
+        "progress_confirmed": "تؤكد Twitch تقدم الدروب: {drop}",
+        "progress_stalled": "لا يوجد تقدم في الدروب منذ {minutes} دقيقة: يبدو أن Twitch لا تحتسب وقت المشاهدة على {channel}.",
+        "progress_estimated": "التقدم مقدَّر محليًا ولا تؤكد Twitch شيئًا ({channel}).",
+        "watch_refused": "رفضت Twitch إشارة المشاهدة على {channel}."
     },
     "gui": {
         "output": "الإخراج",

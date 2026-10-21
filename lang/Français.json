@@ -31,7 +31,11 @@
         "captcha": "La connexion a été rejetée par CAPTCHA. Veuillez réessayer dans env. 12 heures.",
         "site_down": "Twitch n'est pas disponible. Veuillez réessayer dans {seconds} secondes...",
         "no_connection": "Impossible de se connecter à Twitch. Veuillez réessayer dans {seconds} secondes... ({url})",
-        "login_rejected": "Twitch a refusé la demande de connexion ({reason}). Nouvelle tentative dans {seconds} secondes..."
+        "login_rejected": "Twitch a refusé la demande de connexion ({reason}). Nouvelle tentative dans {seconds} secondes...",
+        "progress_confirmed": "Twitch confirme la progression du drop : {drop}",
+        "progress_stalled": "Aucune progression du drop depuis {minutes} min : Twitch ne semble pas créditer le temps de visionnage sur {channel}.",
+        "progress_estimated": "Progression estimée localement, Twitch ne confirme rien ({channel}).",
+        "watch_refused": "Twitch a refusé le signal de visionnage sur {channel}."
     },
     "gui": {
         "output": "Sortie",

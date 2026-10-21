@@ -31,7 +31,11 @@
         "captcha": "Vaše připojení bylo zamítnuto službou Twitch, zkuste to znovu za 12 hodin.",
         "site_down": "Služba Twitch je nedostupná，zkuste to znovu za {seconds} sekund...",
         "no_connection": "Nelze se připojit k službe Twitch, zkuste to znovu za {seconds}... ({url})",
-        "login_rejected": "Twitch odmítl požadavek na přihlášení ({reason}). Další pokus za {seconds} s..."
+        "login_rejected": "Twitch odmítl požadavek na přihlášení ({reason}). Další pokus za {seconds} s...",
+        "progress_confirmed": "Twitch potvrzuje postup dropu: {drop}",
+        "progress_stalled": "{minutes} min žádný postup dropu: Twitch zřejmě nezapočítává dobu sledování na {channel}.",
+        "progress_estimated": "Postup je odhadnut lokálně, Twitch nic nepotvrzuje ({channel}).",
+        "watch_refused": "Twitch odmítl signál sledování na {channel}."
     },
     "gui": {
         "output": "Výstup",

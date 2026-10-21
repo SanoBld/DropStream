@@ -31,7 +31,11 @@
         "captcha": "Попытка входа в систему была отклонена CAPTCHA.\nПожалуйста, повторите попытку не менее чем через 12 часов.",
         "site_down": "Twitch недоступен. Повторите попытку через {seconds} секунд...",
         "no_connection": "Невозможно подключиться к Twitch. Повторите попытку через {seconds} секунд... ({url})",
-        "login_rejected": "Twitch отклонил запрос на вход ({reason}). Повтор через {seconds} с..."
+        "login_rejected": "Twitch отклонил запрос на вход ({reason}). Повтор через {seconds} с...",
+        "progress_confirmed": "Twitch подтверждает прогресс дропа: {drop}",
+        "progress_stalled": "Нет прогресса дропа уже {minutes} мин: похоже, Twitch не засчитывает время просмотра на {channel}.",
+        "progress_estimated": "Прогресс оценён локально, Twitch ничего не подтверждает ({channel}).",
+        "watch_refused": "Twitch отклонил сигнал просмотра на {channel}."
     },
     "gui": {
         "output": "Протокол",

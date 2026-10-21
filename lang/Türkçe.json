@@ -31,7 +31,11 @@
         "captcha": "Giriş denemeniz CAPTCHA tarafından reddedildi.\nLütfen 12+ saat sonra tekrar deneyin.",
         "site_down": "Twitch çöktü, {seconds} saniye içinde tekrar deneniyor...",
         "no_connection": "Twitch'e bağlanılamıyor, {seconds} saniye içinde tekrar deneniyor... ({url})",
-        "login_rejected": "Twitch giriş isteğini reddetti ({reason}). {seconds} saniye sonra yeniden denenecek..."
+        "login_rejected": "Twitch giriş isteğini reddetti ({reason}). {seconds} saniye sonra yeniden denenecek...",
+        "progress_confirmed": "Twitch drop ilerlemesini doğruluyor: {drop}",
+        "progress_stalled": "{minutes} dakikadır drop ilerlemesi yok: Twitch {channel} üzerindeki izleme süresini saymıyor gibi görünüyor.",
+        "progress_estimated": "İlerleme yerel olarak tahmin edildi, Twitch hiçbir şeyi doğrulamıyor ({channel}).",
+        "watch_refused": "Twitch, {channel} üzerindeki izleme sinyalini reddetti."
     },
     "gui": {
         "output": "Çıktı",

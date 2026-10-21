@@ -1056,7 +1056,11 @@ class Twitch:
             last_sent: float = time()
             if not succeeded:
                 logger.log(CALL, f"Watch requested failed for channel: {channel.name}")
-                self.print(f"Envoi du visionnage refusé sur {channel.name}")
+                if not getattr(self, "_watch_fail_warned", False):
+                    self._watch_fail_warned = True
+                    self.print(_("error", "watch_refused").format(channel=channel.name))
+            else:
+                self._watch_fail_warned = False
             # wait ~20 seconds for a progress update
             await asyncio.sleep(20)
             if self.gui.progress.minute_almost_done():
@@ -1084,13 +1088,16 @@ class Twitch:
                     if gql_drop is not None and gql_drop.can_earn(channel):
                         if drop_data["currentMinutesWatched"] > gql_drop.real_current_minutes:
                             self._mark_real_progress()
+                            self._note_progress(
+                                f"{gql_drop.name} ({gql_drop.campaign.game}, "
+                                f"{drop_data['currentMinutesWatched']}/{gql_drop.required_minutes})"
+                            )
                         gql_drop.update_minutes(drop_data["currentMinutesWatched"])
                         drop_text: str = (
                             f"{gql_drop.name} ({gql_drop.campaign.game}, "
                             f"{gql_drop.current_minutes}/{gql_drop.required_minutes})"
                         )
                         logger.log(CALL, f"Drop progress from GQL: {drop_text}")
-                        self.print(f"Progression CONFIRMÉE par Twitch (GQL) : {drop_text}")
                         handled = True
 
                 # Solution 2: If GQL fails, figure out which campaign we're most likely mining
@@ -1107,10 +1114,13 @@ class Twitch:
                                 f"{active_drop.current_minutes}/{active_drop.required_minutes})"
                             )
                         logger.log(CALL, f"Drop progress from active search: {drop_text}")
-                        self.print(f"Progression ESTIMÉE (Twitch ne confirme rien) : {drop_text}")
+                        if not getattr(self, "_est_warned", False):
+                            self._est_warned = True
+                            self.print(_("error", "progress_estimated").format(channel=channel.name))
                         handled = True
                     else:
                         logger.log(CALL, "No active drop could be determined")
+            self._warn_progress_stall(channel)
             self._check_stall(channel)
             await self._watch_sleep(interval - min(time() - last_sent, interval))
 
@@ -1186,6 +1196,29 @@ class Twitch:
             # and this channel is ACL-based and the watching channel isn't
             and channel.acl_based > watching_channel.acl_based
         )
+
+    def _note_progress(self, drop_text: str) -> None:
+        # real progress: reset the warnings, and confirm once (again after a stall)
+        self._stall_warned = False
+        self._est_warned = False
+        if not getattr(self, "_progress_confirmed", False):
+            self._progress_confirmed = True
+            self.print(_("error", "progress_confirmed").format(drop=drop_text))
+
+    def _warn_progress_stall(self, channel: Channel) -> None:
+        if getattr(self, "_stall_channel", None) is not channel:
+            self._stall_channel = channel
+            self._stall_ref = time()
+        if getattr(self, "_stall_warned", False):
+            return
+        ref = max(self._last_real_progress, self._stall_ref)
+        minutes = int((time() - ref) // 60)
+        if minutes >= 5:
+            self._stall_warned = True
+            self._progress_confirmed = False
+            self.print(
+                _("error", "progress_stalled").format(minutes=minutes, channel=channel.name)
+            )
 
     def _mark_real_progress(self) -> None:
         self._last_real_progress = time()
@@ -1493,11 +1526,11 @@ class Twitch:
         else:
             drop_text = "<Unknown>"
         logger.log(CALL, f"Drop update from websocket: {drop_text}")
-        self.print(f"Progression CONFIRMÉE par Twitch : {drop_text}")
         if drop is not None and drop.can_earn(self.watching_channel.get_with_default(None)):
             # the received payload is for the drop we expected
             if message["data"]["current_progress_min"] > drop.real_current_minutes:
                 self._mark_real_progress()
+                self._note_progress(drop_text)
             drop.update_minutes(message["data"]["current_progress_min"])
 
     @task_wrapper

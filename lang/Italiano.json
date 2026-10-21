@@ -31,7 +31,11 @@
         "captcha": "Il tuo tentativo di login è stato negato da CAPTCHA.\nRiprova tra 12+ ore.",
         "site_down": "Twitch è irraggiungibile, riprovo tra {seconds} secondi...",
         "no_connection": "Impossibile connettersi a Twitch, riprovo tra {seconds} secondi... ({url})",
-        "login_rejected": "Twitch ha rifiutato la richiesta di accesso ({reason}). Nuovo tentativo tra {seconds} secondi..."
+        "login_rejected": "Twitch ha rifiutato la richiesta di accesso ({reason}). Nuovo tentativo tra {seconds} secondi...",
+        "progress_confirmed": "Twitch conferma l'avanzamento del drop: {drop}",
+        "progress_stalled": "Nessun avanzamento del drop da {minutes} min: Twitch sembra non conteggiare il tempo di visione su {channel}.",
+        "progress_estimated": "Avanzamento stimato localmente, Twitch non conferma nulla ({channel}).",
+        "watch_refused": "Twitch ha rifiutato il segnale di visione su {channel}."
     },
     "gui": {
         "output": "Output",

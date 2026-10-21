@@ -31,7 +31,11 @@
         "captcha": "A bejelentkezési kísérletet a CAPTCHA elutasította.\nPróbáld újra legalább 12 óra múlva.",
         "site_down": "A Twitch nem elérhető, újrapróbálkozás {seconds} másodperc múlva...",
         "no_connection": "Nem sikerült csatlakozni a Twitchhez, újrapróbálkozás {seconds} másodperc múlva... ({url})",
-        "login_rejected": "A Twitch elutasította a bejelentkezési kérést ({reason}). Újrapróbálkozás {seconds} másodperc múlva..."
+        "login_rejected": "A Twitch elutasította a bejelentkezési kérést ({reason}). Újrapróbálkozás {seconds} másodperc múlva...",
+        "progress_confirmed": "A Twitch megerősíti a drop előrehaladását: {drop}",
+        "progress_stalled": "{minutes} perce nincs drop-előrehaladás: a Twitch úgy tűnik, nem számítja be a nézési időt itt: {channel}.",
+        "progress_estimated": "Az előrehaladás helyben becsült, a Twitch nem erősít meg semmit ({channel}).",
+        "watch_refused": "A Twitch elutasította a nézési jelzést itt: {channel}."
     },
     "gui": {
         "output": "Kimenet",

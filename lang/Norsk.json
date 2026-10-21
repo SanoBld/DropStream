@@ -31,7 +31,11 @@
         "captcha": "Innloggingsforsøket ditt ble avvist av CAPTCHA.\nVennligst prøv igjen om 12+ timer.",
         "site_down": "Twitch er nede, prøver igjen om {seconds} sekunder...",
         "no_connection": "Kan ikke koble til Twitch, prøver igjen om {seconds} sekunder... ({url})",
-        "login_rejected": "Twitch avviste påloggingsforespørselen ({reason}). Prøver igjen om {seconds} sekunder..."
+        "login_rejected": "Twitch avviste påloggingsforespørselen ({reason}). Prøver igjen om {seconds} sekunder...",
+        "progress_confirmed": "Twitch bekrefter drop-fremdriften: {drop}",
+        "progress_stalled": "Ingen drop-fremdrift på {minutes} min: Twitch ser ikke ut til å telle visningstiden på {channel}.",
+        "progress_estimated": "Fremdriften er estimert lokalt, Twitch bekrefter ingenting ({channel}).",
+        "watch_refused": "Twitch avviste visningssignalet på {channel}."
     },
     "gui": {
         "output": "Utdata",

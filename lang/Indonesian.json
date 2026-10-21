@@ -31,7 +31,11 @@
         "captcha": "Sambungan ditolak oleh CAPTCHA. Silakan coba lagi dalam waktu sekitar 12 jam.",
         "site_down": "Twitch tidak tersedia. Silakan coba lagi dalam {seconds} detik...",
         "no_connection": "Tidak dapat tersambung ke Twitch. Silakan coba lagi dalam {detik} detik... ({url})",
-        "login_rejected": "Twitch menolak permintaan login ({reason}). Mencoba lagi dalam {seconds} detik..."
+        "login_rejected": "Twitch menolak permintaan login ({reason}). Mencoba lagi dalam {seconds} detik...",
+        "progress_confirmed": "Twitch mengonfirmasi progres drop: {drop}",
+        "progress_stalled": "Tidak ada progres drop selama {minutes} menit: Twitch sepertinya tidak menghitung waktu menonton di {channel}.",
+        "progress_estimated": "Progres diperkirakan secara lokal, Twitch tidak mengonfirmasi apa pun ({channel}).",
+        "watch_refused": "Twitch menolak sinyal menonton di {channel}."
     },
     "gui": {
         "output": "Keluaran",

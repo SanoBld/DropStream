@@ -48,6 +48,10 @@ class ErrorMessages(TypedDict):
     no_connection: str
     site_down: str
     login_rejected: str
+    progress_confirmed: str
+    progress_stalled: str
+    progress_estimated: str
+    watch_refused: str
 
 
 class GUIStatus(TypedDict):
@@ -414,6 +418,10 @@ default_translation: Translation = {
         "site_down": "Twitch is down, retrying in {seconds} seconds...",
         "no_connection": "Cannot connect to Twitch, retrying in {seconds} seconds... ({url})",
         "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds...",
+        "progress_confirmed": "Twitch confirms the drop progress: {drop}",
+        "progress_stalled": "No drop progress for {minutes} min: Twitch does not seem to credit the watch time on {channel}.",
+        "progress_estimated": "Progress estimated locally, Twitch confirms nothing ({channel}).",
+        "watch_refused": "Twitch refused the watch signal on {channel}.",
     },
     "gui": {
         "output": "Output",
