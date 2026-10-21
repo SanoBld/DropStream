@@ -495,9 +495,23 @@ class Channel:
     async def send_watch(self) -> bool:
         if self._stream is None:
             return False
-        if self._spade_url is None:
-            self._spade_url = await self.get_spade_url()
+        ok = await self._send_watch_spade()
+        # Twitch isn't crediting the watch time (flagged by the stall warning): also send the
+        # other kinds of "watching" signals, in case one of them is the one it counts
+        if getattr(self._twitch, "_stall_warned", False):
+            for extra in (self._send_watch_gql, self._send_watch_playlist):
+                try:
+                    ok = bool(await extra()) or ok
+                except Exception:
+                    pass
+        return ok
+
+    async def _send_watch_spade(self) -> bool:
+        if self._stream is None:
+            return False
         try:
+            if self._spade_url is None:
+                self._spade_url = await self.get_spade_url()
             async with self._twitch.request(
                 "POST", self._spade_url, data=self._stream.spade_payload
             ) as response:
