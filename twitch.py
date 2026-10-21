@@ -84,6 +84,7 @@ SAFE_LOADS = lambda s: json.loads(s, cls=SkipExtraJsonDecoder)
 # (initial fetch, manual reload, hourly maintenance reload). This avoids hammering
 # the GQL inventory endpoint every time a single drop/campaign finishes.
 INVENTORY_FETCH_COOLDOWN = timedelta(hours=6)
+STALL_LIMIT = 15 * 60  # seconds without real progress before self-healing
 
 
 class _AuthState:
@@ -493,6 +494,9 @@ class Twitch:
         self.watching_channel: AwaitableValue[Channel] = AwaitableValue()
         self._watching_task: asyncio.Task[None] | None = None
         self._watching_restart = asyncio.Event()
+        # last time Twitch really confirmed progress (not the fake "pretend" one)
+        self._last_real_progress: float = time()
+        self._stall_count: int = 0
         # Websocket
         self.websocket = WebsocketPool(self)
         # Maintenance task
@@ -1053,6 +1057,8 @@ class Twitch:
                 if drop_data is not None:
                     gql_drop: TimedDrop | None = self._drops.get(drop_data["dropID"])
                     if gql_drop is not None and gql_drop.can_earn(channel):
+                        if drop_data["currentMinutesWatched"] > gql_drop.real_current_minutes:
+                            self._mark_real_progress()
                         gql_drop.update_minutes(drop_data["currentMinutesWatched"])
                         drop_text: str = (
                             f"{gql_drop.name} ({gql_drop.campaign.game}, "
@@ -1078,6 +1084,7 @@ class Twitch:
                         handled = True
                     else:
                         logger.log(CALL, "No active drop could be determined")
+            self._check_stall(channel)
             await self._watch_sleep(interval - min(time() - last_sent, interval))
 
     @task_wrapper(critical=True)
@@ -1153,7 +1160,27 @@ class Twitch:
             and channel.acl_based > watching_channel.acl_based
         )
 
+    def _mark_real_progress(self) -> None:
+        self._last_real_progress = time()
+        self._stall_count = 0
+
+    def _check_stall(self, channel: Channel) -> None:
+        # no real progress for a long time while "mining": self-heal
+        if time() - self._last_real_progress < STALL_LIMIT:
+            return
+        self._stall_count += 1
+        self._last_real_progress = time()
+        channel._spade_url = None  # force a fresh spade url
+        msg = f"No real drop progress for {STALL_LIMIT // 60} min (#{self._stall_count})"
+        logger.warning(msg)
+        self.print(msg)
+        if self._stall_count >= 2:
+            self.force_reload()  # full refresh + new channel selection
+        else:
+            self.restart_watching()
+
     def watch(self, channel: Channel, *, update_status: bool = True):
+        self._last_real_progress = time()  # new channel: restart the stall timer
         self.gui.tray.change_icon("active")
         self.gui.channels.set_watching(channel)
         self.watching_channel.set(channel)
@@ -1394,6 +1421,7 @@ class Twitch:
                     f"Drop claim ID: {message['data']['drop_instance_id']}"
                 )
                 return
+            self._mark_real_progress()
             drop.update_claim(message["data"]["drop_instance_id"])
             campaign = drop.campaign
             await drop.claim()
@@ -1440,6 +1468,8 @@ class Twitch:
         logger.log(CALL, f"Drop update from websocket: {drop_text}")
         if drop is not None and drop.can_earn(self.watching_channel.get_with_default(None)):
             # the received payload is for the drop we expected
+            if message["data"]["current_progress_min"] > drop.real_current_minutes:
+                self._mark_real_progress()
             drop.update_minutes(message["data"]["current_progress_min"])
 
     @task_wrapper

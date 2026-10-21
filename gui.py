@@ -3319,19 +3319,30 @@ class HelpTab:
         asyncio.create_task(task_wrapper(self._invalidate_token)())
 
     async def _invalidate_token(self) -> None:
-        auth_state = await self._twitch.get_auth()
-        async with self._twitch.request(
-            "POST",
-            "https://id.twitch.tv/oauth2/revoke",
-            data={
-                "client_id": self._twitch._client_type.CLIENT_ID,
-                "token": auth_state.access_token,
-            }
-        ) as response:
-            if response.status == 200:
-                auth_state.invalidate(delete_cookies=True)
-            else:
-                logger.error(f"Failed to invalidate the auth token: {response.status}")
+        # do not call get_auth() here: it can start a login by itself
+        auth_state = self._twitch._auth_state
+        token = getattr(auth_state, "access_token", None)
+
+        async def revoke() -> None:
+            async with self._twitch.request(
+                "POST",
+                "https://id.twitch.tv/oauth2/revoke",
+                data={
+                    "client_id": self._twitch._client_type.CLIENT_ID,
+                    "token": token,
+                }
+            ) as response:
+                if response.status != 200:
+                    logger.error(f"Failed to revoke the auth token: {response.status}")
+
+        if token:
+            try:
+                # short timeout: no internet must not block the logout
+                await asyncio.wait_for(revoke(), timeout=10)
+            except Exception:
+                logger.exception("Token revoke failed, logging out locally anyway")
+        # always forget the session locally, even if the revoke failed
+        auth_state.invalidate(delete_cookies=True)
         self._twitch.change_state(State.RESTART)
 
 

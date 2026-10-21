@@ -175,13 +175,15 @@ def task_wrapper(
                     return
                 except Exception:
                     logger.exception(f"Exception in {afunc.__name__} task")
-                    if critical and attempt < max_retries:
+                    if critical:
+                        # retry forever, wait grows up to 5 minutes between tries
                         attempt += 1
+                        wait = min(retry_delay * (2 ** min(attempt - 1, 5)), 300.0)
                         logger.warning(
                             f"{afunc.__name__} will be retried "
-                            f"({attempt}/{max_retries}) in {retry_delay:.0f}s..."
+                            f"(attempt {attempt}) in {wait:.0f}s..."
                         )
-                        await asyncio.sleep(retry_delay)
+                        await asyncio.sleep(wait)
                         continue
                     if critical:
                         # retries exhausted (or this task isn't retryable) - this is now
