@@ -30,7 +30,8 @@
     "error": {
         "captcha": "Попытка входа в систему была отклонена CAPTCHA.\nПожалуйста, повторите попытку не менее чем через 12 часов.",
         "site_down": "Twitch недоступен. Повторите попытку через {seconds} секунд...",
-        "no_connection": "Невозможно подключиться к Twitch. Повторите попытку через {seconds} секунд... ({url})"
+        "no_connection": "Невозможно подключиться к Twitch. Повторите попытку через {seconds} секунд... ({url})",
+        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
     },
     "gui": {
         "output": "Протокол",

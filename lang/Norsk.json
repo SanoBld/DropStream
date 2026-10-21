@@ -30,7 +30,8 @@
     "error": {
         "captcha": "Innloggingsforsøket ditt ble avvist av CAPTCHA.\nVennligst prøv igjen om 12+ timer.",
         "site_down": "Twitch er nede, prøver igjen om {seconds} sekunder...",
-        "no_connection": "Kan ikke koble til Twitch, prøver igjen om {seconds} sekunder... ({url})"
+        "no_connection": "Kan ikke koble til Twitch, prøver igjen om {seconds} sekunder... ({url})",
+        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
     },
     "gui": {
         "output": "Utdata",

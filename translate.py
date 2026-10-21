@@ -47,6 +47,7 @@ class ErrorMessages(TypedDict):
     captcha: str
     no_connection: str
     site_down: str
+    login_rejected: str
 
 
 class GUIStatus(TypedDict):
@@ -412,6 +413,7 @@ default_translation: Translation = {
         "captcha": "Your login attempt was denied by CAPTCHA.\nPlease try again in 12+ hours.",
         "site_down": "Twitch is down, retrying in {seconds} seconds...",
         "no_connection": "Cannot connect to Twitch, retrying in {seconds} seconds... ({url})",
+        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds...",
     },
     "gui": {
         "output": "Output",

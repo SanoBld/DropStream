@@ -30,7 +30,8 @@
     "error": {
         "captcha": "La connexion a été rejetée par CAPTCHA. Veuillez réessayer dans env. 12 heures.",
         "site_down": "Twitch n'est pas disponible. Veuillez réessayer dans {seconds} secondes...",
-        "no_connection": "Impossible de se connecter à Twitch. Veuillez réessayer dans {seconds} secondes... ({url})"
+        "no_connection": "Impossible de se connecter à Twitch. Veuillez réessayer dans {seconds} secondes... ({url})",
+        "login_rejected": "Twitch a refusé la connexion ({reason}). Nouvelle tentative dans {seconds} s..."
     },
     "gui": {
         "output": "Sortie",

@@ -30,7 +30,8 @@
     "error": {
         "captcha": "Conexiunea a fost respinsă de CAPTCHA. Vă rugăm să încercați din nou în aprox. 12 ore.",
         "site_down": "Twitch nu este disponibil. Vă rugăm să încercați din nou în {seconds} secunde...",
-        "no_connection": "Nu se poate conecta la Twitch. Vă rugăm să încercați din nou în {seconds} secunde... ({url})"
+        "no_connection": "Nu se poate conecta la Twitch. Vă rugăm să încercați din nou în {seconds} secunde... ({url})",
+        "login_rejected": "Twitch refused the login request ({reason}). Retrying in {seconds} seconds..."
     },
     "gui": {
         "output": "Ieșire",

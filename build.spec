@@ -61,6 +61,7 @@ for source_path, dest_path, required in to_add:
 hooksconfig: dict[str, Any] = {}
 binaries: list[tuple[Path, str]] = []
 hiddenimports: list[str] = [
+    'asyncio', 'asyncio.base_events', 'asyncio.events', 'asyncio.windows_events', 'asyncio.proactor_events', 'asyncio.selector_events',
     "PIL._tkinter_finder",
     "setuptools._distutils.log",
     "setuptools._distutils.dir_util",

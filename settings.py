@@ -52,6 +52,7 @@ class SettingsFile(TypedDict):
     # automatically after a delay, instead of leaving it sitting on a "Terminated" screen
     auto_restart_enabled: bool
     auto_restart_minutes: int
+    login_client: str
 
 
 default_settings: SettingsFile = {
@@ -88,6 +89,7 @@ default_settings: SettingsFile = {
     "low_power_tray_mode": True,
     "auto_restart_enabled": False,
     "auto_restart_minutes": 5,
+    "login_client": "",
 }
 
 
@@ -134,6 +136,7 @@ class Settings:
     low_power_tray_mode: bool
     auto_restart_enabled: bool
     auto_restart_minutes: int
+    login_client: str
 
     PASSTHROUGH = ("_settings", "_args", "_altered")
 
