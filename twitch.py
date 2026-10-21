@@ -159,7 +159,7 @@ class _AuthState:
         while True:
             current = self._twitch._client_type
             candidates = [current] + [
-                c for c in (ClientType.MOBILE_WEB, ClientType.SMARTBOX) if c is not current
+                c for c in (ClientType.SMARTBOX, ClientType.ANDROID_APP) if c is not current
             ]
             now = datetime.now(timezone.utc)
             data = None
@@ -428,8 +428,8 @@ class _AuthState:
                 # ensure the cookie's client ID matches the currently selected client
                 if validate_response["client_id"] == client_info.CLIENT_ID:
                     break
-                known = next((c for c in vars(ClientType).values() if isinstance(c, ClientInfo)
-                              and c.CLIENT_ID == validate_response["client_id"]), None)
+                known = next((c for c in (ClientType.SMARTBOX, ClientType.ANDROID_APP)
+                              if c.CLIENT_ID == validate_response["client_id"]), None)
                 if known is not None:
                     self._twitch.set_client_type(known)
                     client_info = known
@@ -482,7 +482,8 @@ class Twitch:
         self._qgl_limiter = RateLimiter(capacity=5, window=1)
         # Client type, session and auth
         self._client_type: ClientInfo = (
-            getattr(ClientType, settings.login_client, None) or ClientType.SMARTBOX
+            # the web clients (MOBILE_WEB) get their tokens refused by GQL: never use them
+            {"ANDROID_APP": ClientType.ANDROID_APP}.get(settings.login_client, ClientType.SMARTBOX)
         )
         self._session: aiohttp.ClientSession | None = None
         self._auth_state: _AuthState = _AuthState(self)
@@ -1676,7 +1677,10 @@ class Twitch:
                             f"GQL refused the token: client={ci.CLIENT_ID}, "
                             f"validate=HTTP {vstatus}, info={vinfo}"
                         )
-                        if vstatus == 401 and auth_retries > 0:
+                        usable = (ClientType.SMARTBOX, ClientType.ANDROID_APP)
+                        if (vstatus == 401 or ci not in usable) and auth_retries > 0:
+                            if ci not in usable:
+                                self.set_client_type(ClientType.SMARTBOX)
                             # the token is really dead: log in again, once
                             auth_retries -= 1
                             auth_state.invalidate(delete_cookies=True)
