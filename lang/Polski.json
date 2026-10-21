@@ -230,7 +230,15 @@
                 "info": "Aplikacja już automatycznie ponawia próbę kilka razy, zanim się podda. Jeśli mimo to trafi na ekran „Zakończono”, ta opcja opcjonalnie uruchamia ją ponownie automatycznie po opóźnieniu.",
                 "enabled": "Automatyczny restart po awarii: ",
                 "minutes": "Restart po (minutach): "
-            }
+            },
+            "lists_export": "Eksportuj listy",
+            "lists_import": "Importuj listy",
+            "lists_export_title": "Eksportuj gry i kanały",
+            "lists_import_title": "Importuj gry i kanały",
+            "lists_import_ask": "Zastąpić obecne listy zaimportowanymi?\nTak = zastąp, Nie = scal, Anuluj = przerwij.",
+            "lists_import_done": "Import zakończony: {priority} gier priorytetowych, {exclude} gier wykluczonych.",
+            "lists_import_invalid": "Ten plik nie jest prawidłowym eksportem list DropStream.",
+            "lists_export_done": "Wyeksportowano: {priority} gier priorytetowych, {exclude} gier wykluczonych, {channels} kanałów."
         },
         "help": {
             "links": {

@@ -230,7 +230,15 @@
                 "info": "Appen prøver allerede automatisk på nytt et par ganger før den gir opp. Hvis den likevel havner på en \"Avsluttet\"-skjerm, starter dette valget den eventuelt automatisk på nytt etter en forsinkelse.",
                 "enabled": "Automatisk omstart ved krasj: ",
                 "minutes": "Start på nytt etter (minutter): "
-            }
+            },
+            "lists_export": "Eksporter lister",
+            "lists_import": "Importer lister",
+            "lists_export_title": "Eksporter spill og kanaler",
+            "lists_import_title": "Importer spill og kanaler",
+            "lists_import_ask": "Vil du erstatte de nåværende listene dine med de importerte?\nJa = erstatt, Nei = slå sammen, Avbryt = avbryt.",
+            "lists_import_done": "Import fullført: {priority} prioriterte spill, {exclude} ekskluderte spill.",
+            "lists_import_invalid": "Denne filen er ikke en gyldig DropStream-listeeksport.",
+            "lists_export_done": "Eksportert: {priority} prioriterte spill, {exclude} ekskluderte spill, {channels} kanaler."
         },
         "help": {
             "links": {

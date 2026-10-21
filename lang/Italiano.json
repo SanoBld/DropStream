@@ -231,7 +231,15 @@
                 "info": "L'app riprova già automaticamente alcune volte prima di arrendersi. Se comunque finisce su una schermata \"Terminato\", questa opzione la riavvia automaticamente dopo un ritardo.",
                 "enabled": "Riavvio automatico in caso di crash: ",
                 "minutes": "Riavvia dopo (minuti): "
-            }
+            },
+            "lists_export": "Esporta elenchi",
+            "lists_import": "Importa elenchi",
+            "lists_export_title": "Esporta giochi e canali",
+            "lists_import_title": "Importa giochi e canali",
+            "lists_import_ask": "Sostituire gli elenchi attuali con quelli importati?\nSì = sostituisci, No = unisci, Annulla = interrompi.",
+            "lists_import_done": "Importazione completata: {priority} giochi prioritari, {exclude} giochi esclusi.",
+            "lists_import_invalid": "Questo file non è un'esportazione di elenchi DropStream valida.",
+            "lists_export_done": "Esportato: {priority} giochi prioritari, {exclude} giochi esclusi, {channels} canali."
         },
         "help": {
             "links": {

@@ -8,7 +8,9 @@
         "claimed_drop": "Drop vyzvednut: {drop}",
         "no_channel": "Žádný kanál není dostupný, čekání na další...",
         "no_campaign": "Žádné dropy k dispozici, čekání na další dostupné dropy...",
-        "auto_action": "Všechny dropy jsou prozatím hotové, spouští se nastavená akce: {action}"
+        "auto_action": "Všechny dropy jsou prozatím hotové, spouští se nastavená akce: {action}",
+        "auto_restart": "Automatický restart je zapnutý: aplikace se znovu spustí za {minutes} minut(u/y), pokud toto okno nezavřete dříve.",
+        "auto_restart_now": "Restartuji..."
     },
     "login": {
         "unexpected_content": "Chyba při přesměrování. Nepoužíváte VPN?",
@@ -45,14 +47,17 @@
             "adding_campaigns": "Přidávám dropy... {counter}",
             "paused": "Pozastaveno",
             "paused_until": "Pozastaveno do {time}",
-            "scheduled": "Mimo naplánované hodiny"
+            "scheduled": "Mimo naplánované hodiny",
+            "auto_restart": "Ukončeno - restart za {minutes} min"
         },
         "tabs": {
             "main": "Hlavní Panel",
             "inventory": "Inventář",
             "settings": "Nastavení",
             "help": "Nápověda",
-            "dashboard": "Přehled"
+            "dashboard": "Přehled",
+            "games": "Hry",
+            "remote": "Vzdálený přístup"
         },
         "tray": {
             "notification_title": "Začít sbírat dropy",
@@ -135,7 +140,14 @@
             "and_more": "Je tu {amount} ...",
             "percent_progress": "{minutes} minut {percent}",
             "minutes_progress": "{minutes} minut",
-            "reloading": "Znovu se načítá tvůj inventář, chvilku to potrvá..."
+            "reloading": "Znovu se načítá tvůj inventář, chvilku to potrvá...",
+            "server": {
+                "check": "Zkontrolovat",
+                "checking": "Server: kontrola...",
+                "down": "Server: nedostupný",
+                "ok": "Server: OK ({ms} ms)",
+                "unknown": "Server: neznámý"
+            }
         },
         "settings": {
             "general": {
@@ -151,7 +163,9 @@
                 "priority_mode_info": "Hry ze seznamu priorit se vždy zkoušejí jako první, v nastaveném pořadí. \"Končí nejdříve\"/\"Nízká dostupnost jako první\" určují pořadí pouze pro zbytek, jakmile ze seznamu priorit už nic není dostupné.",
                 "tray_notifications": "Oznámení v hlavním panelu: ",
                 "low_power_tray_mode": "Šetřit RAM/baterii při minimalizaci: ",
-                "low_power_tray_mode_info": "Když je aplikace minimalizovaná do systémové lišty, vymaže si obrázky uložené v mezipaměti a méně často kontroluje aktualizace, aby ušetřila paměť a baterii. Nevýhoda: otevření karty Inventář poté může na chvíli působit trochu pomaleji, protože se musí znovu načíst - během této doby se zobrazí načítací obrazovka."
+                "low_power_tray_mode_info": "Když je aplikace minimalizovaná do systémové lišty, vymaže si obrázky uložené v mezipaměti a méně často kontroluje aktualizace, aby ušetřila paměť a baterii. Nevýhoda: otevření karty Inventář poté může na chvíli působit trochu pomaleji, protože se musí znovu načíst - během této doby se zobrazí načítací obrazovka.",
+                "show_inventory_tab": "Zobrazit záložku Inventář (vyžaduje restart): ",
+                "show_inventory_tab_info": "Záložku Inventář zde můžete skrýt, pokud raději sledujete své dropy z vlastní stránky Inventáře webového panelu."
             },
             "game_name": "Název Hry",
             "priority": "Priorita",
@@ -200,8 +214,32 @@
                 "warning": "Varování!",
                 "warning_text": "Tyto možnosti mohou způsobit nesprávné chování těžaře.\nPokud máte problémy, ujistěte se, že jsou všechny tyto možnosti vypnuté.",
                 "enable_badges_emotes": "Povolit částečnou podporu odznaků a emotikonů: ",
-                "available_drops_check": "Povolit dodatečnou kontrolu dostupných dropů: "
-            }
+                "available_drops_check": "Povolit dodatečnou kontrolu dostupných dropů: ",
+                "discord_client_id": "ID aplikace Discord: ",
+                "discord_rpc_enabled": "Zobrazit aktuálně sledovaný kanál na Discordu: ",
+                "discord_rpc_header": "Řádek „Sleduje“ zobrazuje: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Jméno streamera",
+                "discord_rpc_image": "Obrázek na obálce Discordu: ",
+                "discord_rpc_image_game": "Obal hry",
+                "discord_rpc_image_logo": "Logo DropStream",
+                "discord_rpc_image_streamer": "Živý náhled streamera",
+                "mine_unlinked_campaigns": "Těžit kampaně i když účet není propojen: "
+            },
+            "reliability": {
+                "enabled": "Automatický restart po pádu: ",
+                "info": "Aplikace se před vzdáním se sama ještě párkrát pokusí. Pokud přesto skončí na obrazovce „Ukončeno“, tato volba ji volitelně po prodlevě znovu spustí.",
+                "minutes": "Restartovat po (minuty): ",
+                "name": "Spolehlivost"
+            },
+            "lists_export": "Exportovat seznamy",
+            "lists_import": "Importovat seznamy",
+            "lists_export_title": "Exportovat hry a kanály",
+            "lists_import_title": "Importovat hry a kanály",
+            "lists_import_ask": "Nahradit stávající seznamy importovanými?\nAno = nahradit, Ne = sloučit, Zrušit = přerušit.",
+            "lists_import_done": "Import dokončen: {priority} prioritních her, {exclude} vyloučených her.",
+            "lists_import_invalid": "Tento soubor není platný export seznamů DropStream.",
+            "lists_export_done": "Exportováno: {priority} prioritních her, {exclude} vyloučených her, {channels} kanálů."
         },
         "help": {
             "links": {
@@ -233,7 +271,25 @@
             "per_game": "Dropy na hru",
             "total_drops": "Celkem vyzvednutých dropů: {count}",
             "hours_saved": "Ušetřené hodiny sledování: {hours}",
-            "no_data": "Zatím žádná data"
+            "no_data": "Zatím žádná data",
+            "reload": "Znovu načíst"
+        },
+        "remote": {
+            "copy_link": "Kopírovat",
+            "enabled": "Povolit webový panel: ",
+            "info": "Umožňuje sledovat stav v reálném čase a případně ovládat tuto instanci (pauza/pokračování, režim priority) z prohlížeče na jiném zařízení pomocí odkazu níže. Kdokoli s odkazem může sledovat; kdokoli s odkazem a heslem (pokud je nastaveno) může i ovládat, sdílejte ho proto jen s lidmi, kterým důvěřujete.",
+            "link": "Odkaz ke sdílení:",
+            "link_disabled": "Povolte panel pro vygenerování odkazu.",
+            "mode_control": "Zobrazení a ovládání",
+            "mode_label": "Režim přístupu:",
+            "mode_view": "Pouze zobrazení",
+            "new_link": "Vygenerovat nový odkaz",
+            "open_link": "Otevřít",
+            "password_label": "Heslo pro ovládání:",
+            "password_placeholder": "Volitelné, nechte prázdné pro žádné",
+            "port": "Port: ",
+            "show_viewers_label": "Zobrazit počet diváků na stránce: ",
+            "show_logs_label": "Zobrazit na stránce záložku Protokoly (jen ke čtení): "
         }
     }
 }

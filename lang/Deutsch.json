@@ -231,7 +231,15 @@
                 "info": "Die App versucht es bereits von selbst ein paar Mal erneut, bevor sie aufgibt. Landet sie trotzdem auf einem \"Beendet\"-Bildschirm, startet diese Option sie optional nach einer Verzögerung automatisch neu.",
                 "enabled": "Automatischer Neustart bei Absturz: ",
                 "minutes": "Neustart nach (Minuten): "
-            }
+            },
+            "lists_export": "Listen exportieren",
+            "lists_import": "Listen importieren",
+            "lists_export_title": "Spiele und Kanäle exportieren",
+            "lists_import_title": "Spiele und Kanäle importieren",
+            "lists_import_ask": "Aktuelle Listen durch die importierten ersetzen?\nJa = ersetzen, Nein = zusammenführen, Abbrechen = abbrechen.",
+            "lists_import_done": "Import abgeschlossen: {priority} priorisierte Spiele, {exclude} ausgeschlossene Spiele.",
+            "lists_import_invalid": "Diese Datei ist kein gültiger DropStream-Listenexport.",
+            "lists_export_done": "Exportiert: {priority} priorisierte Spiele, {exclude} ausgeschlossene Spiele, {channels} Kanäle."
         },
         "help": {
             "links": {

@@ -8,7 +8,9 @@
         "claimed_drop": "已领取掉宝：“{drop}”",
         "no_channel": "没有可观看的频道，正在等待直播频道上线...",
         "no_campaign": "没有可用于掉宝的活动，正在等待掉宝活动开放...",
-        "auto_action": "目前所有掉落均已领取，正在执行已配置的操作：{action}"
+        "auto_action": "目前所有掉落均已领取，正在执行已配置的操作：{action}",
+        "auto_restart": "已启用自动重启：若不关闭此窗口，将在 {minutes} 分钟后重新启动。",
+        "auto_restart_now": "正在重新启动……"
     },
     "login": {
         "unexpected_content": "返回的内容类型异常，这通常是由于网页被重定向。\n您是否需要先设置VPN或登录到当前网络？",
@@ -45,14 +47,17 @@
             "adding_campaigns": "正在将掉宝活动列表添加至库存...{counter}",
             "paused": "已暂停",
             "paused_until": "暂停至 {time}",
-            "scheduled": "不在计划时间内"
+            "scheduled": "不在计划时间内",
+            "auto_restart": "已终止 - 将在 {minutes} 分钟后重启"
         },
         "tabs": {
             "main": "主面板",
             "inventory": "掉宝库存",
             "settings": "设置",
             "help": "帮助",
-            "dashboard": "仪表盘"
+            "dashboard": "仪表盘",
+            "games": "游戏",
+            "remote": "远程"
         },
         "tray": {
             "notification_title": "已领取掉宝",
@@ -135,7 +140,14 @@
             "and_more": "还有{amount}个...",
             "percent_progress": "{minutes}分钟的{percent}",
             "minutes_progress": "{minutes}分钟",
-            "reloading": "正在重新加载你的库存，只需片刻..."
+            "reloading": "正在重新加载你的库存，只需片刻...",
+            "server": {
+                "check": "检查",
+                "checking": "服务器：检查中……",
+                "down": "服务器：无法访问",
+                "ok": "服务器：正常（{ms} ms）",
+                "unknown": "服务器：未知"
+            }
         },
         "settings": {
             "general": {
@@ -150,14 +162,26 @@
                 "use_system_accent": "使用系统强调色：",
                 "priority_mode_info": "优先级列表中的游戏总是按您设定的顺序优先尝试。「最快结束」/「低可用性优先」仅在优先级列表中没有可farm内容时，决定其余游戏的顺序。",
                 "low_power_tray_mode": "最小化时节省内存/电量：",
-                "low_power_tray_mode_info": "应用最小化到托盘期间，会清除缓存的图片并降低检查更新的频率，以节省内存和电量。代价是：之后打开库存标签页时可能会感觉稍慢一点，因为需要重新加载——这期间会显示加载画面。"
+                "low_power_tray_mode_info": "应用最小化到托盘期间，会清除缓存的图片并降低检查更新的频率，以节省内存和电量。代价是：之后打开库存标签页时可能会感觉稍慢一点，因为需要重新加载——这期间会显示加载画面。",
+                "show_inventory_tab": "显示库存标签页（需要重启）：",
+                "show_inventory_tab_info": "如果你更喜欢在网页仪表盘自带的库存页面查看掉落物，可以在这里隐藏库存标签页。"
             },
             "advanced": {
                 "name": "高级设置",
                 "warning": "警告！",
                 "warning_text": "启用以下选项可能会导致应用运行异常。\n如果您遇到任何问题，请先禁用以下所有选项。",
                 "enable_badges_emotes": "启用对挖掘徽章和表情的不完整支持",
-                "available_drops_check": "启用额外的掉宝可用性检查"
+                "available_drops_check": "启用额外的掉宝可用性检查",
+                "discord_client_id": "Discord 应用 ID：",
+                "discord_rpc_enabled": "在 Discord 上显示当前观看的频道：",
+                "discord_rpc_header": "「正在观看」一行显示：",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "主播的名字",
+                "discord_rpc_image": "Discord 封面图片：",
+                "discord_rpc_image_game": "游戏封面",
+                "discord_rpc_image_logo": "DropStream 图标",
+                "discord_rpc_image_streamer": "主播的实时预览",
+                "mine_unlinked_campaigns": "即使账号未关联也挖取活动："
             },
             "priority_modes": {
                 "priority_only": "仅观看优先列表中的游戏",
@@ -200,7 +224,21 @@
                 "modern_auto": "Twitch 配色（自动）",
                 "modern_light": "Twitch 配色，浅色",
                 "modern_dark": "Twitch 配色，深色"
-            }
+            },
+            "reliability": {
+                "enabled": "崩溃后自动重启：",
+                "info": "应用在放弃之前已经会自行重试几次。如果最终仍停留在“已终止”界面，此选项可在延迟后自动重新启动它。",
+                "minutes": "多少分钟后重启：",
+                "name": "可靠性"
+            },
+            "lists_export": "导出列表",
+            "lists_import": "导入列表",
+            "lists_export_title": "导出游戏和频道",
+            "lists_import_title": "导入游戏和频道",
+            "lists_import_ask": "是否用导入的列表替换当前列表？\n是 = 替换，否 = 合并，取消 = 中止。",
+            "lists_import_done": "导入完成：{priority} 个优先游戏，{exclude} 个排除游戏。",
+            "lists_import_invalid": "此文件不是有效的 DropStream 列表导出文件。",
+            "lists_export_done": "导出完成：{priority} 个优先游戏，{exclude} 个排除游戏，{channels} 个频道。"
         },
         "help": {
             "links": {
@@ -232,7 +270,25 @@
             "per_game": "按游戏统计掉落",
             "total_drops": "已领取掉落总数：{count}",
             "hours_saved": "节省观看时间：{hours}",
-            "no_data": "暂无数据"
+            "no_data": "暂无数据",
+            "reload": "重新加载"
+        },
+        "remote": {
+            "copy_link": "复制",
+            "enabled": "启用网页仪表盘：",
+            "info": "通过下面的链接，你可以在其他设备的浏览器中实时查看本实例的状态，如果需要，还可以对其进行控制（暂停/继续、优先级模式）。拥有该链接的任何人都可以查看；若同时拥有链接和密码（如已设置），则还可以进行控制，因此请只与你信任的人分享。",
+            "link": "分享链接：",
+            "link_disabled": "启用仪表盘以生成链接。",
+            "mode_control": "查看并控制",
+            "mode_label": "访问模式：",
+            "mode_view": "仅查看",
+            "new_link": "生成新链接",
+            "open_link": "打开",
+            "password_label": "控制密码：",
+            "password_placeholder": "可选，留空表示不设置密码",
+            "port": "端口：",
+            "show_viewers_label": "在页面上显示观看人数：",
+            "show_logs_label": "在页面上显示只读的日志标签页："
         }
     }
 }

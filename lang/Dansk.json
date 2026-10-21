@@ -231,7 +231,15 @@
                 "info": "Appen prøver allerede automatisk igen et par gange, før den giver op. Hvis den alligevel ender på en \"Afsluttet\"-skærm, genstarter denne indstilling den valgfrit automatisk efter en forsinkelse.",
                 "enabled": "Automatisk genstart ved nedbrud: ",
                 "minutes": "Genstart efter (minutter): "
-            }
+            },
+            "lists_export": "Eksportér lister",
+            "lists_import": "Importér lister",
+            "lists_export_title": "Eksportér spil og kanaler",
+            "lists_import_title": "Importér spil og kanaler",
+            "lists_import_ask": "Vil du erstatte dine nuværende lister med de importerede?\nJa = erstat, Nej = flet, Annullér = afbryd.",
+            "lists_import_done": "Import fuldført: {priority} prioriterede spil, {exclude} ekskluderede spil.",
+            "lists_import_invalid": "Denne fil er ikke en gyldig DropStream-listeeksport.",
+            "lists_export_done": "Eksporteret: {priority} prioriterede spil, {exclude} ekskluderede spil, {channels} kanaler."
         },
         "help": {
             "links": {

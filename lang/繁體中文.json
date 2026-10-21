@@ -8,7 +8,9 @@
         "claimed_drop": "已領取掉寶：{drop}",
         "no_channel": "沒有可觀看的頻道，正在等待一個正在實況的頻道…",
         "no_campaign": "沒有可用於掉寶的活動，正在等待一個有效的掉寶活動…",
-        "auto_action": "目前所有掉落均已領取，正在執行已配置的操作：{action}"
+        "auto_action": "目前所有掉落均已領取，正在執行已配置的操作：{action}",
+        "auto_restart": "已啟用自動重新啟動：若不關閉此視窗，將於 {minutes} 分鐘後重新啟動。",
+        "auto_restart_now": "正在重新啟動……"
     },
     "login": {
         "unexpected_content": "回傳的內容類型有誤，通常是由於被重新導向導致。您是否需要先設定 VPN 或登入到目前的網路？",
@@ -45,14 +47,17 @@
             "adding_campaigns": "將掉寶活動列表新增至庫存… {counter}",
             "paused": "已暫停",
             "paused_until": "暫停至 {time}",
-            "scheduled": "不在計畫時間內"
+            "scheduled": "不在計畫時間內",
+            "auto_restart": "已終止 - 將於 {minutes} 分鐘後重新啟動"
         },
         "tabs": {
             "main": "主視窗",
             "inventory": "庫存",
             "settings": "設置",
             "help": "幫助",
-            "dashboard": "儀表板"
+            "dashboard": "儀表板",
+            "games": "遊戲",
+            "remote": "遠端"
         },
         "tray": {
             "notification_title": "開始掉寶活動",
@@ -135,7 +140,14 @@
             "and_more": "以及其他 {amount} 個…",
             "percent_progress": "{minutes} 分鐘的 {percent}",
             "minutes_progress": "{minutes} 分鐘",
-            "reloading": "正在重新載入你的庫存，只需片刻..."
+            "reloading": "正在重新載入你的庫存，只需片刻...",
+            "server": {
+                "check": "檢查",
+                "checking": "伺服器：檢查中……",
+                "down": "伺服器：無法連線",
+                "ok": "伺服器：正常（{ms} ms）",
+                "unknown": "伺服器：未知"
+            }
         },
         "settings": {
             "general": {
@@ -150,14 +162,26 @@
                 "use_system_accent": "使用系統強調色：",
                 "priority_mode_info": "優先清單中的遊戲總是按您設定的順序優先嘗試。「最快結束」/「低可用性優先」僅在優先清單中沒有可farm內容時，決定其餘遊戲的順序。",
                 "low_power_tray_mode": "最小化時節省記憶體/電量：",
-                "low_power_tray_mode_info": "應用程式最小化到工作列期間，會清除快取的圖片並降低檢查更新的頻率，以節省記憶體和電量。代價是：之後打開庫存分頁時可能會感覺稍慢一點，因為需要重新載入——這期間會顯示載入畫面。"
+                "low_power_tray_mode_info": "應用程式最小化到工作列期間，會清除快取的圖片並降低檢查更新的頻率，以節省記憶體和電量。代價是：之後打開庫存分頁時可能會感覺稍慢一點，因為需要重新載入——這期間會顯示載入畫面。",
+                "show_inventory_tab": "顯示庫存分頁（需要重新啟動）：",
+                "show_inventory_tab_info": "如果你偏好在網頁儀表板自己的庫存頁面查看掉落物，可以在這裡隱藏庫存分頁。"
             },
             "advanced": {
                 "name": "進階設定",
                 "warning": "警告！",
                 "warning_text": "啟用以下選項可能會導致應用程式運作異常。\n如果您遇到任何問題，請先停用以下所有選項。",
                 "enable_badges_emotes": "啟用對獲取徽章和表情掉寶的不完整支援：",
-                "available_drops_check": "啟用額外的掉寶可用性檢查："
+                "available_drops_check": "啟用額外的掉寶可用性檢查：",
+                "discord_client_id": "Discord 應用程式 ID：",
+                "discord_rpc_enabled": "在 Discord 顯示目前觀看的頻道：",
+                "discord_rpc_header": "「正在觀看」這行顯示：",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "實況主的名稱",
+                "discord_rpc_image": "Discord 封面圖片：",
+                "discord_rpc_image_game": "遊戲封面",
+                "discord_rpc_image_logo": "DropStream 標誌",
+                "discord_rpc_image_streamer": "實況主的即時預覽",
+                "mine_unlinked_campaigns": "即使帳號未連結也挖取活動："
             },
             "priority_modes": {
                 "priority_only": "僅參與優先掉寶遊戲",
@@ -200,7 +224,21 @@
                 "modern_auto": "Twitch 配色（自動）",
                 "modern_light": "Twitch 配色，淺色",
                 "modern_dark": "Twitch 配色，深色"
-            }
+            },
+            "reliability": {
+                "enabled": "當機後自動重新啟動：",
+                "info": "應用程式在放棄前已經會自行重試幾次。如果仍然停留在「已終止」畫面，此選項可在延遲後自動重新啟動。",
+                "minutes": "幾分鐘後重新啟動：",
+                "name": "可靠性"
+            },
+            "lists_export": "匯出清單",
+            "lists_import": "匯入清單",
+            "lists_export_title": "匯出遊戲與頻道",
+            "lists_import_title": "匯入遊戲與頻道",
+            "lists_import_ask": "要用匯入的清單取代目前的清單嗎？\n是 = 取代，否 = 合併，取消 = 中止。",
+            "lists_import_done": "匯入完成：{priority} 個優先遊戲，{exclude} 個排除遊戲。",
+            "lists_import_invalid": "此檔案不是有效的 DropStream 清單匯出檔。",
+            "lists_export_done": "匯出完成：{priority} 個優先遊戲，{exclude} 個排除遊戲，{channels} 個頻道。"
         },
         "help": {
             "links": {
@@ -232,7 +270,25 @@
             "per_game": "按遊戲統計掉落",
             "total_drops": "已領取掉落總數：{count}",
             "hours_saved": "節省觀看時間：{hours}",
-            "no_data": "暫無數據"
+            "no_data": "暫無數據",
+            "reload": "重新載入"
+        },
+        "remote": {
+            "copy_link": "複製",
+            "enabled": "啟用網頁儀表板：",
+            "info": "透過下方連結，你可以在其他裝置的瀏覽器中即時查看此實例的狀態，若你願意，也能控制它（暫停/繼續、優先模式）。擁有此連結的任何人都能檢視；同時擁有連結與密碼（若有設定）的人則還能控制，因此請只與你信任的人分享。",
+            "link": "分享連結：",
+            "link_disabled": "啟用儀表板以產生連結。",
+            "mode_control": "檢視並控制",
+            "mode_label": "存取模式：",
+            "mode_view": "僅檢視",
+            "new_link": "產生新連結",
+            "open_link": "開啟",
+            "password_label": "控制密碼：",
+            "password_placeholder": "選填，留空表示不設定",
+            "port": "連接埠：",
+            "show_viewers_label": "在頁面上顯示觀眾人數：",
+            "show_logs_label": "在頁面上顯示唯讀的日誌分頁："
         }
     }
 }

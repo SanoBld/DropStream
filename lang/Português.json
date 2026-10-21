@@ -56,7 +56,8 @@
             "settings": "Configurações",
             "help": "Ajuda",
             "dashboard": "Painel",
-            "remote": "Remoto"
+            "remote": "Remoto",
+            "games": "Jogos"
         },
         "tray": {
             "notification_title": "Drop coletado",
@@ -139,7 +140,14 @@
             "and_more": "e {amount} mais...",
             "percent_progress": "{percent} de {minutes} minutos",
             "minutes_progress": "{minutes} minutos",
-            "reloading": "Recarregando seu inventário, isso vai levar só um instante..."
+            "reloading": "Recarregando seu inventário, isso vai levar só um instante...",
+            "server": {
+                "check": "Verificar",
+                "checking": "Servidor: verificando...",
+                "down": "Servidor: inacessível",
+                "ok": "Servidor: OK ({ms} ms)",
+                "unknown": "Servidor: desconhecido"
+            }
         },
         "settings": {
             "general": {
@@ -155,7 +163,9 @@
                 "priority_mode": "Modo de prioridade: ",
                 "priority_mode_info": "Os jogos da lista de prioridade são sempre tentados primeiro, na ordem definida por você. \"Termina primeiro\"/\"Baixa disponibilidade primeiro\" determinam apenas a ordem para o restante, quando nada da lista de prioridade estiver mais disponível.",
                 "low_power_tray_mode": "Economizar RAM/bateria ao minimizar: ",
-                "low_power_tray_mode_info": "Enquanto minimizado na bandeja, o app limpa as imagens em cache e verifica atualizações com menos frequência para usar menos memória e bateria. A contrapartida: abrir a aba Inventário depois pode parecer um pouco mais lento por um instante, pois precisa recarregar - uma tela de carregamento é exibida enquanto isso acontece."
+                "low_power_tray_mode_info": "Enquanto minimizado na bandeja, o app limpa as imagens em cache e verifica atualizações com menos frequência para usar menos memória e bateria. A contrapartida: abrir a aba Inventário depois pode parecer um pouco mais lento por um instante, pois precisa recarregar - uma tela de carregamento é exibida enquanto isso acontece.",
+                "show_inventory_tab": "Mostrar a aba Inventário (requer reiniciar): ",
+                "show_inventory_tab_info": "Você pode ocultar aqui a aba Inventário se preferir consultar seus drops pela própria página de Inventário do painel web."
             },
             "game_name": "Nome do jogo",
             "priority": "Prioridade",
@@ -204,14 +214,32 @@
                 "warning": "Aviso!",
                 "warning_text": "Essas opções podem fazer o minerador funcionar incorretamente.\nSe tiver problemas, certifique-se de que todas essas opções estejam desativadas.",
                 "enable_badges_emotes": "Ativar suporte parcial para emblemas e emotes: ",
-                "available_drops_check": "Ativar verificação extra de drops disponíveis: "
+                "available_drops_check": "Ativar verificação extra de drops disponíveis: ",
+                "discord_client_id": "ID da aplicação Discord: ",
+                "discord_rpc_enabled": "Mostrar o canal atualmente assistido no Discord: ",
+                "discord_rpc_header": "A linha \"Assistindo\" mostra: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "O nome do streamer",
+                "discord_rpc_image": "Imagem de capa do Discord: ",
+                "discord_rpc_image_game": "Capa do jogo",
+                "discord_rpc_image_logo": "Logotipo do DropStream",
+                "discord_rpc_image_streamer": "Pré-visualização ao vivo do streamer",
+                "mine_unlinked_campaigns": "Minerar campanhas mesmo que a conta não esteja vinculada: "
             },
             "reliability": {
                 "name": "Fiabilidade",
                 "info": "A aplicação já tenta novamente algumas vezes por conta própria antes de desistir. Se, mesmo assim, acabar num ecrã \"Terminado\", esta opção relança-a automaticamente após um atraso.",
                 "enabled": "Reinício automático após falha: ",
                 "minutes": "Reiniciar após (minutos): "
-            }
+            },
+            "lists_export": "Exportar listas",
+            "lists_import": "Importar listas",
+            "lists_export_title": "Exportar jogos e canais",
+            "lists_import_title": "Importar jogos e canais",
+            "lists_import_ask": "Substituir as suas listas atuais pelas importadas?\nSim = substituir, Não = mesclar, Cancelar = abortar.",
+            "lists_import_done": "Importação concluída: {priority} jogos prioritários, {exclude} jogos excluídos.",
+            "lists_import_invalid": "Este ficheiro não é uma exportação de listas do DropStream válida.",
+            "lists_export_done": "Exportado: {priority} jogos prioritários, {exclude} jogos excluídos, {channels} canais."
         },
         "help": {
             "links": {
@@ -243,7 +271,8 @@
             "per_game": "Drops por jogo",
             "total_drops": "Total de drops resgatados: {count}",
             "hours_saved": "Horas de visualização economizadas: {hours}",
-            "no_data": "Ainda sem dados"
+            "no_data": "Ainda sem dados",
+            "reload": "Recarregar"
         },
         "remote": {
             "info": "Permite ver o estado em tempo real e, se assim escolher, controlar esta instância (pausar/retomar, modo de prioridade) a partir de um navegador noutro dispositivo, através da ligação abaixo. Qualquer pessoa com a ligação pode ver; qualquer pessoa com a ligação e a palavra-passe (se definida) também pode controlar, por isso partilhe-a apenas com pessoas de confiança.",
@@ -262,7 +291,9 @@
             "open_link": "Abrir",
             "public_link": "Ligação pública de partilha:",
             "public_link_resolving": "A procurar o seu IP público...",
-            "public_link_unavailable": "Não foi possível determinar um IP público neste momento."
+            "public_link_unavailable": "Não foi possível determinar um IP público neste momento.",
+            "show_viewers_label": "Mostrar número de espectadores na página: ",
+            "show_logs_label": "Mostrar uma aba de Logs somente leitura na página: "
         }
     }
 }

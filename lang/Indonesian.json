@@ -231,7 +231,15 @@
                 "info": "Aplikasi sudah mencoba lagi beberapa kali secara otomatis sebelum menyerah. Jika tetap berakhir di layar \"Dihentikan\", opsi ini akan meluncurkannya kembali secara otomatis setelah jeda waktu.",
                 "enabled": "Mulai ulang otomatis saat crash: ",
                 "minutes": "Mulai ulang setelah (menit): "
-            }
+            },
+            "lists_export": "Ekspor daftar",
+            "lists_import": "Impor daftar",
+            "lists_export_title": "Ekspor game dan kanal",
+            "lists_import_title": "Impor game dan kanal",
+            "lists_import_ask": "Ganti daftar Anda saat ini dengan yang diimpor?\nYa = ganti, Tidak = gabungkan, Batal = hentikan.",
+            "lists_import_done": "Impor selesai: {priority} game prioritas, {exclude} game dikecualikan.",
+            "lists_import_invalid": "File ini bukan ekspor daftar DropStream yang valid.",
+            "lists_export_done": "Diekspor: {priority} game prioritas, {exclude} game dikecualikan, {channels} kanal."
         },
         "help": {
             "links": {

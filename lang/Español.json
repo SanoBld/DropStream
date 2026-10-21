@@ -56,7 +56,8 @@
             "settings": "Configuración",
             "help": "Ayuda",
             "dashboard": "Panel",
-            "remote": "Remoto"
+            "remote": "Remoto",
+            "games": "Juegos"
         },
         "tray": {
             "notification_title": "Drop minado",
@@ -139,7 +140,14 @@
             "and_more": "y {amount} más...",
             "percent_progress": "{percent} de {minutes} minutos",
             "minutes_progress": "{minutes} minutos",
-            "reloading": "Recargando tu inventario, solo tomará un momento..."
+            "reloading": "Recargando tu inventario, solo tomará un momento...",
+            "server": {
+                "check": "Comprobar",
+                "checking": "Servidor: comprobando...",
+                "down": "Servidor: inaccesible",
+                "ok": "Servidor: OK ({ms} ms)",
+                "unknown": "Servidor: desconocido"
+            }
         },
         "settings": {
             "general": {
@@ -154,14 +162,26 @@
                 "use_system_accent": "Usar color de acento del sistema: ",
                 "priority_mode_info": "Los juegos de la lista de prioridad siempre se intentan primero, en el orden que hayas definido. \"Finaliza antes\"/\"Baja disponibilidad primero\" solo determinan el orden para todo lo demás, una vez que no queda nada disponible en la lista de prioridad.",
                 "low_power_tray_mode": "Ahorrar RAM/batería al minimizar: ",
-                "low_power_tray_mode_info": "Mientras está minimizada en la bandeja, la app borra sus imágenes en caché y comprueba actualizaciones con menos frecuencia para usar menos memoria y batería. A cambio: abrir la pestaña Inventario después puede sentirse un poco más lento por un momento, ya que necesita recargarse - se muestra una pantalla de carga mientras tanto."
+                "low_power_tray_mode_info": "Mientras está minimizada en la bandeja, la app borra sus imágenes en caché y comprueba actualizaciones con menos frecuencia para usar menos memoria y batería. A cambio: abrir la pestaña Inventario después puede sentirse un poco más lento por un momento, ya que necesita recargarse - se muestra una pantalla de carga mientras tanto.",
+                "show_inventory_tab": "Mostrar la pestaña Inventario (requiere reiniciar): ",
+                "show_inventory_tab_info": "Puedes ocultar aquí la pestaña Inventario si prefieres consultar tus drops desde la propia página de Inventario del panel web."
             },
             "advanced": {
                 "name": "Avanzado",
                 "warning": "¡Advertencia!",
                 "warning_text": "Estas opciones pueden causar un mal funcionamiento.\nSi experimenta algún problema, asegúrese de que todas estas opciones estén desactivadas.",
                 "enable_badges_emotes": "Habilitar soporte parcial para emblemas y emoticonos: ",
-                "available_drops_check": "Habilitar verificación adicional de drops disponibles: "
+                "available_drops_check": "Habilitar verificación adicional de drops disponibles: ",
+                "discord_client_id": "ID de la aplicación de Discord: ",
+                "discord_rpc_enabled": "Mostrar el canal que se está viendo en Discord: ",
+                "discord_rpc_header": "La línea «Viendo» muestra: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "El nombre del streamer",
+                "discord_rpc_image": "Imagen de portada de Discord: ",
+                "discord_rpc_image_game": "Portada del juego",
+                "discord_rpc_image_logo": "Logo de DropStream",
+                "discord_rpc_image_streamer": "Vista previa en directo del streamer",
+                "mine_unlinked_campaigns": "Minar campañas aunque la cuenta no esté vinculada: "
             },
             "priority_modes": {
                 "priority_only": "Solo juegos preferidos",
@@ -210,7 +230,15 @@
                 "info": "La aplicación ya reintenta varias veces por su cuenta antes de rendirse. Si aun así termina en una pantalla de \"Terminado\", esta opción la reinicia automáticamente tras un retraso.",
                 "enabled": "Reinicio automático tras un fallo: ",
                 "minutes": "Reiniciar después de (minutos): "
-            }
+            },
+            "lists_export": "Exportar listas",
+            "lists_import": "Importar listas",
+            "lists_export_title": "Exportar juegos y canales",
+            "lists_import_title": "Importar juegos y canales",
+            "lists_import_ask": "¿Reemplazar tus listas actuales por las importadas?\nSí = reemplazar, No = combinar, Cancelar = abortar.",
+            "lists_import_done": "Importación completada: {priority} juegos prioritarios, {exclude} juegos excluidos.",
+            "lists_import_invalid": "Este archivo no es una exportación de listas de DropStream válida.",
+            "lists_export_done": "Exportado: {priority} juegos prioritarios, {exclude} juegos excluidos, {channels} canales."
         },
         "help": {
             "links": {
@@ -242,7 +270,8 @@
             "per_game": "Drops por juego",
             "total_drops": "Drops totales reclamados: {count}",
             "hours_saved": "Horas de visionado ahorradas: {hours}",
-            "no_data": "Aún no hay datos"
+            "no_data": "Aún no hay datos",
+            "reload": "Recargar"
         },
         "remote": {
             "info": "Permite ver el estado en tiempo real y, si lo desea, controlar esta instancia (pausar/reanudar, modo de prioridad) desde un navegador en otro dispositivo, mediante el enlace de abajo. Cualquiera con el enlace puede ver; cualquiera con el enlace y la contraseña (si se establece una) también puede controlar, así que compártalo solo con quienes confíe.",
@@ -261,7 +290,9 @@
             "open_link": "Abrir",
             "public_link": "Enlace público para compartir:",
             "public_link_resolving": "Buscando su IP pública...",
-            "public_link_unavailable": "No se pudo determinar una IP pública en este momento."
+            "public_link_unavailable": "No se pudo determinar una IP pública en este momento.",
+            "show_viewers_label": "Mostrar el número de espectadores en la página: ",
+            "show_logs_label": "Mostrar una pestaña de Registros de solo lectura en la página: "
         }
     }
 }

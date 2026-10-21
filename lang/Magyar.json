@@ -230,7 +230,15 @@
                 "info": "Az alkalmazás feladás előtt már magától is megpróbálja néhányszor újra. Ha mégis egy \"Leállítva\" képernyőn köt ki, ez a beállítás opcionálisan automatikusan újraindítja egy késleltetés után.",
                 "enabled": "Automatikus újraindítás összeomláskor: ",
                 "minutes": "Újraindítás ennyi perc után: "
-            }
+            },
+            "lists_export": "Listák exportálása",
+            "lists_import": "Listák importálása",
+            "lists_export_title": "Játékok és csatornák exportálása",
+            "lists_import_title": "Játékok és csatornák importálása",
+            "lists_import_ask": "Lecseréled a jelenlegi listáidat az importáltakra?\nIgen = csere, Nem = egyesítés, Mégse = megszakítás.",
+            "lists_import_done": "Az importálás kész: {priority} prioritásos játék, {exclude} kizárt játék.",
+            "lists_import_invalid": "Ez a fájl nem érvényes DropStream-listaexport.",
+            "lists_export_done": "Exportálva: {priority} prioritásos játék, {exclude} kizárt játék, {channels} csatorna."
         },
         "help": {
             "links": {

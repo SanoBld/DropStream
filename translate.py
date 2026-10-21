@@ -314,6 +314,14 @@ class GUISettings(TypedDict):
     exclude: str
     reload: str
     reload_text: str
+    lists_export: str
+    lists_import: str
+    lists_export_title: str
+    lists_import_title: str
+    lists_import_ask: str
+    lists_import_done: str
+    lists_import_invalid: str
+    lists_export_done: str
 
 
 class GUIHelpLinks(TypedDict):
@@ -646,6 +654,14 @@ default_translation: Translation = {
             "exclude": "Exclude",
             "reload": "Reload",
             "reload_text": "Most changes require a reload to take an immediate effect: ",
+            "lists_export": "Export lists",
+            "lists_import": "Import lists",
+            "lists_export_title": "Export games and channels",
+            "lists_import_title": "Import games and channels",
+            "lists_import_ask": "Replace your current lists with the imported ones?\nYes = replace, No = merge, Cancel = abort.",
+            "lists_import_done": "Import done: {priority} priority games, {exclude} excluded games.",
+            "lists_import_invalid": "This file is not a valid DropStream lists export.",
+            "lists_export_done": "Exported: {priority} priority games, {exclude} excluded games, {channels} channels.",
         },
         "remote": {
             "info": (

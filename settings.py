@@ -85,7 +85,7 @@ default_settings: SettingsFile = {
     "web_server_show_viewers": False,
     "web_server_show_logs": False,
     "show_inventory_tab": True,
-    "low_power_tray_mode": False,
+    "low_power_tray_mode": True,
     "auto_restart_enabled": False,
     "auto_restart_minutes": 5,
 }

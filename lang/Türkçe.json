@@ -8,7 +8,9 @@
         "claimed_drop": "Alınan drop: {drop}",
         "no_channel": "İzlenecek uygun kanal yok. ÇEVRİMİÇİ bir kanal bekleniyor...",
         "no_campaign": "Drop kazılacak aktif kampanya yok. Aktif bir kampanya bekleniyor...",
-        "auto_action": "Şimdilik tüm droplar alındı, yapılandırılan eylem çalıştırılıyor: {action}"
+        "auto_action": "Şimdilik tüm droplar alındı, yapılandırılan eylem çalıştırılıyor: {action}",
+        "auto_restart": "Otomatik yeniden başlatma etkin: bu pencereyi kapatmazsanız {minutes} dakika içinde yeniden başlatılacak.",
+        "auto_restart_now": "Şimdi yeniden başlatılıyor..."
     },
     "login": {
         "unexpected_content": "Beklenmeyen içerik türü döndürüldü, genellikle bir yönlendirmeden kaynaklanır. İnternet erişimi için giriş yapmanız gerekiyor mu?",
@@ -45,14 +47,17 @@
             "adding_campaigns": "Kampanyalar envantere ekleniyor... {counter}",
             "paused": "Duraklatıldı",
             "paused_until": "{time} saatine kadar duraklatıldı",
-            "scheduled": "Planlanan saatler dışında"
+            "scheduled": "Planlanan saatler dışında",
+            "auto_restart": "Sonlandırıldı - {minutes} dk içinde yeniden başlatılıyor"
         },
         "tabs": {
             "main": "Ana Sayfa",
             "inventory": "Envanter",
             "settings": "Ayarlar",
             "help": "Yardım",
-            "dashboard": "Panel"
+            "dashboard": "Panel",
+            "games": "Oyunlar",
+            "remote": "Uzaktan"
         },
         "tray": {
             "notification_title": "Kazanılan Drop",
@@ -135,7 +140,14 @@
             "and_more": "ve {amount} tane daha...",
             "percent_progress": "{minutes} dakikanın {percent} kadarı",
             "minutes_progress": "{minutes} dakika",
-            "reloading": "Envanterin yeniden yükleniyor, bu sadece bir an sürecek..."
+            "reloading": "Envanterin yeniden yükleniyor, bu sadece bir an sürecek...",
+            "server": {
+                "check": "Kontrol et",
+                "checking": "Sunucu: kontrol ediliyor...",
+                "down": "Sunucu: erişilemiyor",
+                "ok": "Sunucu: OK ({ms} ms)",
+                "unknown": "Sunucu: bilinmiyor"
+            }
         },
         "settings": {
             "general": {
@@ -150,14 +162,26 @@
                 "use_system_accent": "Sistem vurgu rengini kullan: ",
                 "priority_mode_info": "Öncelik listesindeki oyunlar her zaman belirlediğiniz sırayla önce denenir. \"En Yakında Bitenler\"/\"Önce Düşük Erişilebilirlik\" yalnızca öncelik listesinde hiçbir şey kalmadığında geri kalanın sırasını belirler.",
                 "low_power_tray_mode": "Küçültüldüğünde RAM/pil tasarrufu yap: ",
-                "low_power_tray_mode_info": "Uygulama sistem tepsisine küçültüldüğünde, önbelleğe alınmış görselleri temizler ve bellek/pil tasarrufu için güncellemeleri daha seyrek kontrol eder. Bunun bedeli: sonrasında Envanter sekmesini açmak, yeniden yüklenmesi gerektiğinden bir an için biraz daha yavaş hissettirebilir - bu sırada bir yükleme ekranı gösterilir."
+                "low_power_tray_mode_info": "Uygulama sistem tepsisine küçültüldüğünde, önbelleğe alınmış görselleri temizler ve bellek/pil tasarrufu için güncellemeleri daha seyrek kontrol eder. Bunun bedeli: sonrasında Envanter sekmesini açmak, yeniden yüklenmesi gerektiğinden bir an için biraz daha yavaş hissettirebilir - bu sırada bir yükleme ekranı gösterilir.",
+                "show_inventory_tab": "Envanter sekmesini göster (yeniden başlatma gerekir): ",
+                "show_inventory_tab_info": "Drop'larınızı web panosunun kendi Envanter sayfasından kontrol etmeyi tercih ederseniz Envanter sekmesini burada gizleyebilirsiniz."
             },
             "advanced": {
                 "name": "Gelişmiş",
                 "warning": "Uyarı!",
                 "warning_text": "Bu seçenekler uygulamanın hatalı çalışmasına neden olabilir.\nEğer herhangi bir sorun yaşıyorsanız, bu seçeneklerin tümünün devre dışı olduğundan emin olun.",
                 "enable_badges_emotes": "Rozetler ve ifadeler için kısmi desteği etkinleştir: ",
-                "available_drops_check": "Ekstra kullanılabilir drop kontrolünü etkinleştir: "
+                "available_drops_check": "Ekstra kullanılabilir drop kontrolünü etkinleştir: ",
+                "discord_client_id": "Discord Uygulama Kimliği: ",
+                "discord_rpc_enabled": "Şu anda izlenen kanalı Discord'da göster: ",
+                "discord_rpc_header": "\"İzliyor\" satırı şunu gösterir: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Yayıncının adı",
+                "discord_rpc_image": "Discord kapak görseli: ",
+                "discord_rpc_image_game": "Oyun kapak görseli",
+                "discord_rpc_image_logo": "DropStream logosu",
+                "discord_rpc_image_streamer": "Yayıncının canlı önizlemesi",
+                "mine_unlinked_campaigns": "Hesap bağlı olmasa bile kampanyaları madenle: "
             },
             "priority_modes": {
                 "priority_only": "Sadece öncelik listesi",
@@ -200,7 +224,21 @@
                 "modern_auto": "Twitch Renkleri (Otomatik)",
                 "modern_light": "Twitch Renkleri, Açık",
                 "modern_dark": "Twitch Renkleri, Koyu"
-            }
+            },
+            "reliability": {
+                "enabled": "Çökme sonrası otomatik yeniden başlatma: ",
+                "info": "Uygulama vazgeçmeden önce zaten birkaç kez kendiliğinden yeniden dener. Yine de \"Sonlandırıldı\" ekranında kalırsa, bu seçenek bir gecikmeden sonra isteğe bağlı olarak yeniden başlatır.",
+                "minutes": "Şu kadar dakika sonra yeniden başlat: ",
+                "name": "Güvenilirlik"
+            },
+            "lists_export": "Listeleri dışa aktar",
+            "lists_import": "Listeleri içe aktar",
+            "lists_export_title": "Oyunları ve kanalları dışa aktar",
+            "lists_import_title": "Oyunları ve kanalları içe aktar",
+            "lists_import_ask": "Mevcut listeleriniz içe aktarılanlarla değiştirilsin mi?\nEvet = değiştir, Hayır = birleştir, İptal = vazgeç.",
+            "lists_import_done": "İçe aktarma tamamlandı: {priority} öncelikli oyun, {exclude} hariç tutulan oyun.",
+            "lists_import_invalid": "Bu dosya geçerli bir DropStream liste dışa aktarımı değil.",
+            "lists_export_done": "Dışa aktarıldı: {priority} öncelikli oyun, {exclude} hariç tutulan oyun, {channels} kanal."
         },
         "help": {
             "links": {
@@ -232,7 +270,25 @@
             "per_game": "Oyun Başına Drop",
             "total_drops": "Toplam alınan drop: {count}",
             "hours_saved": "Kazanılan izleme saati: {hours}",
-            "no_data": "Henüz veri yok"
+            "no_data": "Henüz veri yok",
+            "reload": "Yenile"
+        },
+        "remote": {
+            "copy_link": "Kopyala",
+            "enabled": "Web panosunu etkinleştir: ",
+            "info": "Aşağıdaki bağlantıyı kullanarak başka bir cihazdaki tarayıcıdan bu örneğin canlı durumunu görmenizi ve isterseniz kontrol etmenizi (duraklat/devam et, öncelik modu) sağlar. Bağlantıya sahip herkes görüntüleyebilir; bağlantıya ve (varsa) şifreye sahip herkes ayrıca kontrol de edebilir, bu yüzden yalnızca güvendiğiniz kişilerle paylaşın.",
+            "link": "Paylaşım bağlantısı:",
+            "link_disabled": "Bir bağlantı oluşturmak için panoyu etkinleştirin.",
+            "mode_control": "Görüntüleme ve kontrol",
+            "mode_label": "Erişim modu:",
+            "mode_view": "Yalnızca görüntüleme",
+            "new_link": "Yeni bağlantı oluştur",
+            "open_link": "Aç",
+            "password_label": "Kontrol şifresi:",
+            "password_placeholder": "İsteğe bağlı, yoksa boş bırakın",
+            "port": "Port: ",
+            "show_viewers_label": "Sayfada izleyici sayısını göster: ",
+            "show_logs_label": "Sayfada salt okunur bir Günlükler sekmesi göster: "
         }
     }
 }

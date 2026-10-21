@@ -8,7 +8,9 @@
         "claimed_drop": "ドロップを取得しました：{drop}",
         "no_channel": "視聴可能なチャンネルがありません。オンラインになるチャンネルを待機中...",
         "no_campaign": "マイニングするドロップがないアクティブなキャンペーンはありません。アクティブなキャンペーンを待機中...",
-        "auto_action": "現在すべてのドロップを獲得済みです。設定されたアクションを実行します: {action}"
+        "auto_action": "現在すべてのドロップを獲得済みです。設定されたアクションを実行します: {action}",
+        "auto_restart": "自動再起動が有効です。このウィンドウを閉じない限り、{minutes}分後に再起動します。",
+        "auto_restart_now": "再起動しています..."
     },
     "login": {
         "unexpected_content": "予期しないコンテンツタイプが返されました。リダイレクトされたためかもしれません。インターネットアクセスのためにログインが必要ですか？",
@@ -45,14 +47,17 @@
             "adding_campaigns": "キャンペーンをインベントリに追加中... {counter}",
             "paused": "一時停止中",
             "paused_until": "{time}まで一時停止中",
-            "scheduled": "スケジュール時間外"
+            "scheduled": "スケジュール時間外",
+            "auto_restart": "終了しました - {minutes}分後に再起動します"
         },
         "tabs": {
             "main": "メイン",
             "inventory": "インベントリ",
             "settings": "設定",
             "help": "ヘルプ",
-            "dashboard": "ダッシュボード"
+            "dashboard": "ダッシュボード",
+            "games": "ゲーム",
+            "remote": "リモート"
         },
         "tray": {
             "notification_title": "ドロップを取得しました",
@@ -135,7 +140,14 @@
             "and_more": "その他 {amount} 件...",
             "percent_progress": "{minutes} 分のうち {percent}",
             "minutes_progress": "{minutes} 分",
-            "reloading": "インベントリを再読み込み中です、少々お待ちください..."
+            "reloading": "インベントリを再読み込み中です、少々お待ちください...",
+            "server": {
+                "check": "確認",
+                "checking": "サーバー: 確認中...",
+                "down": "サーバー: 接続できません",
+                "ok": "サーバー: OK ({ms} ms)",
+                "unknown": "サーバー: 不明"
+            }
         },
         "settings": {
             "general": {
@@ -151,7 +163,9 @@
                 "priority_mode": "優先モード: ",
                 "priority_mode_info": "優先リストのゲームは、設定した順序で常に最初に試行されます。「終了が最も早いもの」/「可用性が低いものを優先」は、優先リストに何も残っていない場合にのみ、残りの順序を決定します。",
                 "low_power_tray_mode": "最小化時にRAM/バッテリーを節約: ",
-                "low_power_tray_mode_info": "トレイに最小化している間、アプリはキャッシュされた画像を消去し、更新の確認頻度を下げてメモリとバッテリーを節約します。トレードオフとして、その後インベントリタブを開くと再読み込みが必要なため一瞬遅く感じることがあります - その間はローディング画面が表示されます。"
+                "low_power_tray_mode_info": "トレイに最小化している間、アプリはキャッシュされた画像を消去し、更新の確認頻度を下げてメモリとバッテリーを節約します。トレードオフとして、その後インベントリタブを開くと再読み込みが必要なため一瞬遅く感じることがあります - その間はローディング画面が表示されます。",
+                "show_inventory_tab": "インベントリタブを表示する（再起動が必要）: ",
+                "show_inventory_tab_info": "Web ダッシュボード自体のインベントリページでドロップを確認する場合は、ここでインベントリタブを非表示にできます。"
             },
             "game_name": "ゲーム名",
             "priority": "優先度",
@@ -200,8 +214,32 @@
                 "warning": "警告！",
                 "warning_text": "これらのオプションはマイナーの誤動作を引き起こす可能性があります。\n問題が発生した場合は、これらのオプションがすべて無効になっていることを確認してください。",
                 "enable_badges_emotes": "バッジとエモートの部分的なサポートを有効にする: ",
-                "available_drops_check": "利用可能なドロップの追加チェックを有効にする: "
-            }
+                "available_drops_check": "利用可能なドロップの追加チェックを有効にする: ",
+                "discord_client_id": "Discord アプリケーション ID: ",
+                "discord_rpc_enabled": "現在視聴中のチャンネルを Discord に表示する: ",
+                "discord_rpc_header": "「視聴中」の行に表示する内容: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "配信者の名前",
+                "discord_rpc_image": "Discord のカバー画像: ",
+                "discord_rpc_image_game": "ゲームのボックスアート",
+                "discord_rpc_image_logo": "DropStream のロゴ",
+                "discord_rpc_image_streamer": "配信者のライブプレビュー",
+                "mine_unlinked_campaigns": "アカウントが連携されていないキャンペーンもマイニングする: "
+            },
+            "reliability": {
+                "enabled": "クラッシュ時に自動再起動する: ",
+                "info": "アプリはあきらめる前に自動的に何度か再試行します。それでも「終了しました」画面のままになる場合、このオプションで一定時間後に自動的に再起動できます。",
+                "minutes": "再起動までの時間（分）: ",
+                "name": "信頼性"
+            },
+            "lists_export": "リストをエクスポート",
+            "lists_import": "リストをインポート",
+            "lists_export_title": "ゲームとチャンネルをエクスポート",
+            "lists_import_title": "ゲームとチャンネルをインポート",
+            "lists_import_ask": "現在のリストをインポートしたリストで置き換えますか？\nはい = 置き換え、いいえ = 統合、キャンセル = 中止。",
+            "lists_import_done": "インポート完了：優先ゲーム {priority} 件、除外ゲーム {exclude} 件。",
+            "lists_import_invalid": "このファイルは有効な DropStream のリストエクスポートではありません。",
+            "lists_export_done": "エクスポート完了：優先ゲーム {priority} 件、除外ゲーム {exclude} 件、チャンネル {channels} 件。"
         },
         "help": {
             "links": {
@@ -233,7 +271,25 @@
             "per_game": "ゲームごとのドロップ",
             "total_drops": "獲得済みドロップ合計: {count}",
             "hours_saved": "節約した視聴時間: {hours}",
-            "no_data": "まだデータがありません"
+            "no_data": "まだデータがありません",
+            "reload": "再読み込み"
+        },
+        "remote": {
+            "copy_link": "コピー",
+            "enabled": "Web ダッシュボードを有効にする: ",
+            "info": "下のリンクを使って、別の端末のブラウザからこのインスタンスの状態をリアルタイムで確認したり、必要に応じて操作（一時停止/再開、優先モード）したりできます。リンクを知っている人は誰でも閲覧でき、リンクとパスワード（設定されている場合）を知っている人は操作もできるため、信頼できる相手にのみ共有してください。",
+            "link": "共有リンク:",
+            "link_disabled": "リンクを生成するにはダッシュボードを有効にしてください。",
+            "mode_control": "閲覧と操作",
+            "mode_label": "アクセスモード:",
+            "mode_view": "閲覧のみ",
+            "new_link": "新しいリンクを生成",
+            "open_link": "開く",
+            "password_label": "操作用パスワード:",
+            "password_placeholder": "任意。設定しない場合は空欄のままにしてください",
+            "port": "ポート: ",
+            "show_viewers_label": "ページに視聴者数を表示する: ",
+            "show_logs_label": "ページに読み取り専用のログタブを表示する: "
         }
     }
 }

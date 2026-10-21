@@ -8,7 +8,9 @@
         "claimed_drop": "Drop-ul a fost recuperat : {drop}",
         "no_channel": "Nu există canale disponibile pentru vizionare. În așteptarea unui canal ONLINE...",
         "no_campaign": "Nu există campanii active pentru a mina drop-uri. În așteptarea unei campanii active...",
-        "auto_action": "Toate drops-urile sunt gata deocamdată, se execută acțiunea configurată: {action}"
+        "auto_action": "Toate drops-urile sunt gata deocamdată, se execută acțiunea configurată: {action}",
+        "auto_restart": "Repornirea automată este activă: se va relansa în {minutes} minut(e), dacă nu închizi fereastra înainte.",
+        "auto_restart_now": "Se relansează acum..."
     },
     "login": {
         "chrome": {
@@ -45,14 +47,17 @@
             "adding_campaigns": "S-a adăugat lista de campanii la inventar... {counter}",
             "paused": "Pauzat",
             "paused_until": "Pauzat până la {time}",
-            "scheduled": "În afara orelor programate"
+            "scheduled": "În afara orelor programate",
+            "auto_restart": "Terminat - repornire în {minutes}m"
         },
         "tabs": {
             "main": "Principal",
             "inventory": "Inventar",
             "settings": "Setări",
             "help": "Ajutor",
-            "dashboard": "Panou"
+            "dashboard": "Panou",
+            "games": "Jocuri",
+            "remote": "Distant"
         },
         "tray": {
             "notification_title": "Drop minat",
@@ -135,7 +140,14 @@
             "and_more": "și încă {amount}...",
             "percent_progress": "{percent} din {minutes} minute",
             "minutes_progress": "{minutes} minute",
-            "reloading": "Se reîncarcă inventarul tău, va dura doar un moment..."
+            "reloading": "Se reîncarcă inventarul tău, va dura doar un moment...",
+            "server": {
+                "check": "Verifică",
+                "checking": "Server: se verifică...",
+                "down": "Server: inaccesibil",
+                "ok": "Server: OK ({ms} ms)",
+                "unknown": "Server: necunoscut"
+            }
         },
         "settings": {
             "general": {
@@ -151,7 +163,9 @@
                 "priority_mode": "Mod prioritate: ",
                 "priority_mode_info": "Jocurile din lista de priorități sunt încercate mereu primele, în ordinea stabilită. \"Se termină cel mai curând\"/\"Disponibilitate scăzută prima\" determină doar ordinea pentru rest, odată ce nimic din lista de priorități nu mai este disponibil.",
                 "low_power_tray_mode": "Economisește RAM/baterie la minimizare: ",
-                "low_power_tray_mode_info": "Când este minimizată în bara de sistem, aplicația golește imaginile din cache și verifică actualizările mai rar pentru a economisi memorie și baterie. Compromisul: deschiderea filei Inventar ulterior poate părea puțin mai lentă un moment, deoarece trebuie reîncărcată - un ecran de încărcare este afișat în acest timp."
+                "low_power_tray_mode_info": "Când este minimizată în bara de sistem, aplicația golește imaginile din cache și verifică actualizările mai rar pentru a economisi memorie și baterie. Compromisul: deschiderea filei Inventar ulterior poate părea puțin mai lentă un moment, deoarece trebuie reîncărcată - un ecran de încărcare este afișat în acest timp.",
+                "show_inventory_tab": "Afișează fila Inventar (necesită repornire): ",
+                "show_inventory_tab_info": "Fila Inventar poate fi ascunsă aici dacă preferi să îți verifici drop-urile din pagina proprie de Inventar a tabloului de bord web."
             },
             "game_name": "Nume joc",
             "priority": "Prioritate",
@@ -200,8 +214,32 @@
                 "warning": "Avertisment!",
                 "warning_text": "Aceste opțiuni pot face ca aplicația să funcționeze defectuos.\nDacă întâmpini probleme, asigură-te că toate aceste opțiuni sunt dezactivate.",
                 "enable_badges_emotes": "Activează suportul parțial pentru insigne și emote-uri: ",
-                "available_drops_check": "Activează verificarea suplimentară a drops-urilor disponibile: "
-            }
+                "available_drops_check": "Activează verificarea suplimentară a drops-urilor disponibile: ",
+                "discord_client_id": "ID aplicație Discord: ",
+                "discord_rpc_enabled": "Afișează canalul urmărit momentan pe Discord: ",
+                "discord_rpc_header": "Linia „Urmărește” afișează: ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Numele streamerului",
+                "discord_rpc_image": "Imagine de copertă Discord: ",
+                "discord_rpc_image_game": "Coperta jocului",
+                "discord_rpc_image_logo": "Logo DropStream",
+                "discord_rpc_image_streamer": "Previzualizare live a streamerului",
+                "mine_unlinked_campaigns": "Minează campaniile chiar dacă contul nu este conectat: "
+            },
+            "reliability": {
+                "enabled": "Repornire automată la blocare: ",
+                "info": "Aplicația încearcă deja de câteva ori pe cont propriu înainte de a renunța. Dacă tot ajunge pe un ecran „Terminat”, această opțiune o repornește automat după o întârziere.",
+                "minutes": "Repornește după (minute): ",
+                "name": "Fiabilitate"
+            },
+            "lists_export": "Exportă listele",
+            "lists_import": "Importă listele",
+            "lists_export_title": "Exportă jocuri și canale",
+            "lists_import_title": "Importă jocuri și canale",
+            "lists_import_ask": "Înlocuiești listele actuale cu cele importate?\nDa = înlocuiește, Nu = îmbină, Anulare = renunță.",
+            "lists_import_done": "Import finalizat: {priority} jocuri prioritare, {exclude} jocuri excluse.",
+            "lists_import_invalid": "Acest fișier nu este un export de liste DropStream valid.",
+            "lists_export_done": "Exportat: {priority} jocuri prioritare, {exclude} jocuri excluse, {channels} canale."
         },
         "help": {
             "links": {
@@ -233,7 +271,25 @@
             "per_game": "Drops per joc",
             "total_drops": "Total drops revendicate: {count}",
             "hours_saved": "Ore de vizionare economisite: {hours}",
-            "no_data": "Încă nu există date"
+            "no_data": "Încă nu există date",
+            "reload": "Reîncarcă"
+        },
+        "remote": {
+            "copy_link": "Copiază",
+            "enabled": "Activează tabloul de bord web: ",
+            "info": "Îți permite să vezi starea în timp real și, dacă alegi, să controlezi această instanță (pauză/reluare, mod prioritate) dintr-un browser de pe alt dispozitiv, folosind linkul de mai jos. Oricine are linkul poate vizualiza; oricine are linkul și parola (dacă e setată) poate și controla, așa că partajează-l doar cu persoane de încredere.",
+            "link": "Link de partajare:",
+            "link_disabled": "Activează tabloul de bord pentru a genera un link.",
+            "mode_control": "Vizualizare și control",
+            "mode_label": "Mod de acces:",
+            "mode_view": "Doar vizualizare",
+            "new_link": "Generează un link nou",
+            "open_link": "Deschide",
+            "password_label": "Parolă de control:",
+            "password_placeholder": "Opțional, lasă gol pentru niciuna",
+            "port": "Port: ",
+            "show_viewers_label": "Afișează numărul de spectatori pe pagină: ",
+            "show_logs_label": "Afișează o filă Jurnale needitabilă pe pagină: "
         }
     }
 }

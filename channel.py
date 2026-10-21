@@ -490,8 +490,12 @@ class Channel:
             async with self._twitch.request(
                 "POST", self._spade_url, data=self._stream.spade_payload
             ) as response:
-                return response.status == 204
+                if response.status == 204:
+                    return True
+                self._spade_url = None  # get a fresh url next time
+                return False
         except RequestException:
+            self._spade_url = None
             return False
 
     # NOTE: This is currently unused.

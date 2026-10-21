@@ -232,7 +232,15 @@
                 "info": "De app probeert het al zelf een paar keer opnieuw voordat hij het opgeeft. Als hij toch op een \"Beëindigd\"-scherm belandt, herstart deze optie hem optioneel automatisch na een vertraging.",
                 "enabled": "Automatisch herstarten bij crash: ",
                 "minutes": "Herstarten na (minuten): "
-            }
+            },
+            "lists_export": "Lijsten exporteren",
+            "lists_import": "Lijsten importeren",
+            "lists_export_title": "Games en kanalen exporteren",
+            "lists_import_title": "Games en kanalen importeren",
+            "lists_import_ask": "Je huidige lijsten vervangen door de geïmporteerde?\nJa = vervangen, Nee = samenvoegen, Annuleren = afbreken.",
+            "lists_import_done": "Import voltooid: {priority} prioriteitsgames, {exclude} uitgesloten games.",
+            "lists_import_invalid": "Dit bestand is geen geldige DropStream-lijstexport.",
+            "lists_export_done": "Geëxporteerd: {priority} prioriteitsgames, {exclude} uitgesloten games, {channels} kanalen."
         },
         "help": {
             "links": {

@@ -56,7 +56,8 @@
             "settings": "Paramètres",
             "help": "Aide",
             "dashboard": "Tableau de bord",
-            "remote": "Distant"
+            "remote": "Distant",
+            "games": "Jeux"
         },
         "tray": {
             "notification_title": "Drop miné",
@@ -139,7 +140,14 @@
             "and_more": "et {amount} de plus...",
             "percent_progress": "{percent} de {minutes} minutes",
             "minutes_progress": "{minutes} minutes",
-            "reloading": "Rechargement de ton inventaire, ça ne prend qu'un instant..."
+            "reloading": "Rechargement de ton inventaire, ça ne prend qu'un instant...",
+            "server": {
+                "check": "Vérifier",
+                "checking": "Serveur : vérification...",
+                "down": "Serveur : injoignable",
+                "ok": "Serveur : OK ({ms} ms)",
+                "unknown": "Serveur : inconnu"
+            }
         },
         "settings": {
             "general": {
@@ -153,7 +161,9 @@
                 "use_system_accent": "Utiliser la couleur d'accentuation du système : ",
                 "priority_mode_info": "Les jeux de la liste de priorité sont toujours essayés en premier, dans l'ordre défini. « Se termine le plus tôt »/« Faible disponibilité en premier » ne déterminent que l'ordre pour tout le reste, une fois qu'il n'y a plus rien à farmer dans la liste de priorité.",
                 "low_power_tray_mode": "Économiser RAM/batterie une fois réduit : ",
-                "low_power_tray_mode_info": "Une fois réduite dans la barre des tâches, l'app vide ses images en cache et vérifie les mises à jour moins souvent pour économiser mémoire et batterie. En contrepartie : ouvrir l'onglet Inventaire ensuite peut sembler un peu plus lent le temps qu'il se recharge - un écran de chargement s'affiche pendant ce temps."
+                "low_power_tray_mode_info": "Une fois réduite dans la barre des tâches, l'app vide ses images en cache et vérifie les mises à jour moins souvent pour économiser mémoire et batterie. En contrepartie : ouvrir l'onglet Inventaire ensuite peut sembler un peu plus lent le temps qu'il se recharge - un écran de chargement s'affiche pendant ce temps.",
+                "show_inventory_tab": "Afficher l'onglet Inventaire (redémarrage requis) : ",
+                "show_inventory_tab_info": "Vous pouvez masquer ici l'onglet Inventaire si vous préférez consulter vos drops depuis la page Inventaire du tableau de bord web."
             },
             "priority_modes": {
                 "priority_only": "Liste de priorité uniquement",
@@ -202,14 +212,32 @@
                 "warning": "Attention !",
                 "warning_text": "Ces options peuvent perturber le fonctionnement du mineur.\nSi vous rencontrez des problèmes, assurez-vous qu'elles sont toutes désactivées.",
                 "enable_badges_emotes": "Activer le support partiel des badges et émotes : ",
-                "available_drops_check": "Activer la vérification supplémentaire des drops disponibles : "
+                "available_drops_check": "Activer la vérification supplémentaire des drops disponibles : ",
+                "discord_client_id": "ID de l'application Discord : ",
+                "discord_rpc_enabled": "Afficher la chaîne actuellement regardée sur Discord : ",
+                "discord_rpc_header": "La ligne « En train de regarder » affiche : ",
+                "discord_rpc_header_app": "DropStream",
+                "discord_rpc_header_streamer": "Le nom du streamer",
+                "discord_rpc_image": "Image de couverture Discord : ",
+                "discord_rpc_image_game": "Jaquette du jeu",
+                "discord_rpc_image_logo": "Logo de DropStream",
+                "discord_rpc_image_streamer": "Aperçu en direct du streamer",
+                "mine_unlinked_campaigns": "Miner les campagnes même si le compte n'est pas lié : "
             },
             "reliability": {
                 "name": "Fiabilité",
                 "info": "L'application retente déjà plusieurs fois automatiquement avant d'abandonner. Si elle finit malgré tout sur un écran « Arrêtée », cette option la relance automatiquement après un délai.",
                 "enabled": "Redémarrage automatique après un plantage : ",
                 "minutes": "Redémarrer après (minutes) : "
-            }
+            },
+            "lists_export": "Exporter les listes",
+            "lists_import": "Importer les listes",
+            "lists_export_title": "Exporter les jeux et chaînes",
+            "lists_import_title": "Importer les jeux et chaînes",
+            "lists_import_ask": "Remplacer vos listes actuelles par celles importées ?\nOui = remplacer, Non = fusionner, Annuler = abandonner.",
+            "lists_import_done": "Import terminé : {priority} jeux prioritaires, {exclude} jeux exclus.",
+            "lists_import_invalid": "Ce fichier n'est pas un export de listes DropStream valide.",
+            "lists_export_done": "Exporté : {priority} jeux prioritaires, {exclude} jeux exclus, {channels} chaînes."
         },
         "help": {
             "links": {
@@ -241,7 +269,8 @@
             "pause_until": "Mettre en pause jusqu'à",
             "resume_at_info": "Exemple : tapez 14:30 puis cliquez sur « Mettre en pause jusqu'à » pour mettre en pause maintenant et reprendre automatiquement à 14h30 (aujourd'hui, ou demain si l'heure est déjà passée).",
             "drop_remaining": "Temps restant pour ce drop : ",
-            "campaign_remaining": "Temps restant pour la campagne : "
+            "campaign_remaining": "Temps restant pour la campagne : ",
+            "reload": "Recharger"
         },
         "remote": {
             "info": "Permet de consulter l'état en direct et, si vous le choisissez, de contrôler cette instance (pause/reprise, mode de priorité) depuis un navigateur, sur un autre appareil, grâce au lien ci-dessous. Toute personne disposant du lien peut consulter ; toute personne disposant du lien et du mot de passe (si défini) peut aussi contrôler l'application. Ne le partagez donc qu'avec des personnes de confiance.",
@@ -260,7 +289,9 @@
             "open_link": "Ouvrir",
             "public_link": "Lien de partage public :",
             "public_link_resolving": "Recherche de votre IP publique...",
-            "public_link_unavailable": "Impossible de déterminer une IP publique pour le moment."
+            "public_link_unavailable": "Impossible de déterminer une IP publique pour le moment.",
+            "show_viewers_label": "Afficher le nombre de spectateurs sur la page : ",
+            "show_logs_label": "Afficher un onglet Journaux en lecture seule sur la page : "
         }
     }
 }

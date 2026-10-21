@@ -202,6 +202,7 @@ if __name__ == "__main__":
         logger.addHandler(buffer_handler)
 
         exit_status = 0
+        captcha_error = False
         client = Twitch(settings)
         loop = asyncio.get_running_loop()
         if sys.platform == "linux":
@@ -211,6 +212,7 @@ if __name__ == "__main__":
             await client.run()
         except CaptchaRequired:
             exit_status = 1
+            captcha_error = True
             client.prevent_close()
             client.print(_("error", "captcha"))
         except Exception:
@@ -231,7 +233,8 @@ if __name__ == "__main__":
             client.gui.status.update(_("gui", "status", "terminated"))
             # notify the user about the closure
             client.gui.grab_attention(sound=True)
-            if settings.auto_restart_enabled:
+            # always retry (forever), except when a captcha needs the user
+            if not captcha_error:
                 # give the user a chance to look at the error and cancel by closing the
                 # window manually; if they don't, relaunch a fresh instance once the timer
                 # elapses. os.execv replaces the current process outright (same PID isn't

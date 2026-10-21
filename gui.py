@@ -10,6 +10,7 @@ import asyncio
 import logging
 import plistlib
 import webbrowser
+import json
 import tkinter as tk
 from pathlib import Path
 from collections import abc
@@ -20,7 +21,7 @@ from tkinter.font import Font, nametofont
 import tkinter.font as tkfont
 from functools import partial, cached_property
 from datetime import datetime, timedelta, timezone
-from tkinter import Tk, ttk, StringVar, DoubleVar, IntVar, messagebox
+from tkinter import Tk, ttk, StringVar, DoubleVar, IntVar, messagebox, filedialog
 from typing import Any, Union, Tuple, TypedDict, Generic, TYPE_CHECKING, Literal, cast
 
 # Local aliases for tkinter's private (underscore-prefixed) stub-only type aliases.
@@ -811,6 +812,11 @@ class CampaignProgress:
         while self._seconds > 0:
             await asyncio.sleep(1)
             self._seconds -= 1
+            if (
+                self._manager._minimized
+                and self._manager._twitch.settings.low_power_tray_mode
+            ):
+                continue  # nobody sees the widgets: skip the redraw, keep the count
             self._update_time()
         self._timer_task = None
 
@@ -2858,6 +2864,119 @@ class SettingsPanel:
             text=_("gui", "settings", "reload"),
             command=self._manager._twitch.force_reload,
         ).grid(column=1, row=0)
+        # Export / import of the games lists (priority + excluded) and the channels seen
+        io_frame = ttk.Frame(center_frame)
+        io_frame.grid(column=0, row=6, pady=(0, 4))
+        ttk.Button(
+            io_frame, text=_("gui", "settings", "lists_export"), command=self.export_lists
+        ).grid(column=0, row=0, padx=4)
+        ttk.Button(
+            io_frame, text=_("gui", "settings", "lists_import"), command=self.import_lists
+        ).grid(column=1, row=0, padx=4)
+
+    LISTS_FORMAT = "DropStream-lists"
+    LISTS_MAX_ITEMS = 2000
+
+    def export_lists(self) -> None:
+        path = filedialog.asksaveasfilename(
+            title=_("gui", "settings", "lists_export_title"),
+            defaultextension=".json",
+            initialfile="dropstream_lists.json",
+            filetypes=[("JSON", "*.json")],
+        )
+        if not path:
+            return
+        channels = [
+            channel._login for channel in list(self._manager._twitch.channels.values())
+        ]
+        data = {
+            "format": self.LISTS_FORMAT,
+            "version": 1,
+            "priority": list(self._settings.priority),
+            "exclude": sorted(self._settings.exclude),
+            # informational snapshot of the channels currently listed; not re-imported
+            "channels": channels,
+        }
+        try:
+            with open(path, "w", encoding="utf8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+        except OSError as exc:
+            messagebox.showerror(_("gui", "settings", "lists_export_title"), str(exc))
+            return
+        messagebox.showinfo(
+            _("gui", "settings", "lists_export_title"),
+            _("gui", "settings", "lists_export_done").format(
+                priority=len(data["priority"]),
+                exclude=len(data["exclude"]),
+                channels=len(channels),
+            ),
+        )
+
+    @classmethod
+    def _clean_names(cls, value: Any) -> list[str] | None:
+        # validates untrusted input: list of non-empty strings, deduplicated, bounded
+        if not isinstance(value, list):
+            return None
+        result: list[str] = []
+        seen: set[str] = set()
+        for item in value[:cls.LISTS_MAX_ITEMS]:
+            if not isinstance(item, str):
+                continue
+            item = item.strip()[:200]
+            if item and item not in seen:
+                seen.add(item)
+                result.append(item)
+        return result
+
+    def import_lists(self) -> None:
+        path = filedialog.askopenfilename(
+            title=_("gui", "settings", "lists_import_title"),
+            filetypes=[("JSON", "*.json")],
+        )
+        if not path:
+            return
+        title = _("gui", "settings", "lists_import_title")
+        try:
+            with open(path, "r", encoding="utf8") as file:
+                data = json.load(file)
+        except (OSError, ValueError):
+            messagebox.showerror(title, _("gui", "settings", "lists_import_invalid"))
+            return
+        if not isinstance(data, dict) or data.get("format") != self.LISTS_FORMAT:
+            messagebox.showerror(title, _("gui", "settings", "lists_import_invalid"))
+            return
+        priority = self._clean_names(data.get("priority", []))
+        exclude = self._clean_names(data.get("exclude", []))
+        if priority is None or exclude is None:
+            messagebox.showerror(title, _("gui", "settings", "lists_import_invalid"))
+            return
+        answer = messagebox.askyesnocancel(title, _("gui", "settings", "lists_import_ask"))
+        if answer is None:
+            return
+        if answer:  # replace
+            new_priority = priority
+            new_exclude = set(exclude)
+        else:  # merge: keep current order, append the new ones
+            new_priority = list(self._settings.priority)
+            new_priority.extend(g for g in priority if g not in new_priority)
+            new_exclude = set(self._settings.exclude) | set(exclude)
+        self._settings.priority[:] = new_priority
+        self._settings.exclude.clear()
+        self._settings.exclude.update(new_exclude)
+        self._settings.alter()
+        self._priority_list.delete(0, "end")
+        self._priority_list.insert("end", *self._settings.priority)
+        self._exclude_list.delete(0, "end")
+        self._exclude_list.insert("end", *sorted(self._settings.exclude))
+        self.update_priority_choices()
+        self.update_excluded_choices()
+        self._manager._twitch.change_state(State.GAMES_UPDATE)
+        messagebox.showinfo(
+            title,
+            _("gui", "settings", "lists_import_done").format(
+                priority=len(self._settings.priority), exclude=len(self._settings.exclude)
+            ),
+        )
 
     def clear_selection(self) -> None:
         self._priority_list.selection_clear(0, "end")
@@ -3319,19 +3438,30 @@ class HelpTab:
         asyncio.create_task(task_wrapper(self._invalidate_token)())
 
     async def _invalidate_token(self) -> None:
-        auth_state = await self._twitch.get_auth()
-        async with self._twitch.request(
-            "POST",
-            "https://id.twitch.tv/oauth2/revoke",
-            data={
-                "client_id": self._twitch._client_type.CLIENT_ID,
-                "token": auth_state.access_token,
-            }
-        ) as response:
-            if response.status == 200:
-                auth_state.invalidate(delete_cookies=True)
-            else:
-                logger.error(f"Failed to invalidate the auth token: {response.status}")
+        # do not call get_auth() here: it can start a login by itself
+        auth_state = self._twitch._auth_state
+        token = getattr(auth_state, "access_token", None)
+
+        async def revoke() -> None:
+            async with self._twitch.request(
+                "POST",
+                "https://id.twitch.tv/oauth2/revoke",
+                data={
+                    "client_id": self._twitch._client_type.CLIENT_ID,
+                    "token": token,
+                }
+            ) as response:
+                if response.status != 200:
+                    logger.error(f"Failed to revoke the auth token: {response.status}")
+
+        if token:
+            try:
+                # short timeout: no internet must not block the logout
+                await asyncio.wait_for(revoke(), timeout=10)
+            except Exception:
+                logger.exception("Token revoke failed, logging out locally anyway")
+        # always forget the session locally, even if the revoke failed
+        auth_state.invalidate(delete_cookies=True)
         self._twitch.change_state(State.RESTART)
 
 
