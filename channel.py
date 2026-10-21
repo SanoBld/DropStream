@@ -308,20 +308,31 @@ class Channel:
         """
         SETTINGS_PATTERN: str = r'src="(https://[\w.]+/config/settings\.[0-9a-f]{32}\.js)"'
         SPADE_PATTERN: str = r'"spade_?url": ?"(https://[.\w\-/]+)"'
-        async with self._twitch.request("GET", self.url) as response1:
-            streamer_html: str = await response1.text(encoding="utf8")
-        match = re.search(SPADE_PATTERN, streamer_html, re.I)
-        if not match:
-            match = re.search(SETTINGS_PATTERN, streamer_html, re.I)
-            if not match:
-                raise MinerException("Error while spade_url extraction: step #1")
-            streamer_settings = match.group(1)
-            async with self._twitch.request("GET", streamer_settings) as response2:
-                settings_js: str = await response2.text(encoding="utf8")
-            match = re.search(SPADE_PATTERN, settings_js, re.I)
-            if not match:
-                raise MinerException("Error while spade_url extraction: step #2")
-        return URLType(match.group(1))
+        # the TV client's own page doesn't carry the spade URL: try the regular web pages,
+        # and fall back to Twitch's well-known tracking endpoint
+        login = self._login
+        for page_url in (
+            f"https://www.twitch.tv/{login}",
+            f"https://m.twitch.tv/{login}",
+            self.url,
+        ):
+            try:
+                async with self._twitch.request("GET", page_url) as response1:
+                    streamer_html: str = await response1.text(encoding="utf8")
+                match = re.search(SPADE_PATTERN, streamer_html, re.I)
+                if not match:
+                    settings_match = re.search(SETTINGS_PATTERN, streamer_html, re.I)
+                    if settings_match:
+                        async with self._twitch.request(
+                            "GET", settings_match.group(1)
+                        ) as response2:
+                            settings_js: str = await response2.text(encoding="utf8")
+                        match = re.search(SPADE_PATTERN, settings_js, re.I)
+                if match:
+                    return URLType(match.group(1))
+            except RequestException:
+                continue
+        return URLType("https://spade.twitch.tv/track")
 
     def _check_drops_enabled(self, available_drops: list[JsonType]) -> bool:
         return any(
