@@ -4,6 +4,7 @@ import re
 import gzip
 import json
 import asyncio
+from time import time
 import logging
 from base64 import b64encode
 from functools import cached_property
@@ -446,12 +447,15 @@ class Channel:
         """
         if self._stream is None:
             return False
+        dbg = self._seg_dbg = getattr(self, "_seg_dbg", None) or {"pl": "-", "ok": 0, "bad": 0, "hs": "-"}
         stream_url = await self._stream.get_stream_url()
         if stream_url is None:
+            dbg["pl"] = "no url"
             return False
         async with self._twitch.request(
             "GET", stream_url, headers={"Connection": "close"}
         ) as response:
+            dbg["pl"] = response.status
             if response.status >= 400:
                 # token expired or stream is offline: get a fresh playlist url next time
                 self._stream._stream_url = None
@@ -471,6 +475,11 @@ class Channel:
             seen[segment_url] = None
             try:
                 async with self._twitch.request("HEAD", URL(segment_url)) as head:
+                    dbg["hs"] = head.status
+                    if head.status == 200:
+                        dbg["ok"] += 1
+                    else:
+                        dbg["bad"] += 1
                     ok = (head.status == 200) or ok
             except RequestException:
                 pass
@@ -481,9 +490,17 @@ class Channel:
 
     async def poll_segments(self) -> None:
         """Runs in the background while this channel is watched, until cancelled."""
+        last_print = 0.0
         while True:
             try:
                 ok = await self._send_watch_playlist()
+                if time() - last_print >= 60:
+                    last_print = time()
+                    d = getattr(self, "_seg_dbg", {})
+                    self._twitch.print(
+                        f"[debug] {self.name}: playlist={d.get('pl')} "
+                        f"segments ok={d.get('ok')} bad={d.get('bad')} last={d.get('hs')}"
+                    )
             except asyncio.CancelledError:
                 raise
             except Exception as exc:
