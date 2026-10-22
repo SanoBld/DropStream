@@ -492,20 +492,23 @@ class Channel:
         """Runs in the background while this channel is watched, until cancelled."""
         last_print = 0.0
         while True:
+            err = ""
             try:
                 ok = await self._send_watch_playlist()
-                if time() - last_print >= 60:
-                    last_print = time()
-                    d = getattr(self, "_seg_dbg", {})
-                    self._twitch.print(
-                        f"[debug] {self.name}: playlist={d.get('pl')} "
-                        f"segments ok={d.get('ok')} bad={d.get('bad')} last={d.get('hs')}"
-                    )
             except asyncio.CancelledError:
                 raise
             except Exception as exc:
                 logger.log(CALL, f"Segment polling error on {self.name}: {exc}")
+                err = f" ERROR={type(exc).__name__}: {exc}"
                 ok = False
+            # print first right away, then once per minute (also when it fails)
+            if time() - last_print >= 60:
+                last_print = time()
+                d = getattr(self, "_seg_dbg", None) or {}
+                self._twitch.print(
+                    f"[debug] {self.name}: playlist={d.get('pl')} "
+                    f"segments ok={d.get('ok')} bad={d.get('bad')} last={d.get('hs')}{err}"
+                )
             await asyncio.sleep(8 if ok else 15)
 
     async def send_watch(self) -> bool:
