@@ -439,71 +439,67 @@ class Channel:
         if needs_display:
             self.display()
 
-    # NOTE: This is currently unused.
     async def _send_watch_playlist(self) -> bool:
         """
-        This performs a HEAD request on the stream's current playlist,
-        to simulate watching the stream.
-        Optimally, send every ~20 seconds to advance drops.
+        Act like a real player: read the media playlist and send a HEAD request
+        for every new segment. Twitch only credits drop watch time when it sees this.
         """
         if self._stream is None:
             return False
-        # get the stream url
         stream_url = await self._stream.get_stream_url()
         if stream_url is None:
             return False
-        # fetch a list of chunks available to download for the stream
-        # NOTE: the CDN is configured to forcibly disconnect shortly after serving the list,
-        # if we don't do it yourselves. Lets help it by actually doing it ourselves instead.
         async with self._twitch.request(
             "GET", stream_url, headers={"Connection": "close"}
-        ) as chunks_response:
-            if chunks_response.status >= 400:
-                # if the stream goes OFFLINE, trying to get a list of chunks returns a 404
+        ) as response:
+            if response.status >= 400:
+                # token expired or stream is offline: get a fresh playlist url next time
+                self._stream._stream_url = None
                 return False
-            available_chunks: str = await chunks_response.text()
-        # the response may contain some invalid JSON with duplicate double quotes
-        # in the value strings: we need to get rid of them by removing the "url" key entirely
-        # if no JSON can be found within the response, this is a NOOP
-        available_chunks = re.sub(r'"url": ?".+}",', '', available_chunks)
-        # try to decode the suspected JSON
-        try:
-            available_json: JsonType = json.loads(available_chunks)
-        except json.JSONDecodeError:
-            # No JSON: this is the expected path. Do nothing and continue with the below.
-            pass
-        else:
-            # JSON was decoded - if there's an error, log it and report failure
-            if isinstance(available_json, list):
-                available_json = available_json[0]
-            if "error" in available_json:
-                logger.error(f"Send watch error: \"{available_json['error']}\"")
-            return False
-        # the list contains ~10-13 chunks of the stream at 2s intervals,
-        # pick the last chunk URL available. Ensure it's not the end-of-stream tag,
-        # otherwise use the 2nd to last line.
-        chunks_list: list[str] = available_chunks.strip().split("\n")
-        selected_chunk: str = chunks_list[-1]
-        if selected_chunk == "#EXT-X-ENDLIST":
-            selected_chunk = chunks_list[-2]
-        stream_chunk_url: URLType = URLType(selected_chunk)
-        # sending a HEAD request is enough to advance the drops,
-        # without downloading the actual stream data
-        async with self._twitch.request("HEAD", stream_chunk_url) as head_response:
-            return head_response.status == 200
+            playlist: str = await response.text()
+        seen: dict[str, None] = getattr(self, "_seen_segments", None)
+        if seen is None:
+            seen = self._seen_segments = {}
+        ok = False
+        for line in playlist.splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            segment_url = str(URL(str(stream_url)).join(URL(line)))
+            if segment_url in seen:
+                continue
+            seen[segment_url] = None
+            try:
+                async with self._twitch.request("HEAD", URL(segment_url)) as head:
+                    ok = (head.status == 200) or ok
+            except RequestException:
+                pass
+        # keep only the latest segments in memory
+        while len(seen) > 100:
+            seen.pop(next(iter(seen)))
+        return ok
+
+    async def poll_segments(self) -> None:
+        """Runs in the background while this channel is watched, until cancelled."""
+        while True:
+            try:
+                ok = await self._send_watch_playlist()
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                logger.log(CALL, f"Segment polling error on {self.name}: {exc}")
+                ok = False
+            await asyncio.sleep(8 if ok else 15)
 
     async def send_watch(self) -> bool:
         if self._stream is None:
             return False
         ok = await self._send_watch_spade()
-        # Twitch isn't crediting the watch time (flagged by the stall warning): also send the
-        # other kinds of "watching" signals, in case one of them is the one it counts
         if getattr(self._twitch, "_stall_warned", False):
-            for extra in (self._send_watch_gql, self._send_watch_playlist):
-                try:
-                    ok = bool(await extra()) or ok
-                except Exception:
-                    pass
+            try:
+                ok = bool(await self._send_watch_gql()) or ok
+            except Exception:
+                pass
         return ok
 
     async def _send_watch_spade(self) -> bool:

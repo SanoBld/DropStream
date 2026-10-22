@@ -1051,6 +1051,12 @@ class Twitch:
                 # if the channel isn't online anymore, we stop watching it
                 self.stop_watching()
                 continue
+            # background task: request the video segments like a real player does
+            seg_task = getattr(self, "_seg_task", None)
+            if getattr(self, "_seg_channel", None) is not channel or seg_task is None or seg_task.done():
+                self._stop_segments()
+                self._seg_channel = channel
+                self._seg_task = asyncio.create_task(channel.poll_segments())
             # logger.log(CALL, f"Sending watch payload to: {channel.name}")
             succeeded: bool = await channel.send_watch()
             last_sent: float = time()
@@ -1278,7 +1284,15 @@ class Twitch:
                 show_streamer_in_header=(self.settings.discord_rpc_header == "streamer"),
             )
 
+    def _stop_segments(self) -> None:
+        seg_task = getattr(self, "_seg_task", None)
+        if seg_task is not None:
+            seg_task.cancel()
+        self._seg_task = None
+        self._seg_channel = None
+
     def stop_watching(self):
+        self._stop_segments()
         self.gui.clear_drop()
         self.watching_channel.clear()
         self.gui.channels.clear_watching()
