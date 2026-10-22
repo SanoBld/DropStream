@@ -53,7 +53,8 @@
             "paused": "Pausiert",
             "paused_until": "Pausiert bis {time}",
             "scheduled": "Außerhalb der geplanten Zeiten",
-            "auto_restart": "Beendet - Neustart in {minutes} Min"
+            "auto_restart": "Beendet - Neustart in {minutes} Min",
+            "stalled": "Läuft, aber Twitch zählt keinen Fortschritt"
         },
         "tabs": {
             "main": "Hauptseite",

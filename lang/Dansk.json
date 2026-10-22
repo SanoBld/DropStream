@@ -53,7 +53,8 @@
             "paused": "Sat på pause",
             "paused_until": "Sat på pause indtil {time}",
             "scheduled": "Uden for planlagte timer",
-            "auto_restart": "Afsluttet - genstarter om {minutes} min"
+            "auto_restart": "Afsluttet - genstarter om {minutes} min",
+            "stalled": "Ser med, men Twitch tæller ingen fremgang"
         },
         "tabs": {
             "main": "Main",

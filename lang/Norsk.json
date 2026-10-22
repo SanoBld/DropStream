@@ -53,7 +53,8 @@
             "paused": "Satt på pause",
             "paused_until": "Satt på pause til {time}",
             "scheduled": "Utenfor planlagte timer",
-            "auto_restart": "Avsluttet - omstart om {minutes} min"
+            "auto_restart": "Avsluttet - omstart om {minutes} min",
+            "stalled": "Ser på, men Twitch teller ingen fremgang"
         },
         "tabs": {
             "main": "Hoved",

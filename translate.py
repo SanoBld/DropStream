@@ -66,6 +66,7 @@ class GUIStatus(TypedDict):
     fetching_campaigns: str
     adding_campaigns: str
     paused: str
+    stalled: str
     paused_until: str
     scheduled: str
     auto_restart: str
@@ -437,6 +438,7 @@ default_translation: Translation = {
             "fetching_campaigns": "Fetching campaigns...",
             "adding_campaigns": "Adding campaigns to inventory... {counter}",
             "paused": "Paused",
+            "stalled": "Watching, but Twitch is not crediting progress",
             "paused_until": "Paused until {time}",
             "scheduled": "Outside scheduled hours",
             "auto_restart": "Terminated - restarting in {minutes}m",

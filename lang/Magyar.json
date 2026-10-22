@@ -53,7 +53,8 @@
             "paused": "Szüneteltetve",
             "paused_until": "Szüneteltetve eddig: {time}",
             "scheduled": "Az ütemezett időn kívül",
-            "auto_restart": "Leállítva - újraindítás {minutes} perc múlva"
+            "auto_restart": "Leállítva - újraindítás {minutes} perc múlva",
+            "stalled": "Nézés folyik, de a Twitch nem számít be haladást"
         },
         "tabs": {
             "main": "Főoldal",

@@ -53,7 +53,8 @@
             "paused": "Dijeda",
             "paused_until": "Dijeda hingga {time}",
             "scheduled": "Di luar jam terjadwal",
-            "auto_restart": "Dihentikan - mulai ulang dalam {minutes} mnt"
+            "auto_restart": "Dihentikan - mulai ulang dalam {minutes} mnt",
+            "stalled": "Sedang menonton, tapi Twitch tidak mencatat progres"
         },
         "tabs": {
             "main": "Umum",

@@ -53,7 +53,8 @@
             "paused": "Wstrzymano",
             "paused_until": "Wstrzymano do {time}",
             "scheduled": "Poza zaplanowanymi godzinami",
-            "auto_restart": "Zakończono - restart za {minutes} min"
+            "auto_restart": "Zakończono - restart za {minutes} min",
+            "stalled": "Oglądanie trwa, ale Twitch nie zalicza postępu"
         },
         "tabs": {
             "main": "Główna",

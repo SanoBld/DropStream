@@ -53,7 +53,8 @@
             "paused": "In pausa",
             "paused_until": "In pausa fino alle {time}",
             "scheduled": "Fuori dagli orari pianificati",
-            "auto_restart": "Terminato - riavvio tra {minutes} min"
+            "auto_restart": "Terminato - riavvio tra {minutes} min",
+            "stalled": "In visione, ma Twitch non accredita i progressi"
         },
         "tabs": {
             "main": "Principale",

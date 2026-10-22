@@ -342,6 +342,8 @@ class WebDashboard:
         # (running, unpaused, but nothing is currently being watched)
         if twitch.paused:
             status = "paused"
+        elif watching is not None and getattr(twitch, "_stall_warned", False):
+            status = "stalled"
         elif watching is not None:
             status = "mining"
         else:
@@ -419,6 +421,7 @@ class WebDashboard:
     # desktop tray icon, so the tab tells you what's happening at a glance too
     _FAVICON_BY_STATUS = {
         "mining": "active.ico",
+        "stalled": "maint.ico",
         "paused": "maint.ico",
         "idle": "idle.ico",
     }
@@ -428,7 +431,7 @@ class WebDashboard:
         if twitch.paused:
             status = "paused"
         elif twitch.watching_channel.get_with_default(None) is not None:
-            status = "mining"
+            status = "stalled" if getattr(twitch, "_stall_warned", False) else "mining"
         else:
             status = "idle"
         filename = self._FAVICON_BY_STATUS.get(status, "idle.ico")
@@ -718,6 +721,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
   .dot.mining { background: var(--green); }
   .dot.paused { background: var(--amber); }
+  .dot.stalled { background: #ff7a1a; }
   .dot.idle { background: var(--red); }
   .bar { background: var(--input-bg); border-radius: 6px; overflow: hidden; height: 10px; margin-top: 6px; }
   .bar > div { background: var(--accent); height: 100%; transition: width .3s; }
@@ -1214,6 +1218,7 @@ const I18N = {
     "mode_view": "View only",
     "mode_control": "View & control",
     "mining": "Mining",
+    "stalled": "No progress",
     "paused": "Paused",
     "pause": "Pause",
     "resume": "Resume",
@@ -1328,6 +1333,7 @@ const I18N = {
     "mode_view": "Consultation uniquement",
     "mode_control": "Consultation et contrôle",
     "mining": "En cours",
+    "stalled": "Bloqué",
     "paused": "En pause",
     "pause": "Pause",
     "resume": "Reprendre",
@@ -1442,6 +1448,7 @@ const I18N = {
     "mode_view": "Nur ansehen",
     "mode_control": "Ansehen & steuern",
     "mining": "Aktiv",
+    "stalled": "Kein Fortschritt",
     "paused": "Pausiert",
     "pause": "Pause",
     "resume": "Fortsetzen",
@@ -1543,6 +1550,7 @@ const I18N = {
     "mode_view": "Solo ver",
     "mode_control": "Ver y controlar",
     "mining": "Minando",
+    "stalled": "Sin progreso",
     "paused": "En pausa",
     "pause": "Pausar",
     "resume": "Reanudar",
@@ -1644,6 +1652,7 @@ const I18N = {
     "mode_view": "Solo visualizzazione",
     "mode_control": "Visualizzazione e controllo",
     "mining": "In corso",
+    "stalled": "Nessun progresso",
     "paused": "In pausa",
     "pause": "Pausa",
     "resume": "Riprendi",
@@ -1745,6 +1754,7 @@ const I18N = {
     "mode_view": "Apenas visualizar",
     "mode_control": "Visualizar e controlar",
     "mining": "A minerar",
+    "stalled": "Sem progresso",
     "paused": "Em pausa",
     "pause": "Pausar",
     "resume": "Retomar",
@@ -1846,6 +1856,7 @@ const I18N = {
     "mode_view": "Alleen bekijken",
     "mode_control": "Bekijken & besturen",
     "mining": "Actief",
+    "stalled": "Geen voortgang",
     "paused": "Gepauzeerd",
     "pause": "Pauzeren",
     "resume": "Hervatten",
@@ -1947,6 +1958,7 @@ const I18N = {
     "mode_view": "Kun visning",
     "mode_control": "Visning & styring",
     "mining": "Aktiv",
+    "stalled": "Ingen fremgang",
     "paused": "Pause",
     "pause": "Pause",
     "resume": "Genoptag",
@@ -2048,6 +2060,7 @@ const I18N = {
     "mode_view": "Kun visning",
     "mode_control": "Visning & styring",
     "mining": "Aktiv",
+    "stalled": "Ingen fremgang",
     "paused": "Pause",
     "pause": "Pause",
     "resume": "Gjenoppta",
@@ -2149,6 +2162,7 @@ const I18N = {
     "mode_view": "Tylko podgląd",
     "mode_control": "Podgląd i sterowanie",
     "mining": "Zdobywanie",
+    "stalled": "Brak postępu",
     "paused": "Wstrzymano",
     "pause": "Wstrzymaj",
     "resume": "Wznów",
@@ -2250,6 +2264,7 @@ const I18N = {
     "mode_view": "Pouze zobrazení",
     "mode_control": "Zobrazení a ovládání",
     "mining": "Těžba",
+    "stalled": "Bez postupu",
     "paused": "Pozastaveno",
     "pause": "Pozastavit",
     "resume": "Pokračovat",
@@ -2351,6 +2366,7 @@ const I18N = {
     "mode_view": "Doar vizualizare",
     "mode_control": "Vizualizare și control",
     "mining": "Activ",
+    "stalled": "Fără progres",
     "paused": "Pauzat",
     "pause": "Pauză",
     "resume": "Reluare",
@@ -2452,6 +2468,7 @@ const I18N = {
     "mode_view": "Csak megtekintés",
     "mode_control": "Megtekintés és vezérlés",
     "mining": "Bányászás",
+    "stalled": "Nincs haladás",
     "paused": "Szüneteltetve",
     "pause": "Szünet",
     "resume": "Folytatás",
@@ -2553,6 +2570,7 @@ const I18N = {
     "mode_view": "Yalnızca görüntüleme",
     "mode_control": "Görüntüleme ve kontrol",
     "mining": "Kazılıyor",
+    "stalled": "İlerleme yok",
     "paused": "Duraklatıldı",
     "pause": "Duraklat",
     "resume": "Devam ettir",
@@ -2654,6 +2672,7 @@ const I18N = {
     "mode_view": "Только просмотр",
     "mode_control": "Просмотр и управление",
     "mining": "Добыча",
+    "stalled": "Нет прогресса",
     "paused": "На паузе",
     "pause": "Пауза",
     "resume": "Возобновить",
@@ -2755,6 +2774,7 @@ const I18N = {
     "mode_view": "Лише перегляд",
     "mode_control": "Перегляд і керування",
     "mining": "Видобуток",
+    "stalled": "Немає прогресу",
     "paused": "На паузі",
     "pause": "Пауза",
     "resume": "Відновити",
@@ -2856,6 +2876,7 @@ const I18N = {
     "mode_view": "عرض فقط",
     "mode_control": "عرض وتحكم",
     "mining": "قيد التعدين",
+    "stalled": "لا يوجد تقدم",
     "paused": "متوقف مؤقتًا",
     "pause": "إيقاف مؤقت",
     "resume": "استئناف",
@@ -2957,6 +2978,7 @@ const I18N = {
     "mode_view": "閲覧のみ",
     "mode_control": "閲覧と操作",
     "mining": "マイニング中",
+    "stalled": "進行なし",
     "paused": "一時停止中",
     "pause": "一時停止",
     "resume": "再開",
@@ -3058,6 +3080,7 @@ const I18N = {
     "mode_view": "仅查看",
     "mode_control": "查看并控制",
     "mining": "正在挖取",
+    "stalled": "无进度",
     "paused": "已暂停",
     "pause": "暂停",
     "resume": "继续",
@@ -3159,6 +3182,7 @@ const I18N = {
     "mode_view": "僅檢視",
     "mode_control": "檢視並控制",
     "mining": "挖取中",
+    "stalled": "無進度",
     "paused": "已暫停",
     "pause": "暫停",
     "resume": "繼續",
@@ -3260,6 +3284,7 @@ const I18N = {
     "mode_view": "Hanya lihat",
     "mode_control": "Lihat dan kendalikan",
     "mining": "Menambang",
+    "stalled": "Tidak ada progres",
     "paused": "Dijeda",
     "pause": "Jeda",
     "resume": "Lanjutkan",
@@ -3969,7 +3994,7 @@ async function refresh() {
     const dot = document.getElementById("status-dot");
     const text = document.getElementById("status-text");
     dot.className = "dot " + s.status;
-    text.textContent = s.status === "paused" ? t("paused") : (s.status === "mining" ? t("mining") : t("idle"));
+    text.textContent = s.status === "paused" ? t("paused") : (s.status === "stalled" ? t("stalled") : (s.status === "mining" ? t("mining") : t("idle")));
     lastPaused = s.paused;
     const toggleBtn = document.getElementById("toggle-btn");
     toggleBtn.textContent = s.paused ? t("resume") : t("pause");
@@ -3979,7 +4004,7 @@ async function refresh() {
     // so the browser actually refetches the icon instead of reusing the page-load one
     document.getElementById("favicon").href = base + "/favicon.ico?s=" + s.status;
     document.getElementById("app-logo").src = base + "/favicon.ico?s=" + s.status;
-    const statusColor = { mining: "#2ecc71", paused: "#e0a800", idle: "#e05252" }[s.status] || "#9147ff";
+    const statusColor = { mining: "#2ecc71", paused: "#e0a800", stalled: "#ff7a1a", idle: "#e05252" }[s.status] || "#9147ff";
     document.getElementById("theme-color-meta").content = statusColor;
 
     document.getElementById("resume-at-info").textContent = s.resume_at

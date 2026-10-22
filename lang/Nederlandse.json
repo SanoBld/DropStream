@@ -53,7 +53,8 @@
             "paused": "Gepauzeerd",
             "paused_until": "Gepauzeerd tot {time}",
             "scheduled": "Buiten geplande uren",
-            "auto_restart": "Beëindigd - herstart over {minutes} min"
+            "auto_restart": "Beëindigd - herstart over {minutes} min",
+            "stalled": "Kijken, maar Twitch telt geen voortgang"
         },
         "tabs": {
             "main": "Algemeen",

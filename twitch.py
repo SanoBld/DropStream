@@ -1201,6 +1201,9 @@ class Twitch:
         # real progress: reset the warnings, and confirm once (again after a stall)
         if getattr(self, "_stall_warned", False):
             self.gui.tray.change_icon("active")  # back to green: progress resumed
+            ch = self.watching_channel.get_with_default(None)
+            if ch is not None:
+                self.gui.status.update(_("status", "watching").format(channel=ch.name))
         self._stall_warned = False
         self._est_warned = False
         if not getattr(self, "_progress_confirmed", False):
@@ -1211,6 +1214,7 @@ class Twitch:
         if getattr(self, "_stall_channel", None) is not channel:
             self._stall_channel = channel
             self._stall_ref = time()
+            self._stall_warned = False  # new channel: allow a new warning
         if getattr(self, "_stall_warned", False):
             return
         ref = max(self._last_real_progress, self._stall_ref)
@@ -1219,6 +1223,7 @@ class Twitch:
             self._stall_warned = True
             self._progress_confirmed = False
             self.gui.tray.change_icon("maint")  # orange: Twitch doesn't credit the watch time
+            self.gui.status.update(_("gui", "status", "stalled"))  # status bar too
             self.print(
                 _("error", "progress_stalled").format(minutes=minutes, channel=channel.name)
             )
@@ -1244,7 +1249,8 @@ class Twitch:
 
     def watch(self, channel: Channel, *, update_status: bool = True):
         self._last_real_progress = time()  # new channel: restart the stall timer
-        self.gui.tray.change_icon("active")
+        # stay orange while Twitch still does not credit the watch time
+        self.gui.tray.change_icon("maint" if getattr(self, "_stall_warned", False) else "active")
         self.gui.channels.set_watching(channel)
         self.watching_channel.set(channel)
         if update_status:
