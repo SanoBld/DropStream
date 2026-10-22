@@ -161,6 +161,7 @@ class Stream:
 
 class Channel:
     __slots__ = (
+        "_seg_dbg", "_seen_segments",
         "_twitch", "_gui_channels", "id", "_login", "_display_name", "_spade_url",
         "_stream", "_pending_stream_up", "acl_based"
     )
