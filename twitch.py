@@ -823,8 +823,12 @@ class Twitch:
                     )
                 # pass 1: normal rules. pass 2: if nothing was found in PRIORITY_ONLY mode,
                 # temporarily allow non-priority games (still respects the exclude list)
+                # attempts: normal rules -> any game (priority-only mode only)
+                # the "unlinked campaigns" setting is always respected as is
                 for use_fallback in (False, True):
-                    if use_fallback and (self.wanted_games or not restrict_to_priority):
+                    if self.wanted_games:
+                        break
+                    if use_fallback and not restrict_to_priority:
                         break
                     for campaign in sorted_campaigns:
                         game: Game = campaign.game
@@ -838,8 +842,20 @@ class Twitch:
                         ):
                             # non-excluded games with no priority are placed last
                             self.wanted_games.append(game)
-                    if use_fallback and self.wanted_games:
+                    if self.wanted_games and use_fallback:
                         logger.info("No priority game available, using fallback games")
+                # debug: explain once why every campaign was skipped
+                if not self.wanted_games and not getattr(self, "_diag_done", False):
+                    self._diag_done = True
+                    self.print(f"DEBUG: {len(sorted_campaigns)} campaigns in inventory")
+                    for c in sorted_campaigns[:12]:
+                        self.print(
+                            f"DEBUG {c.game.name}: linked={c.linked}, eligible={c.eligible}, "
+                            f"valid={c._valid}, excluded={c.game.name in exclude}, "
+                            f"can_earn={c.can_earn_within(next_hour)}"
+                        )
+                elif self.wanted_games:
+                    self._diag_done = False
                 full_cleanup = True
                 self.restart_watching()
                 self.change_state(State.CHANNELS_CLEANUP)
