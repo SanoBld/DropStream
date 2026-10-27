@@ -821,18 +821,25 @@ class Twitch:
                             priority.index(c.game.name) if c.game.name in priority else MAX_INT
                         )
                     )
-                for campaign in sorted_campaigns:
-                    game: Game = campaign.game
-                    if (
-                        game not in self.wanted_games  # isn't already there
-                        # and isn't excluded by list or priority mode
-                        and game.name not in exclude
-                        and (not restrict_to_priority or game.name in priority)
-                        # and can be progressed within the next hour
-                        and campaign.can_earn_within(next_hour)
-                    ):
-                        # non-excluded games with no priority are placed last, below priority ones
-                        self.wanted_games.append(game)
+                # pass 1: normal rules. pass 2: if nothing was found in PRIORITY_ONLY mode,
+                # temporarily allow non-priority games (still respects the exclude list)
+                for use_fallback in (False, True):
+                    if use_fallback and (self.wanted_games or not restrict_to_priority):
+                        break
+                    for campaign in sorted_campaigns:
+                        game: Game = campaign.game
+                        if (
+                            game not in self.wanted_games  # isn't already there
+                            # and isn't excluded by list or priority mode
+                            and game.name not in exclude
+                            and (use_fallback or not restrict_to_priority or game.name in priority)
+                            # and can be progressed within the next hour
+                            and campaign.can_earn_within(next_hour)
+                        ):
+                            # non-excluded games with no priority are placed last
+                            self.wanted_games.append(game)
+                    if use_fallback and self.wanted_games:
+                        logger.info("No priority game available, using fallback games")
                 full_cleanup = True
                 self.restart_watching()
                 self.change_state(State.CHANNELS_CLEANUP)
